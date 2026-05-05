@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/load_calculator_page.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/rate_planner_page.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/costs_page.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/export_page.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/profile_page.dart';
 import 'package:gathering_app/Service/Controller/bottom_nav_controller.dart';
 import 'package:provider/provider.dart';
 
@@ -18,9 +21,9 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
   final List<Widget> _pages = [
     const LoadCalculatorPage(),
     const RatePlannerPage(),
-    const Center(child: Text('Costs Page', style: TextStyle(color: Colors.white))),
-    const Center(child: Text('Export Page', style: TextStyle(color: Colors.white))),
-    const Center(child: Text('Profile Page', style: TextStyle(color: Colors.white))),
+    const CostsPage(),
+    const ExportPage(),
+    const ProfilePage(),
   ];
 
   @override
