@@ -1,0 +1,45 @@
+Chat Message Module: Frontend Integration Guide
+This guide provides the necessary information for a frontend developer to integrate the Chat Message module into the application.
+1. Authentication
+All chat endpoints and socket connections require authentication. Ensure the Authorization header includes a valid Bearer token.
+2. REST API Endpoints
+Get Chat Messages
+Retrieve messages for a specific chat room with pagination.
+Endpoint: GET /api/v1/chatmessages/:roomId/messages
+Query Params:
+page: Page number (default: 1)
+limit: Messages per page (default: 50)
+before: ISO date string to fetch messages older than this date (for infinite scroll)
+Response: IPaginatedResponse<IChatMessageResponseDTO>
+Send Message
+Endpoint: POST /api/v1/chat-messages/:roomId/messages
+Body:
+Like/Unlike Message
+Toggle the "like" status for a message.
+Endpoint: POST /api/v1/chatmessages/messages/:messageId/like
+Delete Message
+Endpoint: DELETE /api/v1/chatmessages/messages/:messageId
+Get Participants
+Get the list of people in the chat room.
+Endpoint: GET /api/v1/chatmessages/:roomId/participants
+3. Real-time Integration (Socket.io)
+The chat module uses Socket.io for real-time updates.
+Room Management
+Upon entering a chat room, the client must join the specific socket room.
+Join Room: socket.emit('join-room', roomId)
+Leave Room: socket.emit('leave-room', roomId)
+Listening for Events
+Event	Payload	Description
+new-message	
+ 
+IChatMessageResponseDTO
+	A new message was posted in the room.
+message-liked	{ messageId, userId }	A user liked or unliked a message.
+message-deleted	{ messageId }	A message was deleted by its author.
+4. Key Data Interfaces (TypeScript)
+typescriptexport interface IChatMessageResponseDTO {  id: string;  userId: string;  userProfile: {    name: string;    avatar?: string;  };  message: string;  messageType: 'text' | 'emoji' | 'system';  formattedTime: string;  likes: number;  hasLiked: boolean;  createdAt: Date;}export interface IPaginatedResponse<T> {  success: boolean;  meta: {    page: number;    limit: number;    total: number;    totalPages: number;  };  data: T[];}
+5. Implementation Tips
+Infinite Scroll: Use the before query parameter with the createdAt timestamp of the oldest message in your current list to fetch previous messages.
+Local Echo: For a better UX, add the message to the UI state immediately with a "sending" status, then update it once the API response or socket event arrives.
+Room Isolation: Ensure you call leave-room when the component unmounts to avoid receiving events from rooms the user is no longer viewing.
+json{  "message": "Hello World!",  "messageType": "text" // or "emoji"}

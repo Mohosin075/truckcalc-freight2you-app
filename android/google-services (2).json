@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "844611876388",
+    "project_id": "gathering-525c5",
+    "storage_bucket": "gathering-525c5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:844611876388:android:48b78e61599de31f7f4ab1",
+        "android_client_info": {
+          "package_name": "com.example.gathering_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "844611876388-uoau0hh36gedb5de9f18fuh0kiq49lbt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.gathering_app",
+            "certificate_hash": "1ef31cac11a21253ee880e82066322ad89d218d8"
+          }
+        },
+        {
+          "client_id": "844611876388-a16bec6gr9cc6u5iu25ntlau5eprd7co.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB75s0uQdUza3VBhVfvrhFbuH2Qd7Zs0s0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "844611876388-a16bec6gr9cc6u5iu25ntlau5eprd7co.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "844611876388-iupnq1g5meql74s4n5jjejj6pihabftp.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.gatheringApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

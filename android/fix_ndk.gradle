@@ -1,0 +1,16 @@
+subprojects {
+    println "Applying NDK fix to project: ${project.name}"
+    plugins.withId("com.android.library") {
+        android {
+            ndkVersion "26.1.10909125"
+            defaultConfig {
+                externalNativeBuild {
+                    cmake {
+                        arguments "-DANDROID_STL=c++_shared"
+                        cppFlags "-std=c++17"
+                    }
+                }
+            }
+        }
+    }
+}
