@@ -20,7 +20,7 @@ class LoadCalculatorPage extends StatelessWidget {
                   children: [
                     Text(
                       'Load Calculator',
-                      style: TextStyle(color: Colors.white, fontSize: 20.sp, fontWeight: FontWeight.bold),
+                      style: TextStyle(color: Colors.white, fontSize: 22.sp, fontWeight: FontWeight.bold),
                     ),
                     ElevatedButton(
                       onPressed: () {},
@@ -28,8 +28,9 @@ class LoadCalculatorPage extends StatelessWidget {
                         backgroundColor: const Color(0xFF00D193),
                         minimumSize: Size(80.w, 36.h),
                         padding: EdgeInsets.zero,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
                       ),
-                      child: const Text('Save'),
+                      child: const Text('Save', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
@@ -56,16 +57,17 @@ class LoadCalculatorPage extends StatelessWidget {
 
   Widget _buildSummaryHeader() {
     return Container(
+      width: double.infinity,
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: const Color(0xFF021C1C),
         borderRadius: BorderRadius.circular(20.r),
         border: Border.all(color: Colors.white.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('LOAD CALCULATOR', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          const Text('LOAD CALCULATOR', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
           SizedBox(height: 16.h),
           Row(
             children: [
@@ -83,25 +85,17 @@ class LoadCalculatorPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(color: Colors.white70, fontSize: 12.sp)),
-        Text(value, style: TextStyle(color: Colors.white, fontSize: 24.sp, fontWeight: FontWeight.bold)),
+        Text(label, style: TextStyle(color: Colors.white70, fontSize: 11.sp)),
+        Text(value, style: TextStyle(color: Colors.white, fontSize: 22.sp, fontWeight: FontWeight.bold)),
       ],
     );
   }
 
   Widget _buildRevenueInputsCard() {
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
-      ),
+    return _buildSectionCard(
+      title: 'Revenue Inputs',
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Revenue Inputs', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-          SizedBox(height: 16.h),
           Row(
             children: [
               Expanded(child: _buildInputField('Base Rate Per Mile', '0.00')),
@@ -118,25 +112,17 @@ class LoadCalculatorPage extends StatelessWidget {
             ],
           ),
           SizedBox(height: 16.h),
-          _buildDarkSummaryBox(r'Total FSC $', r'$0.00'),
+          _buildDarkResultBox(r'Total FSC $', r'$0.00'),
         ],
       ),
     );
   }
 
   Widget _buildDeadheadBonusCard() {
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
-      ),
+    return _buildSectionCard(
+      title: 'Deadhead & Bonus',
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Deadhead & Bonus', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-          SizedBox(height: 16.h),
           Row(
             children: [
               Expanded(child: _buildInputField('DH Miles', '0')),
@@ -145,7 +131,7 @@ class LoadCalculatorPage extends StatelessWidget {
             ],
           ),
           SizedBox(height: 16.h),
-          _buildDarkSummaryBox(r'Total DH $', r'$0.00'),
+          _buildDarkResultBox(r'Total DH $', r'$0.00'),
           SizedBox(height: 16.h),
           _buildInputField('Bonus/Accessorial Pay', '0.00'),
         ],
@@ -154,45 +140,29 @@ class LoadCalculatorPage extends StatelessWidget {
   }
 
   Widget _buildSummaryTableCard() {
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
-      ),
+    return _buildSectionCard(
+      title: 'Summary',
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Summary', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-          SizedBox(height: 16.h),
           Row(
             children: [
-              Expanded(child: _buildGraySummaryBox('Total Revenue', r'$0.00')),
+              Expanded(child: _buildDarkResultBox('Total Revenue', r'$0.00', small: true)),
               SizedBox(width: 16.w),
-              Expanded(child: _buildGraySummaryBox('Total Miles', '0')),
+              Expanded(child: _buildDarkResultBox('Total Miles', '0', small: true)),
             ],
           ),
           SizedBox(height: 12.h),
-          _buildGraySummaryBox('Compensation Per Mile', r'$0.00'),
+          _buildDarkResultBox('Compensation Per Mile', r'$0.00'),
         ],
       ),
     );
   }
 
   Widget _buildDriverProfitCard() {
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
-      ),
+    return _buildSectionCard(
+      title: 'DRIVER PROFIT',
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('DRIVER PROFIT', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-          SizedBox(height: 16.h),
           Row(
             children: [
               Expanded(child: _buildLabelValue('Profit Per Mile', r'$0.00')),
@@ -212,18 +182,10 @@ class LoadCalculatorPage extends StatelessWidget {
   }
 
   Widget _buildEarningsSplitCard() {
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
-      ),
+    return _buildSectionCard(
+      title: 'Earnings Split',
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Earnings Split', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-          SizedBox(height: 16.h),
           _buildInputField('Driver Percentage (%)', '100'),
           SizedBox(height: 16.h),
           _buildSplitItem('DRIVER', '100.0%', r'$0.00'),
@@ -234,12 +196,33 @@ class LoadCalculatorPage extends StatelessWidget {
     );
   }
 
+  Widget _buildSectionCard({required String title, required Widget child}) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.03),
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14.sp)),
+          SizedBox(height: 16.h),
+          child,
+        ],
+      ),
+    );
+  }
+
   Widget _buildSplitItem(String label, String percent, String value, {Color color = const Color(0xFF00D193)}) {
     return Container(
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: const Color(0xFF081414),
         borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -261,42 +244,27 @@ class LoadCalculatorPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(color: Colors.white70, fontSize: 12.sp)),
+        Text(label, style: TextStyle(color: Colors.white70, fontSize: 11.sp)),
         Text(value, style: TextStyle(color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.bold)),
       ],
     );
   }
 
-  Widget _buildDarkSummaryBox(String label, String value) {
+  Widget _buildDarkResultBox(String label, String value, {bool small = false}) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.3),
+        color: const Color(0xFF081414),
         borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: TextStyle(color: Colors.white70, fontSize: 12.sp)),
-          Text(value, style: TextStyle(color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.bold)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildGraySummaryBox(String label, String value) {
-    return Container(
-      padding: EdgeInsets.all(12.w),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(12.r),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: TextStyle(color: Colors.white70, fontSize: 10.sp)),
-          Text(value, style: TextStyle(color: Colors.white, fontSize: 16.sp, fontWeight: FontWeight.bold)),
+          Text(label, style: TextStyle(color: Colors.white70, fontSize: 10.sp, fontWeight: FontWeight.bold)),
+          SizedBox(height: 4.h),
+          Text(value, style: TextStyle(color: Colors.white, fontSize: small ? 16.sp : 18.sp, fontWeight: FontWeight.bold)),
         ],
       ),
     );
@@ -306,19 +274,19 @@ class LoadCalculatorPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.w500)),
+        Text(label, style: TextStyle(color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.w600)),
         SizedBox(height: 8.h),
         TextField(
-          style: const TextStyle(color: Colors.black),
+          style: TextStyle(color: Colors.black, fontSize: 15.sp, fontWeight: FontWeight.w500),
           decoration: InputDecoration(
             fillColor: Colors.white,
             filled: true,
             hintText: hint,
-            hintStyle: const TextStyle(color: Colors.grey),
-            contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r), borderSide: BorderSide.none),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r), borderSide: BorderSide.none),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r), borderSide: const BorderSide(color: Color(0xFF00D193))),
+            hintStyle: TextStyle(color: Colors.grey.shade400),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.r), borderSide: BorderSide.none),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10.r), borderSide: BorderSide.none),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10.r), borderSide: const BorderSide(color: Color(0xFF00D193))),
           ),
         ),
       ],

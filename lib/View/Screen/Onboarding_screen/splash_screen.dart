@@ -30,10 +30,11 @@ class _SplashScreenState extends State<SplashScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Icons.local_shipping,
-                size: 80.w,
-                color: Colors.white,
+              Image.asset(
+                'assets/images/logo-cal.png',
+                width: 120.w,
+                height: 80.h,
+                fit: BoxFit.contain,
               ),
               SizedBox(height: 10.h),
               Text(

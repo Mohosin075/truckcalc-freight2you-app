@@ -20,7 +20,7 @@ class CostsPage extends StatelessWidget {
                   children: [
                     Text(
                       'CPM Calculator',
-                      style: TextStyle(color: Colors.white, fontSize: 20.sp, fontWeight: FontWeight.bold),
+                      style: TextStyle(color: Colors.white, fontSize: 22.sp, fontWeight: FontWeight.bold),
                     ),
                     ElevatedButton(
                       onPressed: () {},
@@ -28,8 +28,9 @@ class CostsPage extends StatelessWidget {
                         backgroundColor: const Color(0xFF00D193),
                         minimumSize: Size(80.w, 36.h),
                         padding: EdgeInsets.zero,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
                       ),
-                      child: const Text('Save'),
+                      child: const Text('Save', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
@@ -57,16 +58,17 @@ class CostsPage extends StatelessWidget {
 
   Widget _buildTotalOperatingCostHeader() {
     return Container(
+      width: double.infinity,
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF004D40).withOpacity(0.3),
+        color: const Color(0xFF021C1C),
         borderRadius: BorderRadius.circular(20.r),
         border: Border.all(color: Colors.white.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('TOTAL OPERATING COST', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          const Text('TOTAL OPERATING COST', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
           SizedBox(height: 16.h),
           Row(
             children: [
@@ -84,8 +86,8 @@ class CostsPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(color: Colors.white70, fontSize: 12.sp)),
-        Text(value, style: TextStyle(color: Colors.white, fontSize: 24.sp, fontWeight: FontWeight.bold)),
+        Text(label, style: TextStyle(color: Colors.white70, fontSize: 11.sp)),
+        Text(value, style: TextStyle(color: Colors.white, fontSize: 22.sp, fontWeight: FontWeight.bold)),
       ],
     );
   }
@@ -93,12 +95,16 @@ class CostsPage extends StatelessWidget {
   Widget _buildSectionHeader(String title) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [Color(0xFFE91E63), Color(0xFFC2185B)]),
+        gradient: const LinearGradient(
+          colors: [Color(0xFFE91E63), Color(0xFFD81B60)],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
         borderRadius: BorderRadius.only(topLeft: Radius.circular(12.r), topRight: Radius.circular(12.r)),
       ),
-      child: Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+      child: Text(title, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14.sp)),
     );
   }
 
@@ -106,8 +112,9 @@ class CostsPage extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.4),
+        color: Colors.white.withOpacity(0.03),
         borderRadius: BorderRadius.only(bottomLeft: Radius.circular(12.r), bottomRight: Radius.circular(12.r)),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
       ),
       child: Column(
         children: [
@@ -119,7 +126,7 @@ class CostsPage extends StatelessWidget {
           _buildInputField('Weekly Permits/Subscriptions', '0.00'),
           _buildInputField('Other Weekly Costs', '0.00'),
           SizedBox(height: 16.h),
-          _buildResultBox('TOTAL WEEKLY FIXED COSTS', r'$0.00'),
+          _buildDarkResultBox('TOTAL WEEKLY FIXED COSTS', r'$0.00'),
         ],
       ),
     );
@@ -129,8 +136,9 @@ class CostsPage extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.4),
+        color: Colors.white.withOpacity(0.03),
         borderRadius: BorderRadius.only(bottomLeft: Radius.circular(12.r), bottomRight: Radius.circular(12.r)),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
       ),
       child: Column(
         children: [
@@ -142,7 +150,7 @@ class CostsPage extends StatelessWidget {
               Expanded(child: _buildInputField('Avg Fuel Price (\$ /gal)', '3.50')),
             ],
           ),
-          _buildResultBox('WEEKLY FUEL COST', r'$0.00'),
+          _buildDarkResultBox('WEEKLY FUEL COST', r'$0.00'),
           SizedBox(height: 16.h),
           Row(
             children: [
@@ -151,15 +159,15 @@ class CostsPage extends StatelessWidget {
               Expanded(child: _buildInputField('Cost Per Oil Change', '300')),
             ],
           ),
-          _buildResultBox('WEEKLY OIL CHANGE COST', r'$0.00'),
+          _buildDarkResultBox('WEEKLY OIL CHANGE COST', r'$0.00'),
           SizedBox(height: 16.h),
           _buildInputField('Tire Cost Per Year', '5000'),
-          _buildResultBox('WEEKLY TIRE COST', r'$0.00'),
+          _buildDarkResultBox('WEEKLY TIRE COST', r'$0.00'),
           SizedBox(height: 16.h),
           _buildInputField('Maintenance Cost Per Year', '8000'),
-          _buildResultBox('WEEKLY MAINTENANCE COST', r'$0.00'),
+          _buildDarkResultBox('WEEKLY MAINTENANCE COST', r'$0.00'),
           SizedBox(height: 16.h),
-          _buildResultBox('TOTAL WEEKLY VARIABLE COSTS', r'$0.00', isLarge: true),
+          _buildDarkResultBox('TOTAL WEEKLY VARIABLE COSTS', r'$0.00', isLargeValue: true),
         ],
       ),
     );
@@ -169,24 +177,72 @@ class CostsPage extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.4),
+        color: Colors.white.withOpacity(0.03),
         borderRadius: BorderRadius.only(bottomLeft: Radius.circular(12.r), bottomRight: Radius.circular(12.r)),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
       ),
       child: Column(
         children: [
           Row(
             children: [
-              Expanded(child: _buildGraySummaryBox('Total Fixed', r'$0.00')),
+              Expanded(child: _buildResultSubBox('Total Fixed', r'$0.00')),
               SizedBox(width: 16.w),
-              Expanded(child: _buildGraySummaryBox('Total Variable', r'$0.00')),
+              Expanded(child: _buildResultSubBox('Total Variable', r'$0.00')),
             ],
           ),
           SizedBox(height: 12.h),
-          _buildGraySummaryBox('TOTAL WEEKLY OPERATING COST', r'$0.00', isLarge: true),
+          _buildDarkResultBox('TOTAL WEEKLY OPERATING COST', r'$0.00', isLargeValue: true),
           SizedBox(height: 12.h),
-          _buildGraySummaryBox('Miles Driven Per Week', '0 miles'),
+          _buildDarkResultBox('Miles Driven Per Week', '0 miles', isMiles: true),
           SizedBox(height: 12.h),
-          _buildGraySummaryBox('TRUE COST PER MILE', r'$0.00', isLarge: true),
+          _buildDarkResultBox('TRUE COST PER MILE', r'$0.00', isLargeValue: true),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildResultSubBox(String label, String value) {
+    return Container(
+      padding: EdgeInsets.all(12.w),
+      decoration: BoxDecoration(
+        color: const Color(0xFF081414),
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: TextStyle(color: Colors.white70, fontSize: 10.sp, fontWeight: FontWeight.bold)),
+          SizedBox(height: 4.h),
+          Text(value, style: TextStyle(color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDarkResultBox(String label, String value, {bool isLargeValue = false, bool isMiles = false}) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(14.w),
+      margin: EdgeInsets.only(top: 8.h),
+      decoration: BoxDecoration(
+        color: const Color(0xFF081414),
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: TextStyle(color: Colors.white70, fontSize: 10.sp, fontWeight: FontWeight.bold)),
+          SizedBox(height: 4.h),
+          Text(
+            value,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: isLargeValue ? 24.sp : (isMiles ? 18.sp : 20.sp),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
     );
@@ -201,54 +257,17 @@ class CostsPage extends StatelessWidget {
         borderRadius: BorderRadius.circular(20.r),
       ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.lightbulb_outline, color: Colors.orange),
+          const Icon(Icons.lightbulb_outline, color: Colors.orange, size: 20),
           SizedBox(width: 10.w),
           Expanded(
             child: Text(
               'TO CONVERT MONTHLY PAYMENTS TO WEEKLY, DIVIDE BY 4.33',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.black, fontSize: 12.sp, fontWeight: FontWeight.bold),
+              style: TextStyle(color: Colors.black, fontSize: 12.sp, fontWeight: FontWeight.w900),
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildResultBox(String label, String value, {bool isLarge = false}) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(12.w),
-      margin: EdgeInsets.symmetric(vertical: 4.h),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A237E).withOpacity(0.2),
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: TextStyle(color: Colors.white70, fontSize: 10.sp, fontWeight: FontWeight.bold)),
-          Text(value, style: TextStyle(color: Colors.white, fontSize: isLarge ? 20.sp : 18.sp, fontWeight: FontWeight.bold)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildGraySummaryBox(String label, String value, {bool isLarge = false}) {
-    return Container(
-      padding: EdgeInsets.all(12.w),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: TextStyle(color: Colors.white70, fontSize: 10.sp)),
-          Text(value, style: TextStyle(color: Colors.white, fontSize: isLarge ? 20.sp : 16.sp, fontWeight: FontWeight.bold)),
         ],
       ),
     );
@@ -259,18 +278,20 @@ class CostsPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: EdgeInsets.only(top: 12.h, bottom: 8.h),
-          child: Text(label, style: TextStyle(color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.w500)),
+          padding: EdgeInsets.only(top: 14.h, bottom: 8.h),
+          child: Text(label, style: TextStyle(color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.w600)),
         ),
         TextField(
-          style: const TextStyle(color: Colors.black),
+          style: TextStyle(color: Colors.black, fontSize: 15.sp, fontWeight: FontWeight.w500),
           decoration: InputDecoration(
             fillColor: Colors.white,
             filled: true,
             hintText: hint,
-            hintStyle: const TextStyle(color: Colors.grey),
+            hintStyle: TextStyle(color: Colors.grey.shade400),
             contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide.none),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.r), borderSide: BorderSide.none),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10.r), borderSide: BorderSide.none),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10.r), borderSide: const BorderSide(color: Color(0xFF00D193), width: 1.5)),
           ),
         ),
       ],

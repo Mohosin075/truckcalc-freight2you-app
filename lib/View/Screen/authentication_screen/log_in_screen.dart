@@ -28,7 +28,12 @@ class _LogInScreenState extends State<LogInScreen> {
           child: Column(
             children: [
               SizedBox(height: 100.h),
-              Icon(Icons.local_shipping, size: 60.w, color: Colors.white),
+              Image.asset(
+                'assets/images/logo-cal.png',
+                width: 100.w,
+                height: 60.h,
+                fit: BoxFit.contain,
+              ),
               SizedBox(height: 10.h),
               Text(
                 'truckcalc',

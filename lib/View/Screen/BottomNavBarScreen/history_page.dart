@@ -23,12 +23,16 @@ class HistoryPage extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
                 child: TextField(
+                  style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.search, color: Colors.grey),
                     hintText: 'Search calculations...',
+                    hintStyle: const TextStyle(color: Colors.white30),
                     fillColor: Colors.white.withOpacity(0.05),
                     filled: true,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: const BorderSide(color: Colors.white10)),
+                    contentPadding: EdgeInsets.symmetric(vertical: 12.h),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide.none),
+                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide.none),
                   ),
                 ),
               ),
@@ -51,6 +55,11 @@ class HistoryPage extends StatelessWidget {
                       '= Revenue: \$543209888396296.00, Profit: \$543209888374074.00',
                       '4/24/2026, 2:18',
                     ),
+                    _buildHistoryCard(
+                      'Load: 22222222mi + 0DH @ \$22222222/mi',
+                      '= Revenue: \$543209883456790.00, Profit: \$543209883456790.00',
+                      '4/24/2026, 2:17',
+                    ),
                   ],
                 ),
               ),
@@ -66,9 +75,9 @@ class HistoryPage extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 16.h),
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: const Color(0xFF081414).withOpacity(0.8),
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -77,18 +86,25 @@ class HistoryPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(header, style: TextStyle(color: Colors.white70, fontSize: 12.sp)),
-                SizedBox(height: 8.h),
-                Text(result, style: TextStyle(color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.bold)),
-                SizedBox(height: 4.h),
-                Text(time, style: TextStyle(color: Colors.white30, fontSize: 10.sp)),
+                Text(header, style: TextStyle(color: Colors.white70, fontSize: 11.sp)),
+                SizedBox(height: 10.h),
+                Text(
+                  result,
+                  style: TextStyle(color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 6.h),
+                Text(time, style: TextStyle(color: Colors.white24, fontSize: 10.sp)),
               ],
             ),
           ),
+          SizedBox(width: 10.w),
           Container(
             padding: EdgeInsets.all(8.w),
-            decoration: BoxDecoration(color: Colors.redAccent.withOpacity(0.2), borderRadius: BorderRadius.circular(8.r)),
-            child: const Icon(Icons.close, color: Colors.redAccent, size: 20),
+            decoration: BoxDecoration(
+              color: Colors.redAccent.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(8.r),
+            ),
+            child: const Icon(Icons.close, color: Colors.redAccent, size: 18),
           ),
         ],
       ),

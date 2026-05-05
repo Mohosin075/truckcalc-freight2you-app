@@ -11,7 +11,7 @@ class ExportPage extends StatelessWidget {
       body: AppBackground(
         child: SafeArea(
           child: SingleChildScrollView(
-            padding: EdgeInsets.all(16.w),
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -22,15 +22,15 @@ class ExportPage extends StatelessWidget {
                 SizedBox(height: 20.h),
                 Container(
                   width: double.infinity,
-                  padding: EdgeInsets.all(16.w),
+                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF004D40).withOpacity(0.3),
+                    color: const Color(0xFF021C1C),
                     borderRadius: BorderRadius.circular(16.r),
                     border: Border.all(color: const Color(0xFF00D193).withOpacity(0.2)),
                   ),
-                  child: const Text(
+                  child: Text(
                     '5 calculations ready to export',
-                    style: TextStyle(color: Color(0xFF00D193), fontWeight: FontWeight.bold),
+                    style: TextStyle(color: const Color(0xFF00D193), fontWeight: FontWeight.bold, fontSize: 13.sp),
                   ),
                 ),
                 SizedBox(height: 20.h),
@@ -71,9 +71,9 @@ class ExportPage extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: const Color(0xFF081414).withOpacity(0.8),
         borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,33 +82,47 @@ class ExportPage extends StatelessWidget {
             children: [
               Container(
                 padding: EdgeInsets.all(12.w),
-                decoration: BoxDecoration(color: iconBg.withOpacity(0.3), borderRadius: BorderRadius.circular(12.r)),
-                child: Icon(icon, color: Colors.blueAccent),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1A237E).withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Icon(icon, color: Colors.blueAccent, size: 24),
               ),
               SizedBox(width: 16.w),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                  Text(subtitle, style: TextStyle(color: Colors.white70, fontSize: 12.sp)),
+                  Text(title, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15.sp)),
+                  Text(subtitle, style: TextStyle(color: Colors.white60, fontSize: 11.sp)),
                 ],
               ),
             ],
           ),
           SizedBox(height: 16.h),
-          Text(desc, style: TextStyle(color: Colors.white70, fontSize: 13.sp)),
+          Text(desc, style: TextStyle(color: Colors.white70, fontSize: 12.sp, height: 1.4)),
           SizedBox(height: 20.h),
           Container(
             width: double.infinity,
             height: 48.h,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12.r),
-              gradient: const LinearGradient(colors: [Color(0xFFFBC02D), Color(0xFF00D193)]),
+              gradient: const LinearGradient(
+                colors: [Color(0xFFFBC02D), Color(0xFF00D193)],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
             ),
             child: ElevatedButton(
               onPressed: () {},
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent),
-              child: Text(btnText),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+              ),
+              child: Text(
+                btnText,
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14.sp),
+              ),
             ),
           ),
         ],
@@ -121,9 +135,9 @@ class ExportPage extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: const Color(0xFF081414).withOpacity(0.8),
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -131,6 +145,7 @@ class ExportPage extends StatelessWidget {
           _previewItem('Weekly Costs: Fixed \$34.00 + Variable \$22227.54 = Total: \$22261.54, CPM: \$1.00'),
           _previewItem('Weekly Goal: \$2222222, 2 days = Need 100mi @ \$22222.00/mi'),
           _previewItem('Load: 22222222mi + 2222DH @ \$22222222/mi = Revenue: \$543209888396296.00, Profit: \$543209888374074.00'),
+          _previewItem('Load: 22222222mi + 0DH @ \$22222222/mi = Revenue: \$543209883456790.00, Profit: \$543209883456790.00'),
         ],
       ),
     );
@@ -138,8 +153,11 @@ class ExportPage extends StatelessWidget {
 
   Widget _previewItem(String text) {
     return Padding(
-      padding: EdgeInsets.only(bottom: 12.h),
-      child: Text(text, style: TextStyle(color: Colors.white70, fontSize: 12.sp, height: 1.5)),
+      padding: EdgeInsets.only(bottom: 14.h),
+      child: Text(
+        text,
+        style: TextStyle(color: Colors.white60, fontSize: 11.sp, height: 1.6),
+      ),
     );
   }
 }

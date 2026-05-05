@@ -12,25 +12,16 @@ class AppBackground extends StatelessWidget {
       height: double.infinity,
       decoration: const BoxDecoration(
         color: Color(0xFF010B0B),
-        gradient: RadialGradient(
-          center: Alignment(-0.8, -0.5),
-          radius: 1.5,
-          colors: [
-            Color(0xFF004D40),
-            Color(0xFF010B0B),
-          ],
-          stops: [0.0, 0.8],
-        ),
       ),
       child: Stack(
         children: [
-          // Add another glow at the bottom right
+          // Left Side Glow
           Positioned(
-            right: -100,
-            bottom: -100,
+            left: -150,
+            top: 100,
             child: Container(
-              width: 300,
-              height: 300,
+              width: 400,
+              height: 600,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
@@ -42,6 +33,26 @@ class AppBackground extends StatelessWidget {
               ),
             ),
           ),
+          // Right Side Glow
+          Positioned(
+            right: -150,
+            bottom: 50,
+            child: Container(
+              width: 400,
+              height: 600,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    const Color(0xFF00D193).withOpacity(0.2),
+                    const Color(0xFF00D193).withOpacity(0.05),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
+          // Subtle grid pattern or texture could be added here if needed
           child,
         ],
       ),
