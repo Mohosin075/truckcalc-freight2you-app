@@ -87,7 +87,7 @@ class OtherUserProfileController extends ChangeNotifier {
 
     try {
       final response = isCurrentlyFollowing 
-          ? await NetworkCaller.deleteRequest(url)
+          ? await NetworkCaller.deleteRequest(url: url)
           : await NetworkCaller.postRequest(url: url, body: {});
 
       debugPrint("📡 Response Success: ${response.isSuccess}, Status: ${response.statusCode}");

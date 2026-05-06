@@ -5,7 +5,6 @@ import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/log_in_screen.dart';
 
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/saved_events_screen.dart';
 import 'package:provider/provider.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -128,7 +127,7 @@ class SettingsScreen extends StatelessWidget {
                     icon: Icons.bookmark_border,
                     title: "Saved Events",
                     onTap: () {
-                      Navigator.pushNamed(context, SavedEventsScreen.name);
+                      Navigator.pushNamed(context, '/saved-events');
                     },
                   ),
                   _buildDivider(),

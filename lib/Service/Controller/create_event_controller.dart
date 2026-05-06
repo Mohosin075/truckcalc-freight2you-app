@@ -67,7 +67,7 @@ class CreateEventController extends ChangeNotifier {
         method: 'POST',
         fields: {"data": dataJson},
         fileKey: "images",
-        filePaths: imagePaths,
+        fileList: images,
       );
 
       _inProgress = false;

@@ -1,0 +1,332 @@
+# Flutter অ্যাপ — API ইন্টিগ্রেশন গাইড (TruckCalc / Freight2You Backend)
+
+এই ডকুমেন্ট **একটি REST API ব্যাকএন্ড** (Express, MongoDB, JWT) এর সাথে Flutter মোবাইল অ্যাপ পুরোপুরি কানেক্ট করতে প্রয়োজনীয় তথ্য দেয়। বেস URL প্রোডাকশন/স্টেজিং এ পরিবর্তন করুন।
+
+---
+
+## ১. বেস ইনফরমেশন
+
+| আইটেম | মান |
+|--------|-----|
+| API প্রিফিক্স | `/api/v1` |
+| বিভিন্ন এন্ডপয়েন্ট | নিচের টেবিল অনুযায়ী |
+| ডিফল্ট `Content-Type` | `application/json` |
+| হেলথ চেক | `GET /api/v1/status` |
+| রুট নট ফাউন্ড | `404` — `{ success: false, message: "API route not found!", ... }` |
+
+**উদাহরণ বেস URL:** `https://your-domain.com`  
+সম্পূর্ণ পাথ: `https://your-domain.com/api/v1/auth/login`
+
+স্ট্যাটিক ফাইল (প্রোফাইল ইমেজ ইত্যাদি সার্ভারে সেভ হলে) সাধারণত এগুলো দিয়ে সার্ভ হয়:
+
+- `/uploads`, `/images`, `/media`, `/documents`
+
+---
+
+## ২. স্ট্যান্ডার্ড রেসপন্স ফরম্যাট
+
+### সাফল্য (সাধারণত `sendResponse`)
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "Optional message",
+  "meta": {
+    "page": 1,
+    "limit": 10,
+    "total": 100
+  },
+  "data": { }
+}
+```
+
+`meta` শুধু পেজিনেশন যেখানে আছে সেখানেই থাকে।
+
+### ত্রুটি (`globalErrorHandler`)
+
+```json
+{
+  "success": false,
+  "message": "Human readable message",
+  "errorMessages": [
+    { "path": "fieldOrEmpty", "message": "Details" }
+  ],
+  "stack": "...(শুধু non-production)..."
+}
+```
+
+---
+
+## ৩. অথেনটিকেশন
+
+### ৩.১ হেডার
+
+সুরক্ষিত রুটে:
+
+```http
+Authorization: Bearer <accessToken>
+```
+
+টোকেন ফরম্যাট সার্ভার কোডে `Bearer` দিয়ে শুরু হতে হবে (স্পেসের পর আসল JWT)।
+
+### ৩.২ ইউজার রোল (`USER_ROLES`)
+
+ব্যাকএন্ডে সংজ্ঞায়িত রোল:
+
+- `super_admin`
+- `admin`
+- `user`
+- `organizer`
+
+প্রতিটি রুট নির্দিষ্ট রোল চায়; ভুল রোলে `403`।
+
+### ৩.৩ লগইন রেসপন্স (সাধারণ)
+
+লগইন সফল হলে `data` তে সাধারণত থাকে:
+
+```json
+{
+  "accessToken": "...",
+  "refreshToken": "...",
+  "role": "user"
+}
+```
+
+সার্ভার **httpOnly কুকি** তেও `refreshToken` সেট করতে পারে। মোবাইল অ্যাপে কুকি নির্ভর করবেন না — **JSON বডি থেকে `refreshToken` সিকিউর স্টোরেজে** রাখুন।
+
+### ৩.৪ রিফ্রেশ টোকেন — গুরুত্বপূর্ণ (Flutter)
+
+**`POST /api/v1/auth/refresh-token`** বর্তমান ইমপ্লিমেন্টেশনে `req.cookies.refreshToken` থেকে রিফ্রেশ টোকেন নেয়।
+
+মোবাইলে কুকি স্বয়ংক্রিয় নাও আসতে পারে। **ওয়ার্কআরাউন্ড:** লগইনের পর যে `refreshToken` বডিতে পান, রিফ্রেশ রিকোয়েস্টে ম্যানুয়ালি কুকি হেডার পাঠান:
+
+```http
+POST /api/v1/auth/refresh-token
+Cookie: refreshToken=<সংরক্ষিত_refresh_token>
+```
+
+অথবা একই ডোমেইনে `dio` + কুকি জার ব্যবহার করুন। রিফ্রেশ সফল হলে রেসপন্স:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "Token refreshed successfully",
+  "data": {
+    "accessToken": "..."
+  }
+}
+```
+
+> যদি ভবিষ্যতে ব্যাকএন্ড `body`-তে `refreshToken` গ্রহণ করে, তখন কুকি ওয়ার্কআরাউন্ড সরিয়ে দেওয়া যাবে।
+
+### ৩.৫ Flutter টিপস (সংক্ষেপ)
+
+- `flutter_secure_storage` — `accessToken`, `refreshToken`
+- `dio` — ইন্টারসেপ্টরে `401` হলে রিফ্রেশ, তারপর আবার অরিজিনাল রিকোয়েস্ট
+- মাল্টিপার্ট — প্রোফাইল আপডেট ও মেসেজ (নিচে)
+
+---
+
+## ৪. সম্পূর্ণ API তালিকা
+
+সব পাথ নিচে **`/api/v1` এর পরের অংশ**। সম্পূর্ণ URL = `BASE_URL + /api/v1 + path`।
+
+### ৪.১ Auth — `/auth`
+
+| মেথড | পাথ | অথ | বডি / নোট |
+|--------|------|-----|------------|
+| POST | `/signup` | না | `email` (optional), `password` (min 6), `name` (optional), `phone` (optional, libphonenumber বৈধ), `address` (optional) |
+| POST | `/login` | না | `email` **অথবা** `phone`, `password` (min 6), `deviceToken`?, `rememberMe`? — তারপর Passport `local` |
+| POST | `/custom-login` | না | একই লগইন বডি; কাস্টম লগইন সার্ভিস |
+| POST | `/admin-login` | না | অ্যাডমিন লগইন |
+| GET | `/google` | না | ব্রাউজারে Google OAuth শুরু |
+| GET | `/google/callback` | না | কলব্যাক (ওয়েব রিডাইরেক্ট; মোবাইলে সাধারণত ডিপ লিঙ্ক/ওয়েবভিউ পরিকল্পনা লাগে) |
+| POST | `/verify-account` | না | `email`, `oneTimeCode`; `phone` optional — নতুন ইউজার ভেরিফাই বা রিসেট ফ্লো |
+| POST | `/forget-password` | না | `email` **অথবা** `phone` |
+| POST | `/reset-password` | না | হেডার: `Authorization` — OTP ভেরিফিকেশনের পর `verify-account` রেসপন্সের **`data.token`** (টোকেন মডেলের স্ট্রিং)। বডি: `newPassword`, `confirmPassword` (min 8)। যদি `Bearer` দিয়ে মিল না খায়, ব্যাকএন্ড `Token.findOne({ token })` ব্যবহার করে — প্রয়োজনে শুধু টোকেন স্ট্রিং হেডারে দিন (টিমের সাথে মিলিয়ে নিন)। |
+| POST | `/resend-otp` | না | `email` / `phone`, `authType` (`resetPassword` \| `createAccount`) |
+| POST | `/change-password` | হ্যাঁ (user/admin) | `currentPassword`, `newPassword`, `confirmPassword` |
+| DELETE | `/delete-account` | হ্যাঁ | `password` |
+| POST | `/refresh-token` | না | কুকি ওয়ার্কআরাউন্ড (উপরে) |
+| POST | `/social-login` | না | `appId`, `deviceToken` |
+| POST | `/logout` | হ্যাঁ | — |
+
+### ৪.২ User — `/user`
+
+| মেথড | পাথ | অথ | নোট |
+|--------|------|-----|------|
+| GET | `/profile` | user, admin, super_admin | প্রোফাইল |
+| PATCH | `/profile` | user, admin, super_admin | **মাল্টিপার্ট** — `fileAndBodyProcessorUsingDiskStorage`; বডি ফিল্ড: `name`, `profile`, `phone`, `description`, `specialty`, `address`, `location`, `appId`, `deviceToken`, `dateOfBirth` (ISO datetime string), `isOnboardingComplete`, ইত্যাদি |
+| DELETE | `/profile` | user, admin | |
+| GET | `/` | admin, super_admin | সব ইউজার (পেজিনেশন কন্ট্রোলারে থাকলে কুয়েরি দেখুন) |
+| GET | `/:userId` | user, admin, super_admin | একক ইউজার |
+| DELETE | `/:userId` | admin, super_admin | |
+| PATCH | `/:userId` | admin, super_admin | বডি: `{ "status": "active" \| "inactive" \| "deleted" }` |
+
+### ৪.৩ Public (CMS, FAQ, কন্টাক্ট) — `/public`
+
+| মেথড | পাথ | অথ | নোট |
+|--------|------|-----|------|
+| POST | `/` | admin | `content`, `type`: `privacy-policy` \| `terms-and-condition` \| `contact` \| `about` |
+| GET | `/:type` | না | ওই টাইপের পাবলিক কন্টেন্ট লিস্ট/ডেটা |
+| DELETE | `/:id` | admin | |
+| PATCH | `/update/:id` | admin | `content`, `type` |
+| POST | `/contact` | না | `name`, `email`, `phone`, `country`, `message` |
+| POST | `/faq` | admin | `question`, `answer` |
+| PATCH | `/faq/:id` | admin | `question`?, `answer`? |
+| GET | `/faq/single/:id` | না | |
+| GET | `/faq/all` | না | |
+| DELETE | `/faq/:id` | admin | |
+
+### ৪.৪ Calculations (ট্রাক ক্যালক) — `/calculations`
+
+সব রুট: `user`, `admin`, `super_admin`।
+
+| মেথড | পাথ | বডি / কুয়েরি |
+|--------|------|----------------|
+| POST | `/` | `type`: `LOAD` \| `GOAL` \| `COST`; `loadData` / `goalData` / `costData` — স্কিমা ব্যাকএন্ড `calculation.validation.ts` এর সাথে মিল রাখুন (সব সংখ্যা ডাবল) |
+| GET | `/` | লিস্ট |
+| GET | `/stats` | স্ট্যাটস |
+| GET | `/export` | এক্সপোর্ট ডেটা |
+| GET | `/:id` | একক |
+| DELETE | `/:id` | ডিলিট |
+
+`LOAD` এর জন্য নমুনা ফিল্ড (সব number): `baseRate`, `fuelSurcharge`, `loadedMiles`, `tolls`, `dhMiles`, `dhRate`, `bonus`, `driverPercentage`, `totalRevenue`, `totalProfit`, … (সম্পূর্ণ তালিকা সার্ভার ফাইলে)।
+
+### ৪.৫ Upload (S3 প্রিসাইন) — `/upload`
+
+| মেথড | পাথ | অথ | বডি |
+|--------|------|-----|------|
+| POST | `/presign` | user, admin, super_admin | `filename`, `contentType`, `folder` (optional, ডিফল্ট `videos`) |
+
+রেসপন্স `data` তে প্রিসাইনড আপলোড তথ্য (সার্ভার `S3Helper.generatePresignedUploadUrl`)।
+
+### ৪.৬ Message — `/message`
+
+| মেথড | পাথ | নোট |
+|--------|------|------|
+| POST | `/` | **মাল্টিপার্ট** — `chatId`, টেক্সট ইত্যাদি + `images` ফাইল থাকলে প্রথম ছবি মেসেজে যায় |
+| GET | `/:id` | `id` = চ্যাট আইডি (কন্ট্রোলার লগ অনুযায়ী মেসেজ লোড) |
+
+### ৪.৭ Chat — `/chat`
+
+| মেথড | পাথ | নোট |
+|--------|------|------|
+| POST | `/:id` | চ্যাট তৈরি/হ্যান্ডেল (`id` প্যারাম অনুযায়ী কন্ট্রোলার) |
+| GET | `/` | ইউজারের চ্যাট লিস্ট |
+
+### ৪.৮ Review — `/review`
+
+সব রুট অথ চেক করে **সব রোল** (`USER_ROLES` এর ভ্যালুগুলো)।
+
+| মেথড | পাথ | বডি |
+|--------|------|------|
+| GET | `/` | |
+| POST | `/` | `reviewee`?, `rating`, `review` |
+| GET | `/:id` | |
+| PATCH | `/:id` | আংশিক আপডেট |
+| DELETE | `/:id` | |
+
+### ৪.৯ Support — `/support`
+
+| মেথড | পাথ | অথ |
+|--------|------|-----|
+| GET | `/` | admin, super_admin |
+| GET | `/:id` | admin, super_admin |
+| POST | `/` | admin, user, super_admin — বডি: `message`, `contentType`: `comment` \| `review`, optional `subject`, `attachments`, `reason`, `status` |
+| PATCH | `/:id` | admin, super_admin |
+| DELETE | `/:id` | admin, super_admin |
+
+### ৪.১০ Admin — `/admin`
+
+সব `admin` বা `super_admin`।
+
+| মেথড | পাথ |
+|--------|------|
+| GET | `/stats` |
+| GET | `/users` |
+| GET | `/subscriptions` |
+| GET | `/plans` |
+
+### ৪.১১ Subscription (Stripe) — `/subscription`
+
+**পাবলিক (অথ ছাড়া):**
+
+| মেথড | পাথ | কুয়েরি / প্যারাম |
+|--------|------|---------------------|
+| GET | `/plans` | `userType`?: `user` \| `organizer` \| `admin` \| `super_admin` |
+| GET | `/plans/:planId` | MongoDB ObjectId |
+
+**ইউজার (user / admin / super_admin):**
+
+| মেথড | পাথ | মূল নোট |
+|--------|------|-----------|
+| GET | `/trial-eligibility/:userId?` | `userId` optional ObjectId |
+| POST | `/create` | `planId`, `paymentMethodId`?, `couponId`? |
+| GET | `/my-subscription` | |
+| PATCH | `/:subscriptionId` | `planId`?, `cancelAtPeriodEnd`? |
+| DELETE | `/:subscriptionId/cancel` | |
+| GET | `/status` | |
+| POST | `/checkout-session` | `planId`, `successUrl`, `cancelUrl` (সব URL) |
+| POST | `/:subscriptionId/reactivate` | |
+| POST | `/:subscriptionId/pause` | |
+| POST | `/:subscriptionId/resume` | |
+| GET | `/usage` | |
+| GET | `/usage/warnings` | |
+| POST | `/billing-portal` | `returnUrl` |
+
+**অ্যাডমিন:**
+
+| মেথড | পাথ |
+|--------|------|
+| POST | `/admin/plans` |
+| PATCH | `/admin/plans/:planId` |
+| GET | `/admin/plans` |
+| GET | `/admin/all-subscriptions` |
+| GET | `/admin/analytics` | কুয়েরি: `startDate`, `endDate`, `planId`, `status` |
+| POST | `/admin/:subscriptionId/retry-payment` | |
+
+**Stripe ওয়েবহুক (সার্ভার সাইড):** `POST /api/v1/subscription/webhook` — রো মোডে বডি; মোবাইল অ্যাপ এটি কল করে না।
+
+---
+
+## ৫. রিয়েলটাইম — Socket.IO
+
+সার্ভার `socket.io` চালু করে; CORS `*`।
+
+- কানেক্ট করুন **একই হোস্ট/পোর্ট** এ যেখানে HTTP API চলে (উদাহরণ `https://api.example.com` বা `http://IP:PORT`)।
+- ইভেন্ট:
+  - **`join-room`** — আর্গুমেন্ট: `roomId` (স্ট্রিং); রুম কী: `room:<roomId>`
+  - **`leave-room`** — একইভাবে `roomId`
+
+Flutter প্যাকেজ: `socket_io_client`। JWT হ্যান্ডশেক এই ব্যাকএন্ডের `socketHelper`-এ দেখা যায়নি — শুধু কানেকশন ও রুম জয়িন।
+
+---
+
+## ৬. ইন্টিগ্রেশন চেকলিস্ট (একটি ডক দিয়ে পুরো অ্যাপ)
+
+1. **কনফিগ** — `BASE_URL`, পরিবেশ (`dev`/`prod`).
+2. **Auth** — সাইনআপ → OTP ইমেইল → `verify-account` → টোকেন স্টোর; অথবা লগইন → `407`-স্টাইল প্রম্পট হলে OTP ফ্লো।
+3. **টোকেন** — প্রতিটি API তে `Authorization: Bearer …`; 401 হলে রিফ্রেশ (`Cookie` ট্রিক বা ভবিষ্যৎ বডি API).
+4. **প্রোফাইল** — `GET/PATCH /user/profile` (PATCH = multipart যদি ফাইল থাকে).
+5. **ট্রাক ক্যালক** — `POST/GET … /calculations`।
+6. **সাবস্ক্রিপশন** — প্ল্যান লিস্ট → চেকআউট বা `create` — Stripe ফ্লো প্রোডাক্ট রিকোয়ারমেন্ট অনুযায়ী।
+7. **চ্যাট/মেসেজ** — চ্যাট তৈরি/লিস্ট → মেসেজ পোস্ট (multipart) → Socket রুম জয়িন।
+8. **স্ট্যাটিক ইমেজ URL** — আপলোড রেসপন্স/প্রোফাইল `profile` পাথ জোড়া দিয়ে দেখান।
+9. **এরর হ্যান্ডলিং** — `success: false`, `errorMessages` ইউজার-ফ্রেন্ডলি মেসেজ।
+
+---
+
+## ৭. উৎস কোড রেফারেন্স (ব্যাকএন্ড)
+
+রুট মানচিত্র: `src/routes/index.ts` → প্রতিটি মডিউল `*.route.ts`।  
+রেসপন্স ওয়্রাপার: `src/shared/sendResponse.ts`।  
+অথ মিডলওয়্যার: `src/app/middleware/auth.ts`।  
+
+এই ফাইলগুলো পরিবর্তন হলে ডকুমেন্ট আপডেট করুন।
+
+---
+
+*শেষ আপডেট: ব্যাকএন্ড রিপোর বর্তমান রাউট অনুযায়ী। নতুন এন্ডপয়েন্ট যোগ হলে এই ফাইলে সেকশন যোগ করুন।*

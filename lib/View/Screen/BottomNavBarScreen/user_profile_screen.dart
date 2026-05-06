@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
 import 'package:gathering_app/Service/urls.dart';
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/details_screen.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/view_event_screen.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/Widgets/auth_textFormField.dart';
 import 'package:gathering_app/View/Widgets/customSnacBar.dart';
@@ -316,7 +316,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       onTap: () {
                                         Navigator.pushNamed(
                                           context,
-                                          DetailsScreen.name,
+                                          ViewEventScreen.name,
                                           arguments: event.event.id,
                                         );
                                       },

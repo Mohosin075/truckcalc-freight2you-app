@@ -1,113 +1,88 @@
 class Urls {
   //base url
-  // static const String baseUrl = "https://mohosin5001.binarybards.online";
-  //  static const String baseUrl = "http://10.10.7.50:4006";
-  static const String baseUrl = "http://167.71.254.250:4006";
+  static const String baseUrl = "http://10.10.7.50:5002/api/v1";
   static const String googleMapsApiKey = "AIzaSyA6w5wid9n0Vii4W6YxQTn9BG69jI_scuM";
 
   //auth api
-  static const String registrationUrl = "$baseUrl/api/v1/auth/signup";
+  static const String registrationUrl = "$baseUrl/auth/signup";
+  static const String loginUrl = "$baseUrl/auth/login";
+  static const String forgotpassUrl = "$baseUrl/auth/forget-password";
+  static const String verifyOtpUrl = "$baseUrl/auth/verify-account";
+  static const String resetPassUrl = "$baseUrl/auth/reset-password";
+  static const String refreshTokenUrl = "$baseUrl/auth/refresh-token";
+  static const String changePasswordUrl = "$baseUrl/auth/change-password";
+  static const String deleteAccountUrl = "$baseUrl/auth/delete-account";
+  static const String logoutUrl = "$baseUrl/auth/logout";
 
-  static const String loginUrl = "$baseUrl/api/v1/auth/login";
+  static const String getAllEvent = "$baseUrl/event";
+  static String getSingleEvent(String eventID) => "$baseUrl/event/$eventID";
 
-  static const String forgotpassUrl = "$baseUrl/api/v1/auth/forget-password";
+  static const String reviewUrl = "$baseUrl/review";
+  static String getSingleReviewUrl(String id) => "$baseUrl/review/$id";
+  static String updateReviewUrl(String id) => "$baseUrl/review/$id";
+  static String deleteReviewUrl(String id) => "$baseUrl/review/$id";
 
-  static const String verifyOtpUrl = "$baseUrl/api/v1/auth/verify-account";
+  static const String userProfileUrl = "$baseUrl/user/profile";
+  static String getUserByIdUrl(String id) => "$baseUrl/user/$id";
+  static const String updateProfileUrl = "$baseUrl/user/update-profile";
 
-  static const String resetPassUrl = "$baseUrl/api/v1/auth/reset-password";
-  static const String getAllEvent = "$baseUrl/api/v1/event";
+  static const String calculationsUrl = "$baseUrl/calculations";
+  static const String calculationStatsUrl = "$baseUrl/calculations/stats";
+  static const String calculationExportUrl = "$baseUrl/calculations/export";
+  static String getSingleCalculationUrl(String id) => "$baseUrl/calculations/$id";
+  static String deleteCalculationUrl(String id) => "$baseUrl/calculations/$id";
 
-  static String getSingleEvent(String eventID) =>
-      "$baseUrl/api/v1/event/$eventID";
+  static const String subscriptionPlansUrl = "$baseUrl/subscription/plans";
+  static String getPlanDetailsUrl(String planId) => "$baseUrl/subscription/plans/$planId";
+  static const String createSubscriptionUrl = "$baseUrl/subscription/create";
+  static const String mySubscriptionUrl = "$baseUrl/subscription/my-subscription";
+  static const String subscriptionStatusUrl = "$baseUrl/subscription/status";
+  static const String createCheckoutSessionUrl = "$baseUrl/subscription/checkout-session";
+  static const String billingPortalUrl = "$baseUrl/subscription/billing-portal";
 
-  static const String reviewUrl = "$baseUrl/api/v1/review";
-
-  static const String getAllReviewUrl = "$baseUrl/api/v1/review";
-
-  static String getReviewByEventIdUrl(String eventId) {
-    return "$baseUrl/api/v1/review/$eventId/event";
-  }
-
-  static const String userProfileUrl = "$baseUrl/api/v1/user/profile";
-
-  static String getUserByIdUrl(String id) => "$baseUrl/api/v1/user/$id";
-
-  static const String updateProfileUrl = "$baseUrl/api/v1/user/profile";
-
-  static const String addSaveEvent = "$baseUrl/api/v1/saved";
-
-  static const String getMySaveEvents = '$baseUrl/api/v1/saved?filter=all';
-
-  static String deleteSavedEvent(String id) => "$baseUrl/api/v1/saved/$id";
+  static const String addSaveEvent = "$baseUrl/saved";
+  static const String getMySaveEvents = '$baseUrl/saved?filter=all';
+  static String deleteSavedEvent(String id) => "$baseUrl/saved/$id";
 
   // chat api
-  static String chatUrl(String other_user_id) =>
-      "$baseUrl/api/v1/chat/${other_user_id}";
-
-  static const String getAllChatsUrl = "$baseUrl/api/v1/chat";
-
-  static String getMessage(String chatId) =>
-      "$baseUrl/api/v1/message/${chatId}";
-
-  static String sendMessage = "$baseUrl/api/v1/message";
+  static String createChatUrl(String other_user_id) => "$baseUrl/chat/${other_user_id}";
+  static const String getAllChatsUrl = "$baseUrl/chat";
+  static String getMessagesUrl(String chatId) => "$baseUrl/message/${chatId}";
+  static const String sendMessageUrl = "$baseUrl/message";
 
   // follow api
-  static String followUserUrl(String userId) =>
-      "$baseUrl/api/v1/follow/$userId";
-  static String unfollowUserUrl(String userId) =>
-      "$baseUrl/api/v1/follow/$userId/unfollow";
-  static String getFollowStatsUrl(String userId, String type) =>
-      "$baseUrl/api/v1/follow/$userId/followers?type=$type";
-  // check in streaming
-  // static const String checkInUrl = "$baseUrl/api/v1/ticket/check-in";
+  static String followUserUrl(String userId) => "$baseUrl/follow/$userId";
+  static String unfollowUserUrl(String userId) => "$baseUrl/follow/$userId/unfollow";
+  static String getFollowStatsUrl(String userId, String type) => "$baseUrl/follow/$userId/followers?type=$type";
 
   //live chat message api
-  //live chat message api
-  // Endpoint: GET /api/v1/chatmessages/:roomId/messages
-  static String getLiveMessageUrl(
-    String roomId, {
-    int page = 1,
-    int limit = 50,
-  }) => "$baseUrl/api/v1/chatmessage/$roomId/messages?page=$page&limit=$limit";
+  static String getLiveMessageUrl(String roomId, {int page = 1, int limit = 50}) => 
+      "$baseUrl/chatmessage/$roomId/messages?page=$page&limit=$limit";
 
-  // Endpoint: POST /api/v1/chatmessages/:roomId/messages
-  static String sentMessageUrl(String roomId) =>
-      "$baseUrl/api/v1/chatmessage/$roomId/messages";
+  static String sentMessageUrl(String roomId) => "$baseUrl/chatmessage/$roomId/messages";
 
-  //like message api
-  // Endpoint: POST /api/v1/chatmessages/messages/:messageId/like
-  static String likeMessageUrl(String messageId) =>
-      "$baseUrl/api/v1/chatmessage/messages/$messageId/like";
+  static String likeMessageUrl(String messageId) => "$baseUrl/chatmessage/messages/$messageId/like";
 
-  //delete message
-  // Endpoint: DELETE /api/v1/chatmessages/messages/:messageId
-  static String deleteMessageUrl(String messageId) =>
-      "$baseUrl/api/v1/chatmessage/messages/$messageId";
+  static String deleteMessageUrl(String messageId) => "$baseUrl/chatmessage/messages/$messageId";
 
-  // Get Participants
-  // Endpoint: GET /api/v1/chatmessages/:roomId/participants
-  static String getChatParticipantsUrl(String roomId) =>
-      "$baseUrl/api/v1/chatmessage/$roomId/participants";
-  static const String userInterestUrl = "$baseUrl/api/v1/user/interest";
+  static String getChatParticipantsUrl(String roomId) => "$baseUrl/chatmessage/$roomId/participants";
+  
+  static const String userInterestUrl = "$baseUrl/user/interest";
 
   //Notification api
-  static const String getAllNotificationUrl = "$baseUrl/api/v1/notifications";
-  static String getNotificationByIdUrl(String id) =>
-      "$baseUrl/api/v1/notifications/$id";
-
-  static String readAllNotificationUrl =
-      "$baseUrl/api/v1/notifications/mark-all";
-
-  static String readNotificationUrl(String id) =>
-      "$baseUrl/api/v1/notifications/$id/read";
+  static const String getAllNotificationUrl = "$baseUrl/notifications";
+  static String getNotificationByIdUrl(String id) => "$baseUrl/notifications/$id";
+  static const String readAllNotificationUrl = "$baseUrl/notifications/mark-all";
+  static String readNotificationUrl(String id) => "$baseUrl/notifications/$id/read";
 
   //for user side create event
-  static const String createUserEvent = "$baseUrl/api/v1/userevent";
+  static const String createUserEvent = "$baseUrl/userevent";
+  static const String getUserEventsUrl = "$baseUrl/userevent";
+  static String getSingleUserEvent(String id) => "$baseUrl/userevent/$id";
 
-  static const String getUserEventsUrl = "$baseUrl/api/v1/userevent";
+  static String searchLocation(String address) => "$baseUrl/event/locations?address=$address";
 
-  static String getSingleUserEvent(String id) => "$baseUrl/api/v1/userevent/$id";
-
-  static String searchLocation(String address) =>
-      "$baseUrl/api/v1/event/locations?address=$address";
+  // Support API
+  static const String supportUrl = "$baseUrl/support";
+  static String getSingleSupportUrl(String id) => "$baseUrl/support/$id";
 }

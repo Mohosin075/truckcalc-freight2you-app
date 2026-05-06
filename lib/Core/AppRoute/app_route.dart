@@ -1,12 +1,11 @@
 // View/app.dart
 import 'package:flutter/material.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/bottom_nav_bar.dart';
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/details_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/notification_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/other_user_profile_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/user_chat_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/settings_screen.dart';
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/saved_events_screen.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/saved_page.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/view_event_screen.dart';
 import 'package:gathering_app/Model/ChatModel.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/code_send.dart';
@@ -32,7 +31,6 @@ class AppRoutes {
   static const String bottomNavBar = BottomNavBarScreen.name;
   static const String notificationScreen = NotificationScreen.name;
   static const String userchatScreen = UserChatScreen.name;
-  static const String detaisScreen = DetailsScreen.name;
   static const String viewEventScreen = ViewEventScreen.name;
   static const String newPassScreen = NewPasswordScreen.name;
   static const String verifyAccount = '/verify-account';
@@ -52,7 +50,6 @@ class AppRoutes {
       final chat = ModalRoute.of(context)!.settings.arguments as ChatModel?;
       return UserChatScreen(chat: chat);
     },
-    detaisScreen: (context) => const DetailsScreen(),
     viewEventScreen: (context) => const ViewEventScreen(),
     newPassScreen: (context) => NewPasswordScreen(),
     verifyAccount: (context) => VerifyAccount(email: ''),
@@ -61,6 +58,6 @@ class AppRoutes {
       return OtherUserProfileScreen(userId: userId);
     },
     SettingsScreen.name: (context) => const SettingsScreen(),
-    SavedEventsScreen.name: (context) => const SavedEventsScreen(),
+    '/saved-events': (context) => const SavedPage(),
   };
 }

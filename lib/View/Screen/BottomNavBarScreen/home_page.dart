@@ -8,8 +8,8 @@ import 'package:gathering_app/Service/Controller/notification_controller.dart';
 import 'package:gathering_app/Service/Controller/user_event_controller.dart';
 import 'package:gathering_app/Service/urls.dart';
 
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/details_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/notification_screen.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/view_event_screen.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/Widgets/serch_textfield.dart';
 import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
@@ -264,7 +264,7 @@ class _HomePageState extends State<HomePage> {
                                       GestureDetector(
                                         onTap: () => Navigator.pushNamed(
                                           context,
-                                          DetailsScreen.name,
+                                          ViewEventScreen.name,
                                           arguments: listEvent.id,
                                         ),
                                         child: _buildFeaturedEvent(
@@ -365,7 +365,7 @@ class _HomePageState extends State<HomePage> {
                                     event: gridEvent,
                                     onTap: () => Navigator.pushNamed(
                                       context,
-                                      DetailsScreen.name,
+                                      ViewEventScreen.name,
                                       arguments: gridEvent.id,
                                     ),
                                   );
@@ -681,7 +681,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildHorizontalEventCard(EventData event) {
     return GestureDetector(
       onTap: () =>
-          Navigator.pushNamed(context, DetailsScreen.name, arguments: event.id),
+          Navigator.pushNamed(context, ViewEventScreen.name, arguments: event.id),
       child: Container(
         width: 280.w,
         decoration: BoxDecoration(

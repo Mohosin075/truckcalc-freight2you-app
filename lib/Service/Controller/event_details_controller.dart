@@ -18,7 +18,6 @@ class EventDetailsController extends ChangeNotifier {
     try {
       var response = await NetworkCaller.getRequest(
         url: Urls.getSingleEvent(eventId),
-        token: "",
       );
 
       debugPrint("=====================Main Event Response========================");

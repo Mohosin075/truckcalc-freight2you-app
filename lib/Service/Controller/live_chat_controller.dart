@@ -245,7 +245,7 @@ class LiveChatController extends ChangeNotifier {
   Future<bool> deleteMessage(String messageId) async {
     try {
       final response = await NetworkCaller.deleteRequest(
-        Urls.deleteMessageUrl(messageId),
+        url: Urls.deleteMessageUrl(messageId),
         requireAuth: true,
       );
 

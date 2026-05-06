@@ -76,7 +76,7 @@ class _SavedPageState extends State<SavedPage> {
                              event: savedEventData.event,
                              onTap: () => Navigator.pushNamed(
                                       context,
-                                      '/details-screen', 
+                                      '/view-event-screen',
                                       arguments: savedEventData.event.id,
                                     ),
                           );

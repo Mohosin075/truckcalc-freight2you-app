@@ -14,7 +14,7 @@ class LogInController extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
 
 
-  Future<bool> login(String email, String password) async {
+  Future<bool> login(String email, String password, {String? deviceToken}) async {
     _inProgress = true;
     _errorMessage = null;
     notifyListeners();
@@ -24,6 +24,7 @@ class LogInController extends ChangeNotifier {
     final Map<String, String> requestBody = {
       "email": email,
       "password": password,
+      if (deviceToken != null) "deviceToken": deviceToken,
     };
 
     try {

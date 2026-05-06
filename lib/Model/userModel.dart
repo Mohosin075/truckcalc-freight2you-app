@@ -4,6 +4,8 @@ class UserProfileModel {
   String? id;
   String? name;
   String? email;
+  String? phone;
+  Address? address;
   List<String>? interest;
   String? status;
   bool? verified;
@@ -24,6 +26,8 @@ class UserProfileModel {
     this.id,
     this.name,
     this.email,
+    this.phone,
+    this.address,
     this.interest,
     this.status,
     this.verified,
@@ -52,6 +56,8 @@ class UserProfileModel {
       name: json['name'] ?? '',
       description: json['description'] ?? '',
       email: json['email'] ?? '',
+      phone: json['phone'] ?? '',
+      address: json['address'] != null ? Address.fromJson(json['address']) : null,
       interest: List<String>.from(json['interest'] ?? []),
       status: json['status'] ?? '',
       verified: json['verified'] ?? false,
@@ -79,6 +85,8 @@ Map<String, dynamic> toJson() {
     "id": id,
     "name": name,
     "email": email,
+    "phone": phone,
+    "address": address?.toJson(),
     "interest": interest,
     "status": status,
     "verified": verified,
@@ -96,6 +104,27 @@ Map<String, dynamic> toJson() {
 }
 }
 
+
+class Address {
+  String? city;
+  String? country;
+
+  Address({this.city, this.country});
+
+  factory Address.fromJson(Map<String, dynamic> json) {
+    return Address(
+      city: json['city'] ?? '',
+      country: json['country'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "city": city,
+      "country": country,
+    };
+  }
+}
 
 class Location {
   final String type;

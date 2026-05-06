@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:gathering_app/Service/Api%20service/network_caller.dart';
@@ -106,7 +107,7 @@ class ChatController extends ChangeNotifier {
     notifyListeners();
 
     final response = await NetworkCaller.postRequest(
-      url: Urls.chatUrl(otherUserId),
+      url: Urls.createChatUrl(otherUserId),
       body: {}, 
     );
 
@@ -286,7 +287,7 @@ void markChatAsSeenLocally(String chatId) {
     _inProgress = true;
     notifyListeners();
     
-    final response = await NetworkCaller.getRequest(url: Urls.getMessage(chatId));
+    final response = await NetworkCaller.getRequest(url: Urls.getMessagesUrl(chatId));
     //progress false 
     _inProgress = false;
 
@@ -324,10 +325,10 @@ void markChatAsSeenLocally(String chatId) {
     if (imagePath != null) {
       // Send image and text via multipart request
       response = await NetworkCaller.multipartRequest(
-        url: Urls.sendMessage,
+        url: Urls.sendMessageUrl,
         method: 'POST',
         fileKey: 'images',
-        filePath: imagePath,
+        files: {'images': File(imagePath)},
         fields: {
           "chatId": chatId,
           if (text != null && text.isNotEmpty) "text": text,
@@ -336,7 +337,7 @@ void markChatAsSeenLocally(String chatId) {
     } else {
       // Send text only via standard post request
       response = await NetworkCaller.postRequest(
-        url: Urls.sendMessage,
+        url: Urls.sendMessageUrl,
         body: {
           "chatId": chatId,
           if (text != null && text.isNotEmpty) "text": text,

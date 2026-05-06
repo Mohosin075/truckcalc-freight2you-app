@@ -14,7 +14,6 @@ import 'package:gathering_app/Service/Controller/log_in_controller.dart';
 import 'package:gathering_app/Service/Controller/other_user_profile_controller.dart';
 import 'package:gathering_app/Service/Controller/otp_verify_controller.dart';
 import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
-import 'package:gathering_app/Service/Controller/reivew_controller.dart';
 import 'package:gathering_app/Service/Controller/live_chat_controller.dart';
 import 'package:gathering_app/Service/Controller/sign_up_controller.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
@@ -24,16 +23,20 @@ import 'package:gathering_app/Service/Controller/notification_controller.dart';
 import 'package:gathering_app/Service/Controller/create_event_controller.dart';
 import 'package:gathering_app/Service/Controller/user_event_controller.dart';
 import 'package:gathering_app/Service/Controller/map_controller.dart';
+import 'package:gathering_app/Service/Controller/calculation_controller.dart';
+import 'package:gathering_app/Service/Controller/subscription_controller.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:gathering_app/Utils/app_utils.dart';
 
+import 'package:gathering_app/Service/Api%20service/network_caller.dart';
 import 'Core/AppRoute/app_route.dart';
 import 'View/Screen/Onboarding_screen/splash_screen.dart';
 import 'View/Theme/theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  NetworkCaller.init();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   try {
     await NotificationService.init().timeout(
@@ -80,7 +83,6 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => EmailVerifyController()),
         ChangeNotifierProvider(create: (_) => GetAllEventController()),
         ChangeNotifierProvider(create: (_) => EventDetailsController()),
-        ChangeNotifierProvider(create: (_) => ReivewController()),
         ChangeNotifierProvider(create: (_) => OtherUserProfileController()),
         ChangeNotifierProvider(create: (_) => OtpVerifyController()),
         ChangeNotifierProvider(
@@ -103,6 +105,8 @@ class MyApp extends StatelessWidget {
           },
         ),
         ChangeNotifierProvider(create: (_) => UserEventController()),
+        ChangeNotifierProvider(create: (_) => CalculationController()),
+        ChangeNotifierProvider(create: (_) => SubscriptionController()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(439, 956),

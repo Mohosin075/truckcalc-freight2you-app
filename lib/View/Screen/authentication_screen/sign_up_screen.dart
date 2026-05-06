@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gathering_app/Service/Controller/sign_up_controller.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/log_in_screen.dart';
+import 'package:gathering_app/View/Screen/authentication_screen/verify_account.dart';
 import 'package:gathering_app/View/Widgets/app_background.dart';
 import 'package:gathering_app/View/Widgets/auth_textFormField.dart';
+import 'package:gathering_app/View/Widgets/customSnacBar.dart';
+import 'package:provider/provider.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -17,6 +21,43 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _isLoading = false;
+
+  Future<void> _handleSignUp() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+
+    final signUpController = Provider.of<SignUpController>(context, listen: false);
+    final success = await signUpController.signUp(
+      email: _emailController.text.trim(),
+      name: _nameController.text.trim(),
+      password: _passwordController.text,
+    );
+
+    if (mounted) {
+      setState(() => _isLoading = false);
+      if (success) {
+        showCustomSnackBar(
+          context: context,
+          message: "Account created successfully! Please verify your email.",
+          isError: false,
+        );
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => VerifyAccount(email: _emailController.text.trim()),
+          ),
+        );
+      } else {
+        showCustomSnackBar(
+          context: context,
+          message: signUpController.errorMessage ?? "Registration failed!",
+          isError: true,
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,38 +105,46 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         controller: _nameController,
                         labelText: 'Full name',
                         hintText: 'Your name',
+                        validator: (v) => v!.isEmpty ? 'Enter name' : null,
                       ),
                       AuthTextField(
                         controller: _emailController,
                         labelText: 'Email',
                         hintText: 'you@email.com',
                         keyboardType: TextInputType.emailAddress,
+                        validator: (v) => v!.isEmpty ? 'Enter email' : null,
                       ),
                       AuthTextField(
                         controller: _passwordController,
                         labelText: 'Password',
                         hintText: 'Min 6 characters',
                         isPassword: true,
+                        validator: (v) => v!.length < 6 ? 'Min 6 characters' : null,
                       ),
                       SizedBox(height: 20.h),
-                      Container(
-                        width: double.infinity,
-                        height: 50.h,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12.r),
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF004D40), Color(0xFF00D193)],
+                      GestureDetector(
+                        onTap: _isLoading ? null : _handleSignUp,
+                        child: Container(
+                          width: double.infinity,
+                          height: 50.h,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12.r),
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF004D40), Color(0xFF00D193)],
+                            ),
                           ),
-                        ),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            // Proceed to main app or verification
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            shadowColor: Colors.transparent,
+                          child: Center(
+                            child: _isLoading
+                                ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                  )
+                                : const Text(
+                                    'Create account',
+                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                  ),
                           ),
-                          child: const Text('Create account'),
                         ),
                       ),
                     ],

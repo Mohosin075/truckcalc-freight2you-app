@@ -1,10 +1,10 @@
 import 'dart:convert';
-import 'dart:async';
-import 'package:http_parser/http_parser.dart';
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:gathering_app/Service/Controller/auth_controller.dart'; // এটা ইম্পোর্ট করো
+import 'dart:io';
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:gathering_app/Service/Controller/auth_controller.dart';
+import 'package:gathering_app/Service/urls.dart';
 
 class NetworkResponse {
   final String? errorMessage;
@@ -21,397 +21,350 @@ class NetworkResponse {
 }
 
 class NetworkCaller {
-  static const String _unAuthorizeMessage = 'Unauthorized access';
+  static final Dio _dio = Dio(BaseOptions(
+    baseUrl: Urls.baseUrl,
+    connectTimeout: const Duration(seconds: 30),
+    receiveTimeout: const Duration(seconds: 30),
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+  ));
 
-  // Resolve token from AuthController or secure storage
-  static Future<String?> _getToken() async {
-    final storage = const FlutterSecureStorage();
-    final tokenFromController = AuthController().accessToken;
-    if (tokenFromController != null && tokenFromController.isNotEmpty)
-      return tokenFromController;
-    return await storage.read(key: 'access_token');
+  static bool _isRefreshing = false;
+  static List<Map<String, dynamic>> _failedRequestsQueue = [];
+
+  static void init() {
+    _dio.interceptors.clear(); // Clear existing to avoid duplicates on hot restart
+    _dio.interceptors.add(InterceptorsWrapper(
+      onRequest: (options, handler) async {
+        debugPrint('🌐 DIO REQUEST [${options.method}] => PATH: ${options.path}');
+        
+        // If requireAuth header is not explicitly false, add token
+        if (options.headers['requireAuth'] != false) {
+          const storage = FlutterSecureStorage();
+          final token = await storage.read(key: 'access_token');
+          
+          if (token != null && token.isNotEmpty) {
+            options.headers['Authorization'] = 'Bearer $token';
+            debugPrint('🔑 Token added to header');
+          }
+        }
+        
+        // Remove the internal flag before sending
+        options.headers.remove('requireAuth');
+
+        if (kDebugMode) {
+          print('==== REQUEST DETAILS ====');
+          print('URL: ${options.uri}');
+          print('HEADERS: ${options.headers}');
+          if (options.data != null) print('BODY: ${options.data}');
+          print('=========================');
+        }
+        return handler.next(options);
+      },
+      onResponse: (response, handler) {
+        debugPrint('✅ DIO RESPONSE [${response.statusCode}] => PATH: ${response.requestOptions.path}');
+        if (kDebugMode) {
+          print('BODY: ${response.data}');
+        }
+        return handler.next(response);
+      },
+      onError: (DioException e, handler) async {
+        debugPrint('❌ DIO ERROR [${e.response?.statusCode}] => PATH: ${e.requestOptions.path}');
+        debugPrint('ERROR MESSAGE: ${e.message}');
+
+        // Handle 401 Unauthorized - Attempt Token Refresh
+        if (e.response?.statusCode == 401 && !e.requestOptions.path.contains('auth/login')) {
+          if (!_isRefreshing) {
+            _isRefreshing = true;
+            final success = await _refreshToken();
+            _isRefreshing = false;
+
+            if (success) {
+              try {
+                final options = e.requestOptions;
+                const storage = FlutterSecureStorage();
+                final token = await storage.read(key: 'access_token');
+                if (token != null) {
+                  options.headers['Authorization'] = 'Bearer $token';
+                }
+                
+                final response = await _dio.request(
+                  options.path,
+                  options: Options(
+                    method: options.method,
+                    headers: options.headers,
+                  ),
+                  data: options.data,
+                  queryParameters: options.queryParameters,
+                );
+
+                // Resolve queued requests
+                for (var request in _failedRequestsQueue) {
+                  final reqOptions = request['options'] as RequestOptions;
+                  if (token != null) reqOptions.headers['Authorization'] = 'Bearer $token';
+                  final reqResponse = await _dio.request(
+                    reqOptions.path,
+                    options: Options(
+                      method: reqOptions.method,
+                      headers: reqOptions.headers,
+                    ),
+                    data: reqOptions.data,
+                    queryParameters: reqOptions.queryParameters,
+                  );
+                  request['handler'].resolve(reqResponse);
+                }
+                _failedRequestsQueue.clear();
+
+                return handler.resolve(response);
+              } catch (retryError) {
+                return handler.next(e);
+              }
+            } else {
+              _failedRequestsQueue.clear();
+              AuthController().logout();
+            }
+          } else {
+            _failedRequestsQueue.add({
+              'options': e.requestOptions,
+              'handler': handler,
+            });
+            return;
+          }
+        }
+        return handler.next(e);
+      },
+    ));
+  }
+
+  static Future<bool> _refreshToken() async {
+    try {
+      const storage = FlutterSecureStorage();
+      final refreshToken = await storage.read(key: 'refresh_token');
+
+      if (refreshToken == null) return false;
+
+      final response = await Dio().post(
+        Urls.refreshTokenUrl,
+        options: Options(
+          headers: {
+            'Cookie': 'refreshToken=$refreshToken',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200 && response.data['success'] == true) {
+        final newAccessToken = response.data['data']['accessToken'];
+        await storage.write(key: 'access_token', value: newAccessToken);
+        AuthController().saveTokens(
+          accessToken: newAccessToken,
+          refreshToken: refreshToken,
+        );
+        return true;
+      }
+    } catch (e) {
+      debugPrint('Token Refresh Error: $e');
+    }
+    return false;
   }
 
   // GET Request
   static Future<NetworkResponse> getRequest({
     required String url,
+    Map<String, dynamic>? queryParameters,
     bool requireAuth = true,
     String? token,
   }) async {
     try {
-      final Uri uri = Uri.parse(url);
-
-      final Map<String, String> headers = {'Accept': 'application/json'};
-
-      // অটো টোকেন যোগ করো (যদি requireAuth true হয়)
-      if (requireAuth) {
-        final String? resolvedToken = await _getToken();
-        if (resolvedToken != null && resolvedToken.isNotEmpty) {
-          if (resolvedToken.contains('.')) {
-            headers['Authorization'] = 'Bearer $resolvedToken';
-          } else {
-            headers['Authorization'] = resolvedToken;
-            headers['token'] = resolvedToken;
-          }
-        }
-      }
-
-      _logRequest('GET', url, null, headers);
-
-      final http.Response response = await http.get(uri, headers: headers);
-
-      _logResponse('GET', url, response);
-
-      return _parseResponse(response);
-    } catch (e) {
-      debugPrint('Network Error (GET): $e');
-      return NetworkResponse(
-        isSuccess: false,
-        statusCode: -1,
-        errorMessage: 'No internet connection or server error',
+      debugPrint('🌐 Initiating GET: $url');
+      final response = await _dio.get(
+        url,
+        queryParameters: queryParameters,
+        options: Options(headers: {
+          'requireAuth': requireAuth,
+          if (token != null) 'Authorization': 'Bearer $token',
+        }),
       );
+      return _handleResponse(response);
+    } on DioException catch (e) {
+      return _handleError(e);
+    } catch (e) {
+      return NetworkResponse(isSuccess: false, statusCode: -1, errorMessage: e.toString());
     }
   }
 
   // POST Request
   static Future<NetworkResponse> postRequest({
     required String url,
-    Map<String, dynamic>? body,
+    dynamic body,
     bool requireAuth = true,
     String? token,
   }) async {
     try {
-      final Uri uri = Uri.parse(url);
-
-      final Map<String, String> headers = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      };
-
-      // Handle Authentication
-      if (token != null && token.isNotEmpty) {
-        if (token.contains('.')) {
-          headers['Authorization'] = 'Bearer $token';
-          debugPrint("JWT TOKEN ADDED: Bearer $token");
-        } else {
-          headers['Authorization'] = token;
-          headers['token'] = token;
-          debugPrint("RAW TOKEN ADDED: $token");
-        }
-      } else if (requireAuth) {
-        final String? resolvedToken = await _getToken();
-        if (resolvedToken != null && resolvedToken.isNotEmpty) {
-          if (resolvedToken.contains('.')) {
-            headers['Authorization'] = 'Bearer $resolvedToken';
-          } else {
-            headers['Authorization'] = resolvedToken;
-            headers['token'] = resolvedToken;
-          }
-          debugPrint("TOKEN ADDED TO HEADER");
-        } else {
-          debugPrint("NO TOKEN FOUND");
-        }
-      }
-
-      final String? encodedBody = body != null ? jsonEncode(body) : null;
-
-      _logRequest('POST', url, body, headers);
-
-      final http.Response response = await http.post(
-        uri,
-        headers: headers,
-        body: encodedBody,
+      debugPrint('🌐 Initiating POST: $url');
+      final response = await _dio.post(
+        url,
+        data: body,
+        options: Options(headers: {
+          'requireAuth': requireAuth,
+          if (token != null) 'Authorization': 'Bearer $token',
+        }),
       );
-
-      _logResponse('POST', url, response);
-
-      return _parseResponse(response);
+      return _handleResponse(response);
+    } on DioException catch (e) {
+      return _handleError(e);
     } catch (e) {
-      debugPrint('Network Error (POST): $e');
-      return NetworkResponse(
-        isSuccess: false,
-        statusCode: -1,
-        errorMessage: 'No internet or server error',
-      );
+      return NetworkResponse(isSuccess: false, statusCode: -1, errorMessage: e.toString());
     }
   }
 
-  // PATCH Request (Profile update-এর জন্য)
+  // PATCH Request
   static Future<NetworkResponse> patchRequest({
     required String url,
-    Map<String, dynamic>? body,
+    dynamic body,
     bool requireAuth = true,
+    String? token,
   }) async {
     try {
-      final Uri uri = Uri.parse(url);
-
-      final Map<String, String> headers = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      };
-
-      if (requireAuth) {
-        final String? resolvedToken = await _getToken();
-        if (resolvedToken != null && resolvedToken.isNotEmpty) {
-          headers['Authorization'] = 'Bearer $resolvedToken';
-          debugPrint("TOKEN ADDED TO PATCH HEADER: Bearer $resolvedToken");
-        } else {
-          debugPrint("NO TOKEN FOUND (AuthController or storage) for PATCH");
-        }
-      }
-
-      final String? encodedBody = body != null ? jsonEncode(body) : null;
-
-      _logRequest('PATCH', url, body, headers);
-
-      final http.Response response = await http.patch(
-        uri,
-        headers: headers,
-        body: encodedBody,
+      debugPrint('🌐 Initiating PATCH: $url');
+      final response = await _dio.patch(
+        url,
+        data: body,
+        options: Options(headers: {
+          'requireAuth': requireAuth,
+          if (token != null) 'Authorization': 'Bearer $token',
+        }),
       );
-
-      _logResponse('PATCH', url, response);
-
-      return _parseResponse(response);
+      return _handleResponse(response);
+    } on DioException catch (e) {
+      return _handleError(e);
     } catch (e) {
-      debugPrint('Network Error (PATCH): $e');
-      return NetworkResponse(
-        isSuccess: false,
-        statusCode: -1,
-        errorMessage: 'No internet connection or server error',
-      );
+      return NetworkResponse(isSuccess: false, statusCode: -1, errorMessage: e.toString());
     }
   }
 
-  // Multi-part Request for file uploads
+  // DELETE Request
+  static Future<NetworkResponse> deleteRequest({
+    required String url,
+    dynamic body,
+    bool requireAuth = true,
+    String? token,
+  }) async {
+    try {
+      debugPrint('🌐 Initiating DELETE: $url');
+      final response = await _dio.delete(
+        url,
+        data: body,
+        options: Options(headers: {
+          'requireAuth': requireAuth,
+          if (token != null) 'Authorization': 'Bearer $token',
+        }),
+      );
+      return _handleResponse(response);
+    } on DioException catch (e) {
+      return _handleError(e);
+    } catch (e) {
+      return NetworkResponse(isSuccess: false, statusCode: -1, errorMessage: e.toString());
+    }
+  }
+
+  // MULTIPART Request
   static Future<NetworkResponse> multipartRequest({
     required String url,
     required String method,
-    Map<String, String>? fields,
+    Map<String, dynamic>? fields,
+    Map<String, File>? files,
+    List<File>? fileList,
     String? fileKey,
-    String? filePath,
-    List<String>? filePaths, // Added support for multiple files
     bool requireAuth = true,
+    String? token,
   }) async {
     try {
-      final Uri uri = Uri.parse(url);
-      final request = http.MultipartRequest(method, uri);
-
-      // Add headers
-      final Map<String, String> headers = {'Accept': 'application/json'};
-
-      if (requireAuth) {
-        final String? resolvedToken = await _getToken();
-        if (resolvedToken != null && resolvedToken.isNotEmpty) {
-          headers['Authorization'] = 'Bearer $resolvedToken';
-        }
-      }
-      request.headers.addAll(headers);
-
-      // Add text fields
+      debugPrint('🌐 Initiating MULTIPART [$method]: $url');
+      final formData = FormData();
+      
       if (fields != null) {
-        request.fields.addAll(fields);
+        fields.forEach((key, value) {
+          formData.fields.add(MapEntry(key, value.toString()));
+        });
       }
 
-      // Add single file
-      if (fileKey != null && filePath != null) {
-        MediaType? mediaType;
-        if (filePath.toLowerCase().endsWith('.png')) {
-          mediaType = MediaType('image', 'png');
-        } else if (filePath.toLowerCase().endsWith('.jpg') ||
-            filePath.toLowerCase().endsWith('.jpeg')) {
-          mediaType = MediaType('image', 'jpeg');
+      if (files != null) {
+        for (var entry in files.entries) {
+          formData.files.add(MapEntry(
+            entry.key,
+            await MultipartFile.fromFile(entry.value.path),
+          ));
         }
+      }
 
-        request.files.add(
-          await http.MultipartFile.fromPath(
+      if (fileList != null && fileKey != null) {
+        for (var file in fileList) {
+          formData.files.add(MapEntry(
             fileKey,
-            filePath,
-            contentType: mediaType,
-          ),
-        );
-      }
-
-      // Add multiple files
-      if (fileKey != null && filePaths != null) {
-        for (var path in filePaths) {
-          MediaType? mediaType;
-          if (path.toLowerCase().endsWith('.png')) {
-            mediaType = MediaType('image', 'png');
-          } else if (path.toLowerCase().endsWith('.jpg') ||
-              path.toLowerCase().endsWith('.jpeg')) {
-            mediaType = MediaType('image', 'jpeg');
-          }
-
-          request.files.add(
-            await http.MultipartFile.fromPath(
-              fileKey,
-              path,
-              contentType: mediaType,
-            ),
-          );
+            await MultipartFile.fromFile(file.path),
+          ));
         }
       }
 
-      debugPrint(
-        '==== MULTIPART $method REQUEST ====\n'
-        'URL: $url\n'
-        'HEADERS: $headers\n'
-        'FIELDS: $fields\n'
-        'FILE: $filePath\n'
-        'FILE_KEY: $fileKey\n'
-        '========================',
+      final response = await _dio.request(
+        url,
+        data: formData,
+        options: Options(
+          method: method,
+          headers: {
+            'requireAuth': requireAuth,
+            if (token != null) 'Authorization': 'Bearer $token',
+          },
+        ),
       );
-
-      final http.StreamedResponse response = await request.send().timeout(
-        const Duration(seconds: 60),
-      );
-      final http.Response httpResponse = await http.Response.fromStream(
-        response,
-      );
-
-      _logResponse(method, url, httpResponse);
-
-      return _parseResponse(httpResponse);
-    } on TimeoutException {
-      debugPrint('Network Error (MULTIPART): Request Timed out (60s)');
-      return NetworkResponse(
-        isSuccess: false,
-        statusCode: 408,
-        errorMessage: 'Request timed out (60s limit)',
-      );
+      return _handleResponse(response);
+    } on DioException catch (e) {
+      return _handleError(e);
     } catch (e) {
-      debugPrint('Network Error (MULTIPART): $e');
+      return NetworkResponse(isSuccess: false, statusCode: -1, errorMessage: e.toString());
+    }
+  }
+
+  static NetworkResponse _handleResponse(Response response) {
+    final body = response.data;
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return NetworkResponse(
+        isSuccess: true,
+        statusCode: response.statusCode!,
+        body: body is Map<String, dynamic> ? body : null,
+      );
+    } else {
       return NetworkResponse(
         isSuccess: false,
-        statusCode: -1,
-        errorMessage: 'Connection failed: $e',
+        statusCode: response.statusCode ?? -1,
+        errorMessage: body?['message'] ?? 'Something went wrong',
+        body: body is Map<String, dynamic> ? body : null,
       );
     }
   }
 
-  static Future<NetworkResponse> deleteRequest(
-    String url, {
-    Map<String, dynamic>? body,
-    bool requireAuth = true,
-  }) async {
-    try {
-      final Map<String, String> headers = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      };
-
-      if (requireAuth) {
-        final String? resolvedToken = await _getToken();
-        if (resolvedToken != null && resolvedToken.isNotEmpty) {
-          headers['Authorization'] = 'Bearer $resolvedToken';
-        }
-      }
-
-      final uri = Uri.parse(url);
-
-      _logRequest('DELETE', url, body, headers);
-
-      http.Response response;
-      if (body != null) {
-        response = await http.delete(
-          uri,
-          headers: headers,
-          body: jsonEncode(body),
-        );
-      } else {
-        response = await http.delete(uri, headers: headers);
-      }
-
-      _logResponse('DELETE', url, response);
-
-      return _parseResponse(response);
-    } catch (e) {
-      debugPrint('Network Error (DELETE): $e');
-      return NetworkResponse(
-        isSuccess: false,
-        statusCode: -1,
-        errorMessage: 'No internet or server error: $e',
-      );
-    }
-  }
-
-  // Common response parser
-  static NetworkResponse _parseResponse(http.Response response) {
-    try {
-      final dynamic decoded = jsonDecode(response.body);
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        return NetworkResponse(
-          isSuccess: true,
-          statusCode: response.statusCode,
-          body: decoded is Map<String, dynamic> ? decoded : null,
-        );
-      } else if (response.statusCode == 401) {
-        return NetworkResponse(
-          isSuccess: false,
-          statusCode: response.statusCode,
-          errorMessage: _unAuthorizeMessage,
-          body: decoded is Map<String, dynamic> ? decoded : null,
-        );
-      } else {
-        final String message = decoded is Map
-            ? (decoded['message'] ??
-                  decoded['errorMessages']?[0]['message'] ??
-                  'Unknown error')
-            : response.body;
-        return NetworkResponse(
-          isSuccess: false,
-          statusCode: response.statusCode,
-          errorMessage: message,
-          body: decoded is Map<String, dynamic> ? decoded : null,
-        );
-      }
-    } catch (e) {
-      return NetworkResponse(
-        isSuccess: false,
-        statusCode: response.statusCode,
-        errorMessage: 'Invalid response format',
-        body: {'raw': response.body},
-      );
-    }
-  }
-
-  static void _logRequest(
-    String method,
-    String url,
-    Map<String, dynamic>? body,
-    Map<String, String>? headers,
-  ) {
-    Map<String, dynamic>? safeBody;
-
-    if (body != null) {
-      safeBody = Map.from(body);
-
-      // যদি 'password' ফিল্ড থাকে তাহলে '***'
-      if (safeBody.containsKey('password')) {
-        safeBody['password'] = '***';
+  static NetworkResponse _handleError(DioException e) {
+    String? errorMessage = 'Something went wrong';
+    
+    if (e.type == DioExceptionType.connectionTimeout || e.type == DioExceptionType.receiveTimeout) {
+      errorMessage = 'Connection timed out. Check your server connection.';
+    } else if (e.type == DioExceptionType.connectionError) {
+      errorMessage = 'No internet connection or server unreachable.';
+    } else if (e.response != null) {
+      final data = e.response?.data;
+      if (data is Map) {
+        errorMessage = data['message'] ?? data['errorMessages']?[0]['message'] ?? 'Server error';
       }
     }
-
-    debugPrint(
-      '==== $method REQUEST ====\n'
-      'URL: $url\n'
-      'HEADERS: $headers\n'
-      'BODY: $safeBody\n'
-      '========================',
-    );
-  }
-
-  static void _logResponse(String method, String url, http.Response response) {
-    debugPrint(
-      '==== $method RESPONSE ====\n'
-      'URL: $url\n'
-      'STATUS: ${response.statusCode}\n'
-      'BODY: ${response.body}\n'
-      '==========================',
+    
+    return NetworkResponse(
+      isSuccess: false,
+      statusCode: e.response?.statusCode ?? -1,
+      errorMessage: errorMessage,
+      body: e.response?.data is Map<String, dynamic> ? e.response?.data : null,
     );
   }
 }
-
-// (token helper moved into NetworkCaller class)

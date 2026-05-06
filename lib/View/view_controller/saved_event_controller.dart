@@ -32,7 +32,7 @@ class SavedEventController extends ChangeNotifier {
 
       if (existingSaved != null) {
         final response = await NetworkCaller.deleteRequest(
-          Urls.deleteSavedEvent(existingSaved.savedId),
+          url: Urls.deleteSavedEvent(existingSaved.savedId),
           requireAuth: true,
         );
 

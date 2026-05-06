@@ -105,7 +105,7 @@ class ProfileController extends ChangeNotifier {
     }
   }
 
-  Future<bool> updateProfile({String? name, String? description}) async {
+  Future<bool> updateProfile({String? name, String? description, String? phone}) async {
     if (_currentUser == null) return false;
 
     _inProgress = true;
@@ -122,6 +122,9 @@ class ProfileController extends ChangeNotifier {
       }
       if (description != null && description.trim().isNotEmpty) {
         updateData['description'] = description.trim();
+      }
+      if (phone != null && phone.trim().isNotEmpty) {
+        updateData['phone'] = phone.trim();
       }
 
       if (updateData.isEmpty) {
@@ -142,6 +145,9 @@ class ProfileController extends ChangeNotifier {
         }
         if (description != null && description.trim().isNotEmpty) {
           _currentUser!.description = description.trim();
+        }
+        if (phone != null && phone.trim().isNotEmpty) {
+          _currentUser!.phone = phone.trim();
         }
 
         // save storage
@@ -204,7 +210,7 @@ class ProfileController extends ChangeNotifier {
         url: Urls.updateProfileUrl,
         method: 'PATCH',
         fileKey: 'images',
-        filePath: finalPath,
+        files: {'images': File(finalPath)},
         requireAuth: true,
       );
 

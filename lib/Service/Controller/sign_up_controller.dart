@@ -15,6 +15,8 @@ class SignUpController extends ChangeNotifier {
     required String email,
     required String name,
     required String password,
+    String? phone,
+    Map<String, String>? address,
   }) async {
     _inProgress = true;
     _errorMessage = null;
@@ -24,6 +26,8 @@ class SignUpController extends ChangeNotifier {
       "name": name,
       "email": email,
       "password": password,
+      if (phone != null) "phone": phone,
+      if (address != null) "address": address,
     };
 
     try {
