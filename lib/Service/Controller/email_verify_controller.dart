@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gathering_app/Service/Api%20Service/network_caller.dart';
-import 'package:gathering_app/Service/urls.dart';
+import 'package:truckcalc/Service/Api%20Service/network_caller.dart';
+import 'package:truckcalc/Service/urls.dart';
 
 class EmailVerifyController extends ChangeNotifier {
   bool _isLoading = false;

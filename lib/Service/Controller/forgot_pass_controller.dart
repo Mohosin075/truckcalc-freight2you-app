@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:gathering_app/Service/Api%20Service/network_caller.dart';
-import 'package:gathering_app/Service/urls.dart';
-import 'package:gathering_app/Service/Controller/auth_controller.dart';
+import 'package:truckcalc/Service/Api%20Service/network_caller.dart';
+import 'package:truckcalc/Service/urls.dart';
+import 'package:truckcalc/Service/Controller/auth_controller.dart';
 
 class ForgotPasswordController extends ChangeNotifier {
   bool _inProgress = false;

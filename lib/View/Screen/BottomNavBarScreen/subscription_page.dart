@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gathering_app/View/Widgets/app_background.dart';
-import 'package:gathering_app/View/Widgets/CustomButton.dart';
+import 'package:truckcalc/View/Widgets/app_background.dart';
+import 'package:truckcalc/View/Widgets/CustomButton.dart';
 
 class SubscriptionPage extends StatelessWidget {
   const SubscriptionPage({super.key});
@@ -149,7 +149,7 @@ class SubscriptionPage extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: const Color(0xFFE2C255),
                     boxShadow: [
-                      BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2)),
+                      BoxShadow(color: Colors.black26, blurRadius: 4, offset: const Offset(0, 2)),
                     ],
                   ),
                   child: Text('BEST VALUE', style: TextStyle(color: Colors.white, fontSize: 8.sp, fontWeight: FontWeight.bold)),

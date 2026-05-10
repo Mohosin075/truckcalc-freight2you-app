@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:gathering_app/Model/notification_model.dart';
-import 'package:gathering_app/Service/Api%20service/network_caller.dart';
-import 'package:gathering_app/Service/urls.dart';
-import 'package:gathering_app/Service/Socket/socket_service.dart';
+import 'package:truckcalc/Model/notification_model.dart';
+import 'package:truckcalc/Service/Api%20service/network_caller.dart';
+import 'package:truckcalc/Service/urls.dart';
+import 'package:truckcalc/Service/Socket/socket_service.dart';
 
 class NotificationController extends ChangeNotifier {
   bool _inProgress = false;

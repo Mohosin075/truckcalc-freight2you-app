@@ -1,9 +1,9 @@
 
 import 'package:flutter/material.dart';
-import 'package:gathering_app/Model/userModel.dart';
-import 'package:gathering_app/Service/Api%20service/network_caller.dart';
-import 'package:gathering_app/Service/urls.dart';
-import 'package:gathering_app/Service/Controller/auth_controller.dart';
+import 'package:truckcalc/Model/userModel.dart';
+import 'package:truckcalc/Service/Api%20service/network_caller.dart';
+import 'package:truckcalc/Service/urls.dart';
+import 'package:truckcalc/Service/Controller/auth_controller.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class OtherUserProfileController extends ChangeNotifier {

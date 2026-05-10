@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gathering_app/View/Widgets/app_background.dart';
+import 'package:truckcalc/View/Widgets/app_background.dart';
+import 'package:truckcalc/View/Widgets/customSnacBar.dart';
 
 class RatePlannerPage extends StatelessWidget {
   const RatePlannerPage({super.key});
@@ -23,7 +24,9 @@ class RatePlannerPage extends StatelessWidget {
                       style: TextStyle(color: Colors.white, fontSize: 22.sp, fontWeight: FontWeight.bold),
                     ),
                     ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        showCustomSnackBar(context: context, message: "Rate plan saved!", isError: false);
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF00D193),
                         minimumSize: Size(80.w, 36.h),

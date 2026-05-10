@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:gathering_app/Service/Controller/auth_controller.dart';
-import 'package:gathering_app/Service/urls.dart';
+import 'package:truckcalc/Service/Controller/auth_controller.dart';
+import 'package:truckcalc/Service/urls.dart';
 
 class NetworkResponse {
   final String? errorMessage;

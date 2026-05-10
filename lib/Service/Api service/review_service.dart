@@ -1,5 +1,5 @@
-import 'package:gathering_app/Service/Api%20service/network_caller.dart';
-import 'package:gathering_app/Service/urls.dart';
+import 'package:truckcalc/Service/Api%20service/network_caller.dart';
+import 'package:truckcalc/Service/urls.dart';
 
 class ReviewService {
   static Future<NetworkResponse> getAllReviews() async {

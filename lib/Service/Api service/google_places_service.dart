@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:gathering_app/Model/location_suggestion_model.dart';
-import 'package:gathering_app/Service/urls.dart';
+import 'package:truckcalc/Model/location_suggestion_model.dart';
+import 'package:truckcalc/Service/urls.dart';
 import 'package:flutter/foundation.dart';
 
 class GooglePlacesService {

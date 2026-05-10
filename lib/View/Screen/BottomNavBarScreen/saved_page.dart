@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gathering_app/View/Widgets/app_background.dart';
-import 'package:gathering_app/View/Widgets/custom_item_container.dart';
-import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
+import 'package:truckcalc/View/Widgets/app_background.dart';
+import 'package:truckcalc/View/Widgets/custom_item_container.dart';
+import 'package:truckcalc/View/view_controller/saved_event_controller.dart';
 import 'package:provider/provider.dart';
 
 class SavedPage extends StatefulWidget {

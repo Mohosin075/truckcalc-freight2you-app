@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gathering_app/Service/Controller/other_user_profile_controller.dart';
-import 'package:gathering_app/Model/ChatModel.dart';
-import 'package:gathering_app/Service/Controller/chat_controller.dart';
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/user_chat_screen.dart';
-import 'package:gathering_app/View/Widgets/app_background.dart';
+import 'package:truckcalc/Service/Controller/other_user_profile_controller.dart';
+import 'package:truckcalc/Model/ChatModel.dart';
+import 'package:truckcalc/Service/Controller/chat_controller.dart';
+import 'package:truckcalc/View/Screen/BottomNavBarScreen/user_chat_screen.dart';
+import 'package:truckcalc/View/Widgets/app_background.dart';
 import 'package:provider/provider.dart';
-import 'package:gathering_app/Service/Controller/bottom_nav_controller.dart';
+import 'package:truckcalc/Service/Controller/bottom_nav_controller.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:gathering_app/View/Widgets/customSnacBar.dart';
-import 'package:gathering_app/Service/urls.dart';
+import 'package:truckcalc/View/Widgets/customSnacBar.dart';
+import 'package:truckcalc/Service/urls.dart';
 
 class OtherUserProfileScreen extends StatefulWidget {
   final String userId;

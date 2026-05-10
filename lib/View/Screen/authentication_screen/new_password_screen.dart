@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gathering_app/Service/Controller/forgot_pass_controller.dart';
-import 'package:gathering_app/View/Screen/authentication_screen/forgot_pass_screen.dart';
-import 'package:gathering_app/View/Screen/authentication_screen/log_in_screen.dart';
-import 'package:gathering_app/View/Widgets/app_background.dart';
-import 'package:gathering_app/View/Widgets/auth_textFormField.dart';
-import 'package:gathering_app/View/Widgets/customSnacBar.dart';
+import 'package:truckcalc/Service/Controller/forgot_pass_controller.dart';
+import 'package:truckcalc/View/Screen/authentication_screen/forgot_pass_screen.dart';
+import 'package:truckcalc/View/Screen/authentication_screen/log_in_screen.dart';
+import 'package:truckcalc/View/Widgets/app_background.dart';
+import 'package:truckcalc/View/Widgets/CustomButton.dart';
+import 'package:truckcalc/View/Widgets/auth_textFormField.dart';
+import 'package:truckcalc/View/Widgets/customSnacBar.dart';
 import 'package:provider/provider.dart';
 
 class NewPasswordScreen extends StatefulWidget {
@@ -25,29 +26,28 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: AppBackground(
+        imagePath: 'assets/images/authimg.png',
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 24.w),
           child: Column(
             children: [
               SizedBox(height: 60.h),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: IconButton(
-                  icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
-                  onPressed: () {
-                    Navigator.pushNamedAndRemoveUntil(context, ForgotPassScreen.name, (route) => false);
-                  },
-                ),
+              Image.asset(
+                'assets/images/logo-cal.png',
+                width: 100.w,
+                height: 60.h,
+                fit: BoxFit.contain,
               ),
+              SizedBox(height: 10.h),
               Text(
-                'Create New Password',
+                'truckcalc',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 24.sp,
+                  fontSize: 32.sp,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 60.h),
+              SizedBox(height: 40.h),
               Container(
                 padding: EdgeInsets.all(20.w),
                 decoration: BoxDecoration(
@@ -59,6 +59,15 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                   key: _formKey,
                   child: Column(
                     children: [
+                      Text(
+                        'Create New Password',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 22.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 20.h),
                       AuthTextField(
                         controller: _newPassController,
                         labelText: 'New Password',
@@ -77,26 +86,26 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                           return null;
                         },
                       ),
-                      SizedBox(height: 20.h),
-                      Container(
-                        width: double.infinity,
-                        height: 50.h,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12.r),
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF004D40), Color(0xFF00D193)],
-                          ),
-                        ),
-                        child: ElevatedButton(
-                          onPressed: onTapConfirmButton,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            shadowColor: Colors.transparent,
-                          ),
-                          child: const Text('Confirm'),
-                        ),
+                      SizedBox(height: 24.h),
+                      CustomButton(
+                        buttonName: 'Confirm',
+                        onPressed: onTapConfirmButton,
                       ),
                     ],
+                  ),
+                ),
+              ),
+              SizedBox(height: 20.h),
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamedAndRemoveUntil(context, ForgotPassScreen.name, (route) => false);
+                },
+                child: Text(
+                  'Back',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),

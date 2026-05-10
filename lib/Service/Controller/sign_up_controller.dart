@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:gathering_app/Service/Api%20Service/network_caller.dart';
-import 'package:gathering_app/Service/urls.dart';
-import 'package:gathering_app/View/Screen/authentication_screen/verify_account.dart';
-import 'package:gathering_app/View/Widgets/customSnacBar.dart';
+import 'package:truckcalc/Service/Api%20Service/network_caller.dart';
+import 'package:truckcalc/Service/urls.dart';
+import 'package:truckcalc/View/Screen/authentication_screen/verify_account.dart';
+import 'package:truckcalc/View/Widgets/customSnacBar.dart';
 
 class SignUpController extends ChangeNotifier {
   bool _inProgress = false;

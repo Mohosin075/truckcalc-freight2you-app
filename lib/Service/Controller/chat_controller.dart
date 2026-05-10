@@ -1,15 +1,15 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:gathering_app/Service/Api%20service/network_caller.dart';
-import 'package:gathering_app/Service/urls.dart';
+import 'package:truckcalc/Service/Api%20service/network_caller.dart';
+import 'package:truckcalc/Service/urls.dart';
 
-import 'package:gathering_app/Model/ChatModel.dart';
+import 'package:truckcalc/Model/ChatModel.dart';
 
-import 'package:gathering_app/Model/MessageModel.dart';
-import 'package:gathering_app/Service/Controller/auth_controller.dart';
-import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
-import 'package:gathering_app/Service/Socket/socket_service.dart';
+import 'package:truckcalc/Model/MessageModel.dart';
+import 'package:truckcalc/Service/Controller/auth_controller.dart';
+import 'package:truckcalc/Service/Controller/profile_page_controller.dart';
+import 'package:truckcalc/Service/Socket/socket_service.dart';
 
 class ChatController extends ChangeNotifier {
   bool _inProgress = false;

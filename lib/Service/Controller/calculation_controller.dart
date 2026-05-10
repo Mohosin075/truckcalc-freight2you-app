@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gathering_app/Model/calculation_model.dart';
-import 'package:gathering_app/Service/Api%20service/calculation_service.dart';
+import 'package:truckcalc/Model/calculation_model.dart';
+import 'package:truckcalc/Service/Api%20service/calculation_service.dart';
 
 class CalculationController extends ChangeNotifier {
   bool _inProgress = false;

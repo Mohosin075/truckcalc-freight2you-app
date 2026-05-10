@@ -1,17 +1,17 @@
 // View/app.dart
 import 'package:flutter/material.dart';
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/bottom_nav_bar.dart';
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/notification_screen.dart';
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/other_user_profile_screen.dart';
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/user_chat_screen.dart';
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/settings_screen.dart';
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/saved_page.dart';
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/view_event_screen.dart';
-import 'package:gathering_app/Model/ChatModel.dart';
-import 'package:gathering_app/View/Screen/authentication_screen/code_send.dart';
-import 'package:gathering_app/View/Screen/authentication_screen/code_submit.dart';
-import 'package:gathering_app/View/Screen/authentication_screen/new_password_screen.dart';
-import 'package:gathering_app/View/Screen/authentication_screen/verify_account.dart';
+import 'package:truckcalc/View/Screen/BottomNavBarScreen/bottom_nav_bar.dart';
+import 'package:truckcalc/View/Screen/BottomNavBarScreen/notification_screen.dart';
+import 'package:truckcalc/View/Screen/BottomNavBarScreen/other_user_profile_screen.dart';
+import 'package:truckcalc/View/Screen/BottomNavBarScreen/user_chat_screen.dart';
+import 'package:truckcalc/View/Screen/BottomNavBarScreen/settings_screen.dart';
+import 'package:truckcalc/View/Screen/BottomNavBarScreen/saved_page.dart';
+import 'package:truckcalc/View/Screen/BottomNavBarScreen/view_event_screen.dart';
+import 'package:truckcalc/Model/ChatModel.dart';
+import 'package:truckcalc/View/Screen/authentication_screen/code_send.dart';
+import 'package:truckcalc/View/Screen/authentication_screen/code_submit.dart';
+import 'package:truckcalc/View/Screen/authentication_screen/new_password_screen.dart';
+import 'package:truckcalc/View/Screen/authentication_screen/verify_account.dart';
 import '../../View/Screen/Onboarding_screen/get_start_screen.dart';
 import '../../View/Screen/Onboarding_screen/interest_screen.dart';
 import '../../View/Screen/Onboarding_screen/splash_screen.dart';
@@ -38,12 +38,12 @@ class AppRoutes {
   static final routes = {
     splash: (context) => const SplashScreen(),
     getStart: (context) => const GetStartScreen(),
-    interest: (context) => InterestScreen(),
-    login: (context) => LogInScreen(),
+    interest: (context) => const InterestScreen(),
+    login: (context) => const LogInScreen(),
     signup: (context) => const SignUpScreen(),
     forgotPass: (context) => const ForgotPassScreen(),
     codeSend: (context) => const CodeSend(),
-    codeSubmit: (context) => CodeSubmit(),
+    codeSubmit: (context) => const CodeSubmit(),
     bottomNavBar: (context) => const BottomNavBarScreen(),
     notificationScreen: (context) => const NotificationScreen(),
     userchatScreen: (context) {
@@ -51,7 +51,7 @@ class AppRoutes {
       return UserChatScreen(chat: chat);
     },
     viewEventScreen: (context) => const ViewEventScreen(),
-    newPassScreen: (context) => NewPasswordScreen(),
+    newPassScreen: (context) => const NewPasswordScreen(),
     verifyAccount: (context) => VerifyAccount(email: ''),
     OtherUserProfileScreen.name: (context) {
       final userId = ModalRoute.of(context)!.settings.arguments as String;

@@ -2,19 +2,19 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gathering_app/Model/get_all_event_model.dart';
-import 'package:gathering_app/Service/Controller/getAllEvent_controller.dart';
-import 'package:gathering_app/Service/Controller/notification_controller.dart';
-import 'package:gathering_app/Service/Controller/user_event_controller.dart';
-import 'package:gathering_app/Service/urls.dart';
+import 'package:truckcalc/Model/get_all_event_model.dart';
+import 'package:truckcalc/Service/Controller/getAllEvent_controller.dart';
+import 'package:truckcalc/Service/Controller/notification_controller.dart';
+import 'package:truckcalc/Service/Controller/user_event_controller.dart';
+import 'package:truckcalc/Service/urls.dart';
 
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/notification_screen.dart';
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/view_event_screen.dart';
-import 'package:gathering_app/View/Theme/theme_provider.dart';
-import 'package:gathering_app/View/Widgets/app_background.dart';
-import 'package:gathering_app/View/Widgets/serch_textfield.dart';
-import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
-import 'package:gathering_app/View/Widgets/custom_item_container.dart';
+import 'package:truckcalc/View/Screen/BottomNavBarScreen/notification_screen.dart';
+import 'package:truckcalc/View/Screen/BottomNavBarScreen/view_event_screen.dart';
+import 'package:truckcalc/View/Theme/theme_provider.dart';
+import 'package:truckcalc/View/Widgets/app_background.dart';
+import 'package:truckcalc/View/Widgets/serch_textfield.dart';
+import 'package:truckcalc/View/view_controller/saved_event_controller.dart';
+import 'package:truckcalc/View/Widgets/custom_item_container.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shimmer/shimmer.dart';
@@ -90,7 +90,7 @@ class _HomePageState extends State<HomePage> {
                 Center(
                   child: Consumer<ThemeProvider>(
                     builder: (context, controller, child) => Text(
-                      'Gathering',
+                      'TruckCalc',
                       style: TextStyle(
                         fontWeight: FontWeight.w700,
                         fontSize: 27.sp,

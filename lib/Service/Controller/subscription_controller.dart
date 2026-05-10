@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gathering_app/Service/Api%20service/subscription_service.dart';
+import 'package:truckcalc/Service/Api%20service/subscription_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SubscriptionController extends ChangeNotifier {

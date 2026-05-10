@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gathering_app/Service/Controller/auth_controller.dart';
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/bottom_nav_bar.dart';
-import 'package:gathering_app/View/Screen/authentication_screen/forgot_pass_screen.dart';
-import 'package:gathering_app/View/Screen/authentication_screen/sign_up_screen.dart';
-import 'package:gathering_app/View/Widgets/app_background.dart';
-import 'package:gathering_app/View/Widgets/auth_textFormField.dart';
-import 'package:gathering_app/View/Widgets/customSnacBar.dart';
+import 'package:truckcalc/Service/Controller/auth_controller.dart';
+import 'package:truckcalc/View/Screen/BottomNavBarScreen/bottom_nav_bar.dart';
+import 'package:truckcalc/View/Screen/authentication_screen/forgot_pass_screen.dart';
+import 'package:truckcalc/View/Screen/authentication_screen/sign_up_screen.dart';
+import 'package:truckcalc/View/Widgets/app_background.dart';
+import 'package:truckcalc/View/Widgets/CustomButton.dart';
+import 'package:truckcalc/View/Widgets/auth_textFormField.dart';
+import 'package:truckcalc/View/Widgets/customSnacBar.dart';
 import 'package:provider/provider.dart';
 
 class LogInScreen extends StatefulWidget {
@@ -53,6 +54,7 @@ class _LogInScreenState extends State<LogInScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: AppBackground(
+        imagePath: 'assets/images/authimg.png',
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 24.w),
           child: Column(
@@ -105,55 +107,37 @@ class _LogInScreenState extends State<LogInScreen> {
                           return null;
                         },
                       ),
-                      SizedBox(height: 20.h),
-                      GestureDetector(
-                        onTap: _isLoading ? null : _handleLogin,
-                        child: Container(
-                          width: double.infinity,
-                          height: 50.h,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12.r),
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF004D40), Color(0xFF00D193)],
-                            ),
-                          ),
-                          child: Center(
-                            child: _isLoading
-                                ? const SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                                  )
-                                : const Text(
-                                    'Sign In',
-                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                                  ),
-                          ),
-                        ),
+                      SizedBox(height: 24.h),
+                      CustomButton(
+                        buttonName: 'Sign in',
+                        isLoading: _isLoading,
+                        onPressed: _handleLogin,
                       ),
-                      SizedBox(height: 10.h),
-                      ElevatedButton(
+                      SizedBox(height: 12.h),
+                      CustomButton(
+                        buttonName: 'Forgot password?',
+                        backgroundColor: Colors.white,
+                        textColor: Colors.black,
                         onPressed: () {
                           Navigator.pushNamed(context, ForgotPassScreen.name);
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: Colors.black,
+                      ),
+                      SizedBox(height: 24.h),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(context, SignUpScreen.name);
+                        },
+                        child: Text(
+                          'New here? Create account',
+                          style: TextStyle(
+                            color: const Color(0xFF4C86FF),
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                        child: const Text('Forgot password?'),
                       ),
                     ],
                   ),
-                ),
-              ),
-              SizedBox(height: 20.h),
-              TextButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, SignUpScreen.name);
-                },
-                child: const Text(
-                  'New here? Create account',
-                  style: TextStyle(color: Color(0xFF4C86FF)),
                 ),
               ),
             ],

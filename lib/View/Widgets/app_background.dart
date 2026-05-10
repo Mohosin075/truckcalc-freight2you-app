@@ -12,53 +12,33 @@ class AppBackground extends StatelessWidget {
     return Container(
       width: double.infinity,
       height: double.infinity,
-      decoration: const BoxDecoration(
-        color: Color(0xFF010B0B),
-      ),
+      color: const Color(0xFF010B0B), // Deep dark base from the image
       child: Stack(
         children: [
-          // Background Image with Pattern - Increased visibility
+          // 1. Prominent Diagonal Pattern Overlay
           Positioned.fill(
             child: Opacity(
-              opacity: 0.6,
+              opacity: 0.8, // Increased opacity to match the bright stripes in the user image
               child: Image.asset(
                 imagePath ?? 'assets/images/authimg.png',
                 fit: BoxFit.cover,
               ),
             ),
           ),
-          
-          // Left Top Glow - More vibrant
+
+          // 2. Large Bottom-Left Glow
           Positioned(
-            left: -80.w,
-            top: -50.h,
+            left: -180.w,
+            bottom: -150.h,
             child: Container(
-              width: 350.w,
-              height: 350.h,
+              width: 500.w,
+              height: 500.h,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    const Color(0xFF00D193).withOpacity(0.25),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
-            ),
-          ),
-          
-          // Right Middle Glow
-          Positioned(
-            right: -100.w,
-            top: 250.h,
-            child: Container(
-              width: 450.w,
-              height: 450.h,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    const Color(0xFF00D193).withOpacity(0.3),
+                    const Color(0xFF00D193).withValues(alpha: 0.45),
+                    const Color(0xFF00D193).withValues(alpha: 0.05),
                     Colors.transparent,
                   ],
                 ),
@@ -66,18 +46,19 @@ class AppBackground extends StatelessWidget {
             ),
           ),
 
-          // Left Bottom Glow
+          // 3. Middle-Right Vertical Glow
           Positioned(
-            left: -120.w,
-            bottom: -50.h,
+            right: -200.w,
+            top: 200.h,
             child: Container(
-              width: 450.w,
-              height: 450.h,
+              width: 500.w,
+              height: 800.h, // Stretched vertically as seen in screenshots
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    const Color(0xFF00D193).withOpacity(0.3),
+                    const Color(0xFF00D193).withValues(alpha: 0.45),
+                    const Color(0xFF00D193).withValues(alpha: 0.05),
                     Colors.transparent,
                   ],
                 ),
@@ -85,6 +66,7 @@ class AppBackground extends StatelessWidget {
             ),
           ),
 
+          // 4. Content Area
           child,
         ],
       ),

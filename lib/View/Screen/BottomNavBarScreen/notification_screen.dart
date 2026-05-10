@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gathering_app/Service/Controller/notification_controller.dart';
-import 'package:gathering_app/View/Theme/theme_provider.dart';
-import 'package:gathering_app/View/Widgets/app_background.dart';
-import 'package:gathering_app/View/Widgets/CustomButton.dart';
+import 'package:truckcalc/Service/Controller/notification_controller.dart';
+import 'package:truckcalc/View/Theme/theme_provider.dart';
+import 'package:truckcalc/View/Widgets/app_background.dart';
+import 'package:truckcalc/View/Widgets/CustomButton.dart';
 import 'package:provider/provider.dart';
 
 import '../../Widgets/notification_container.dart';

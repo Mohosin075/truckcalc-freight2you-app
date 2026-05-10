@@ -1,8 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:gathering_app/Service/Api%20service/auth_service.dart';
-import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
-import 'package:gathering_app/Service/Socket/socket_service.dart';
+import 'package:truckcalc/Service/Api%20service/auth_service.dart';
+import 'package:truckcalc/Service/Controller/profile_page_controller.dart';
+import 'package:truckcalc/Service/Socket/socket_service.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
 
@@ -119,11 +120,15 @@ class AuthController extends ChangeNotifier {
         final String accessToken = data['accessToken'] ?? data['token'] ?? '';
         final String refreshToken = data['refreshToken'] ?? '';
 
+        // Extract user data from response or decode from JWT
         final Map<String, dynamic> userData =
-            data['user'] ?? data['profile'] ?? {};
+            data['user'] ?? data['profile'] ?? _decodeToken(accessToken);
+        
         final String userId = userData['id']?.toString() ??
             userData['_id']?.toString() ??
+            userData['authId']?.toString() ??
             '';
+            
         final String userName = userData['name'] ??
             userData['fullName'] ??
             userData['username'] ??
@@ -171,6 +176,27 @@ class AuthController extends ChangeNotifier {
 
     debugPrint("✅ Tokens saved successfully");
     notifyListeners();
+  }
+
+  Map<String, dynamic> _decodeToken(String token) {
+    try {
+      final parts = token.split('.');
+      if (parts.length != 3) return {};
+      final payload = parts[1];
+
+      // Normalize base64 string
+      String normalized = payload;
+      while (normalized.length % 4 != 0) {
+        normalized += '=';
+      }
+      normalized = normalized.replaceAll('-', '+').replaceAll('_', '/');
+
+      final resp = utf8.decode(base64.decode(normalized));
+      return jsonDecode(resp);
+    } catch (e) {
+      debugPrint("❌ JWT Decode Error: $e");
+      return {};
+    }
   }
 
   // লগআউট আপডেট করা

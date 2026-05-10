@@ -1,10 +1,11 @@
 import 'package:flutter/gestures.dart' show TapGestureRecognizer;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gathering_app/Service/Controller/forgot_pass_controller.dart';
-import 'package:gathering_app/View/Screen/authentication_screen/new_password_screen.dart';
-import 'package:gathering_app/View/Theme/theme_provider.dart';
-import 'package:gathering_app/View/Widgets/customSnacBar.dart';
+import 'package:truckcalc/Service/Controller/forgot_pass_controller.dart';
+import 'package:truckcalc/View/Screen/authentication_screen/new_password_screen.dart';
+import 'package:truckcalc/View/Theme/theme_provider.dart';
+import 'package:truckcalc/View/Widgets/app_background.dart';
+import 'package:truckcalc/View/Widgets/customSnacBar.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:provider/provider.dart';
 
@@ -13,8 +14,7 @@ import '../../Widgets/appbar.dart';
 
 
 class CodeSubmit extends StatefulWidget {
-
-   CodeSubmit({super.key,});
+  const CodeSubmit({super.key});
   static const String name = '/code-submit';
 
   @override
@@ -32,96 +32,112 @@ class _CodeSubmitState extends State<CodeSubmit> {
       listen: false,
     );
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: common_appbar(titleName: 'Forgot Password'),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
+      body: AppBackground(
+        imagePath: 'assets/images/authimg.png',
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 24.w),
           child: Column(
-            // mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Code Submit',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontSize: 32.sp,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-              SizedBox(height: 20.h),
-              Text(
-                'Enter the 6-Digit code sent to you at\n${forgotPassController.savedEmail}',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-              SizedBox(height: 20.h),
-              PinCodeTextField(
-                backgroundColor: Colors.transparent,
-                length: 6,
-                obscureText: false,
-                animationType: AnimationType.none,
-                keyboardType: TextInputType.number,
-                cursorColor: const Color(0xFFCC18CA),
-                textStyle: TextStyle(
-                  fontSize: 24.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).textTheme.bodyLarge?.color,
-                ),
-        
-                pinTheme: PinTheme(
-                  shape: PinCodeFieldShape.box,
-                  borderRadius: BorderRadius.circular(16.r),
-                  fieldHeight: 64.h,
-                  fieldWidth: 64.w,
-        
-                  activeColor: Colors.transparent,
-                  inactiveColor: Colors.transparent,
-                  selectedColor: Colors.transparent,
-        
-                  activeFillColor: const Color(0xFFCC18CA).withOpacity(0.25),
-                  selectedFillColor: const Color(0xFFCC18CA).withOpacity(0.35),
-                  inactiveFillColor: const Color(0xFFCC18CA).withOpacity(0.15),
-        
-                  borderWidth: 0,
-                ),
-        
-                enableActiveFill: true,
-                boxShadows: const [],
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        
-                animationDuration: const Duration(milliseconds: 200),
-                controller: otpController,
-                appContext: context,
-                onChanged: (value) {},
-                onCompleted: (value) {
-                  debugPrint("OTP: $value");
-                },
-              ),
-              SizedBox(height: 20.h),
-              Consumer<ForgotPasswordController>(
-                builder: (context, forgotController, child) {
-                  return CustomButton(
-                    buttonName: 'Submit',
-                    isLoading: forgotController.inProgress,
-                    onPressed: onTapSubmit,
-                  );
-                },
+              SizedBox(height: 60.h),
+              Image.asset(
+                'assets/images/logo-cal.png',
+                width: 100.w,
+                height: 60.h,
+                fit: BoxFit.contain,
               ),
               SizedBox(height: 10.h),
+              Text(
+                'truckcalc',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 32.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 40.h),
+              Container(
+                padding: EdgeInsets.all(20.w),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(20.r),
+                  border: Border.all(color: Colors.white.withOpacity(0.1)),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      'Code Submit',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 10.h),
+                    Text(
+                      'Enter the 6-Digit code sent to you at\n${forgotPassController.savedEmail}',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    SizedBox(height: 30.h),
+                    PinCodeTextField(
+                      backgroundColor: Colors.transparent,
+                      length: 6,
+                      obscureText: false,
+                      animationType: AnimationType.none,
+                      keyboardType: TextInputType.number,
+                      cursorColor: const Color(0xFF00D193),
+                      textStyle: TextStyle(
+                        fontSize: 20.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                      pinTheme: PinTheme(
+                        shape: PinCodeFieldShape.box,
+                        borderRadius: BorderRadius.circular(12.r),
+                        fieldHeight: 45.h,
+                        fieldWidth: 45.w,
+                        activeColor: Colors.white.withOpacity(0.2),
+                        inactiveColor: Colors.white.withOpacity(0.1),
+                        selectedColor: const Color(0xFF00D193),
+                        activeFillColor: Colors.white.withOpacity(0.05),
+                        selectedFillColor: Colors.white.withOpacity(0.1),
+                        inactiveFillColor: Colors.white.withOpacity(0.02),
+                        borderWidth: 1,
+                      ),
+                      enableActiveFill: true,
+                      appContext: context,
+                      controller: otpController,
+                      onChanged: (value) {},
+                    ),
+                    SizedBox(height: 30.h),
+                    Consumer<ForgotPasswordController>(
+                      builder: (context, forgotController, child) {
+                        return CustomButton(
+                          buttonName: 'Submit',
+                          isLoading: forgotController.inProgress,
+                          onPressed: onTapSubmit,
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 20.h),
               Align(
-                alignment: Alignment.centerRight,
+                alignment: Alignment.center,
                 child: RichText(
                   text: TextSpan(
-                    style: Theme.of(context).textTheme.bodyMedium,
+                    style: TextStyle(color: Colors.white70, fontSize: 14.sp),
                     text: "Don't receive code? ",
                     children: [
                       TextSpan(
                         text: 'Resend Again',
-                        style: TextStyle(color: Color(0xFF9810FA)),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = ontapResendCode,
+                        style: const TextStyle(color: Color(0xFF00D193), fontWeight: FontWeight.bold),
+                        recognizer: TapGestureRecognizer()..onTap = ontapResendCode,
                       ),
                     ],
                   ),

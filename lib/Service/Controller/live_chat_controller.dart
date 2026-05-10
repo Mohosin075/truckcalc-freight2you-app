@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'package:gathering_app/Service/Api%20service/network_caller.dart';
-import 'package:gathering_app/Service/urls.dart';
-import 'package:gathering_app/Model/live_chat_message_model.dart';
-import 'package:gathering_app/Service/Socket/socket_service.dart';
-import 'package:gathering_app/Service/Controller/auth_controller.dart';
+import 'package:truckcalc/Service/Api%20service/network_caller.dart';
+import 'package:truckcalc/Service/urls.dart';
+import 'package:truckcalc/Model/live_chat_message_model.dart';
+import 'package:truckcalc/Service/Socket/socket_service.dart';
+import 'package:truckcalc/Service/Controller/auth_controller.dart';
 
 class LiveChatController extends ChangeNotifier {
   bool _isLoading = false;

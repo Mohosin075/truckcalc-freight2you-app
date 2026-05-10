@@ -9,12 +9,12 @@ android {
     namespace = "com.gathering.social"
 
     compileSdk = 36
-    ndkVersion = "26.1.10909125"
+    ndkVersion = "28.2.13676358"
 
     defaultConfig {
         applicationId = "com.gathering.social"
         minSdk = flutter.minSdkVersion
-        targetSdk = 34
+        targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
@@ -25,8 +25,10 @@ android {
         isCoreLibraryDesugaringEnabled = true
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
     }
 
     buildTypes {

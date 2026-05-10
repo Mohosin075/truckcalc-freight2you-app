@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gathering_app/Utils/app_utils.dart';
+import 'package:truckcalc/Utils/app_utils.dart';
 
 void showCustomSnackBar({
   required BuildContext context,

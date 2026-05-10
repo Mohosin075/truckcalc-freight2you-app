@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gathering_app/View/Screen/authentication_screen/log_in_screen.dart';
-import 'package:gathering_app/View/Widgets/app_background.dart';
+import 'package:truckcalc/View/Screen/authentication_screen/log_in_screen.dart';
+import 'package:truckcalc/View/Widgets/app_background.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -26,6 +26,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: AppBackground(
+        imagePath: 'assets/images/authimg.png',
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,

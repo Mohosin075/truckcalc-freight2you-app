@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gathering_app/View/Widgets/app_background.dart';
+import 'package:truckcalc/View/Widgets/app_background.dart';
 
 class HistoryPage extends StatelessWidget {
   const HistoryPage({super.key});

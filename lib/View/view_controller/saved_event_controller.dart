@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:gathering_app/Model/get_all_event_model.dart'; // EventData model এখানে আছে ধরে নিচ্ছি
-import 'package:gathering_app/Service/Api%20service/network_caller.dart';
-import 'package:gathering_app/Service/urls.dart';
+import 'package:truckcalc/Model/get_all_event_model.dart'; // EventData model এখানে আছে ধরে নিচ্ছি
+import 'package:truckcalc/Service/Api%20service/network_caller.dart';
+import 'package:truckcalc/Service/urls.dart';
 
 class SavedEventController extends ChangeNotifier {
   final List<SavedEventData> _savedEvents = [];

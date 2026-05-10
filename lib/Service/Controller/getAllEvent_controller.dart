@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:gathering_app/Model/get_all_event_model.dart';
-import 'package:gathering_app/Service/Api service/network_caller.dart';
-import 'package:gathering_app/Service/urls.dart';
+import 'package:truckcalc/Model/get_all_event_model.dart';
+import 'package:truckcalc/Service/Api service/network_caller.dart';
+import 'package:truckcalc/Service/urls.dart';
 
 class GetAllEventController extends ChangeNotifier {
   bool _inProgress = false;

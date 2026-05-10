@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gathering_app/View/Widgets/app_background.dart';
-import 'package:gathering_app/View/Widgets/auth_textFormField.dart';
+import 'package:truckcalc/View/Widgets/app_background.dart';
+import 'package:truckcalc/View/Widgets/CustomButton.dart';
+import 'package:truckcalc/View/Widgets/auth_textFormField.dart';
 
 class ForgotPassScreen extends StatefulWidget {
   const ForgotPassScreen({super.key});
@@ -19,40 +20,29 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: AppBackground(
+        imagePath: 'assets/images/authimg.png',
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 24.w),
           child: Column(
             children: [
               SizedBox(height: 60.h),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  Text(
-                    'Reset password',
-                    style: TextStyle(color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(width: 40),
-                ],
+              Image.asset(
+                'assets/images/logo-cal.png',
+                width: 100.w,
+                height: 60.h,
+                fit: BoxFit.contain,
+              ),
+              SizedBox(height: 10.h),
+              Text(
+                'truckcalc',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 32.sp,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               SizedBox(height: 40.h),
               if (!_isSent) ...[
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Forgot password',
-                    style: TextStyle(color: Colors.white, fontSize: 24.sp, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                SizedBox(height: 10.h),
-                const Text(
-                  'Enter your email address and we will send you a link',
-                  style: TextStyle(color: Colors.white70),
-                ),
-                SizedBox(height: 40.h),
                 Container(
                   padding: EdgeInsets.all(20.w),
                   decoration: BoxDecoration(
@@ -62,59 +52,77 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
                   ),
                   child: Column(
                     children: [
+                      Text(
+                        'Forgot password',
+                        style: TextStyle(color: Colors.white, fontSize: 24.sp, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 10.h),
+                      const Text(
+                        'Enter your email address and we will send you a link',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                      SizedBox(height: 30.h),
                       AuthTextField(
                         controller: _emailController,
                         labelText: 'Email address',
                         hintText: 'you@email.com',
                         keyboardType: TextInputType.emailAddress,
                       ),
-                      SizedBox(height: 20.h),
-                      Container(
-                        width: double.infinity,
-                        height: 50.h,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12.r),
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF004D40), Color(0xFF00D193)],
-                          ),
-                        ),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            setState(() => _isSent = true);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            shadowColor: Colors.transparent,
-                          ),
-                          child: const Text('Send reset link'),
-                        ),
+                      SizedBox(height: 24.h),
+                      CustomButton(
+                        buttonName: 'Send reset link',
+                        onPressed: () {
+                          setState(() => _isSent = true);
+                        },
                       ),
                     ],
                   ),
                 ),
               ] else ...[
-                SizedBox(height: 100.h),
-                const Icon(Icons.mail_outline, size: 80, color: Colors.white),
-                SizedBox(height: 20.h),
-                Text(
-                  'Check your email',
-                  style: TextStyle(color: Colors.white, fontSize: 24.sp, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 10.h),
-                Text(
-                  'We sent a reset link to ${_emailController.text}',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white70),
-                ),
-                SizedBox(height: 40.h),
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text(
-                    'Back to login',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                Container(
+                  padding: EdgeInsets.all(20.w),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(20.r),
+                    border: Border.all(color: Colors.white.withOpacity(0.1)),
+                  ),
+                  child: Column(
+                    children: [
+                      const Icon(Icons.mail_outline, size: 80, color: Colors.white),
+                      SizedBox(height: 20.h),
+                      Text(
+                        'Check your email',
+                        style: TextStyle(color: Colors.white, fontSize: 24.sp, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 10.h),
+                      Text(
+                        'We sent a reset link to ${_emailController.text}',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: Colors.white70),
+                      ),
+                      SizedBox(height: 30.h),
+                      CustomButton(
+                        buttonName: 'Back to login',
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
                   ),
                 ),
               ],
+              SizedBox(height: 20.h),
+              if (!_isSent)
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Text(
+                    'Back to login',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
             ],
           ),
         ),

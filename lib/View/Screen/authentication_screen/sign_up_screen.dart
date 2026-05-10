@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gathering_app/Service/Controller/sign_up_controller.dart';
-import 'package:gathering_app/View/Screen/authentication_screen/log_in_screen.dart';
-import 'package:gathering_app/View/Screen/authentication_screen/verify_account.dart';
-import 'package:gathering_app/View/Widgets/app_background.dart';
-import 'package:gathering_app/View/Widgets/auth_textFormField.dart';
-import 'package:gathering_app/View/Widgets/customSnacBar.dart';
+import 'package:truckcalc/Service/Controller/sign_up_controller.dart';
+import 'package:truckcalc/View/Screen/authentication_screen/log_in_screen.dart';
+import 'package:truckcalc/View/Screen/authentication_screen/verify_account.dart';
+import 'package:truckcalc/View/Widgets/app_background.dart';
+import 'package:truckcalc/View/Widgets/CustomButton.dart';
+import 'package:truckcalc/View/Widgets/auth_textFormField.dart';
+import 'package:truckcalc/View/Widgets/customSnacBar.dart';
 import 'package:provider/provider.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -63,33 +64,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: AppBackground(
+        imagePath: 'assets/images/authimg.png',
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 24.w),
           child: Column(
             children: [
               SizedBox(height: 60.h),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: IconButton(
-                  icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
-                  onPressed: () => Navigator.pop(context),
-                ),
+              Image.asset(
+                'assets/images/logo-cal.png',
+                width: 100.w,
+                height: 60.h,
+                fit: BoxFit.contain,
               ),
+              SizedBox(height: 10.h),
               Text(
-                'Create account',
+                'truckcalc',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 24.sp,
+                  fontSize: 32.sp,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               SizedBox(height: 40.h),
-              const Text(
-                'Start with a free 7-day trial — no credit card required',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Color(0xFF00D193), fontWeight: FontWeight.w500),
-              ),
-              SizedBox(height: 30.h),
               Container(
                 padding: EdgeInsets.all(20.w),
                 decoration: BoxDecoration(
@@ -121,42 +117,26 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         isPassword: true,
                         validator: (v) => v!.length < 6 ? 'Min 6 characters' : null,
                       ),
-                      SizedBox(height: 20.h),
-                      GestureDetector(
-                        onTap: _isLoading ? null : _handleSignUp,
-                        child: Container(
-                          width: double.infinity,
-                          height: 50.h,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12.r),
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF004D40), Color(0xFF00D193)],
-                            ),
-                          ),
-                          child: Center(
-                            child: _isLoading
-                                ? const SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                                  )
-                                : const Text(
-                                    'Create account',
-                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                                  ),
-                          ),
-                        ),
+                      SizedBox(height: 24.h),
+                      CustomButton(
+                        buttonName: 'Create account',
+                        isLoading: _isLoading,
+                        onPressed: _handleSignUp,
                       ),
                     ],
                   ),
                 ),
               ),
               SizedBox(height: 20.h),
-              TextButton(
-                onPressed: () => Navigator.pushReplacementNamed(context, LogInScreen.name),
-                child: const Text(
+              GestureDetector(
+                onTap: () => Navigator.pushReplacementNamed(context, LogInScreen.name),
+                child: Text(
                   'Back to login',
-                  style: TextStyle(color: Colors.white70),
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             ],

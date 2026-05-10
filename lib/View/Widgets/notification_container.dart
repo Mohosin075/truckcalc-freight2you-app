@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gathering_app/Model/notification_model.dart';
-import 'package:gathering_app/Service/Controller/notification_controller.dart';
-import 'package:gathering_app/View/Theme/theme_provider.dart';
+import 'package:truckcalc/Model/notification_model.dart';
+import 'package:truckcalc/Service/Controller/notification_controller.dart';
+import 'package:truckcalc/View/Theme/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 class NotificationContainer extends StatelessWidget {

@@ -1,6 +1,6 @@
-import 'package:gathering_app/Model/calculation_model.dart';
-import 'package:gathering_app/Service/Api%20service/network_caller.dart';
-import 'package:gathering_app/Service/urls.dart';
+import 'package:truckcalc/Model/calculation_model.dart';
+import 'package:truckcalc/Service/Api%20service/network_caller.dart';
+import 'package:truckcalc/Service/urls.dart';
 
 class CalculationService {
   static Future<NetworkResponse> createCalculation(Map<String, dynamic> payload) async {

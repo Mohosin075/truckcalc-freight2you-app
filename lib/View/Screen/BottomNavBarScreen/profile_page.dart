@@ -1,12 +1,67 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gathering_app/View/Widgets/app_background.dart';
-import 'package:gathering_app/View/Widgets/CustomButton.dart';
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/history_page.dart';
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/subscription_page.dart';
+import 'package:truckcalc/Service/Controller/auth_controller.dart';
+import 'package:truckcalc/Service/Controller/profile_page_controller.dart';
+import 'package:truckcalc/View/Widgets/app_background.dart';
+import 'package:truckcalc/View/Widgets/CustomButton.dart';
+import 'package:truckcalc/View/Screen/BottomNavBarScreen/history_page.dart';
+import 'package:truckcalc/View/Screen/BottomNavBarScreen/subscription_page.dart';
+import 'package:truckcalc/View/Screen/authentication_screen/log_in_screen.dart';
+import 'package:truckcalc/View/Widgets/customSnacBar.dart';
+import 'package:provider/provider.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final profile = Provider.of<ProfileController>(context, listen: false);
+      if (profile.currentUser != null) {
+        _nameController.text = profile.currentUser?.name ?? '';
+        _emailController.text = profile.currentUser?.email ?? '';
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleLogout() async {
+    final authController = Provider.of<AuthController>(context, listen: false);
+    await authController.logout();
+    if (mounted) {
+      Navigator.pushNamedAndRemoveUntil(context, LogInScreen.name, (route) => false);
+    }
+  }
+
+  Future<void> _handleSave() async {
+    final profileController = Provider.of<ProfileController>(context, listen: false);
+    bool success = await profileController.updateProfile(
+      name: _nameController.text.trim(),
+    );
+
+    if (mounted) {
+      showCustomSnackBar(
+        context: context,
+        message: success ? "Profile updated successfully!" : (profileController.errorMessage ?? "Update failed"),
+        isError: !success,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +81,7 @@ class ProfilePage extends StatelessWidget {
                       style: TextStyle(color: Colors.white, fontSize: 20.sp, fontWeight: FontWeight.w600),
                     ),
                     TextButton(
-                      onPressed: () {},
+                      onPressed: _handleLogout,
                       child: Text('Log out', style: TextStyle(color: const Color(0xFFE57373), fontSize: 14.sp, fontWeight: FontWeight.w500)),
                     ),
                   ],
@@ -57,40 +112,49 @@ class ProfilePage extends StatelessWidget {
   }
 
   Widget _buildUserInfo() {
-    return Column(
-      children: [
-        Stack(
-          alignment: Alignment.center,
+    return Consumer<ProfileController>(
+      builder: (context, profile, child) {
+        return Column(
           children: [
-            Container(
-              padding: EdgeInsets.all(3.r),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xFF7E57C2), width: 2),
-              ),
-              child: CircleAvatar(
-                radius: 40.r,
-                backgroundImage: const NetworkImage('https://i.pravatar.cc/150?img=11'),
-              ),
-            ),
-            Positioned(
-              bottom: 0,
-              right: 0,
-              child: Container(
-                padding: EdgeInsets.all(4.r),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF3F51B5),
-                  shape: BoxShape.circle,
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(3.r),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: const Color(0xFF7E57C2), width: 2),
+                  ),
+                  child: CircleAvatar(
+                    radius: 40.r,
+                    backgroundImage: (profile.currentUser?.profile != null)
+                        ? NetworkImage(profile.currentUser!.profile!)
+                        : const NetworkImage('https://i.pravatar.cc/150?img=11'),
+                  ),
                 ),
-                child: Icon(Icons.edit_note, color: Colors.white, size: 16.sp),
-              ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: GestureDetector(
+                    onTap: () => profile.uploadProfileImage(),
+                    child: Container(
+                      padding: EdgeInsets.all(4.r),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF3F51B5),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(Icons.edit_note, color: Colors.white, size: 16.sp),
+                    ),
+                  ),
+                ),
+              ],
             ),
+            SizedBox(height: 12.h),
+            Text(profile.currentUser?.name ?? 'Shahriar', style: TextStyle(color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.bold)),
+            Text(profile.currentUser?.id ?? '123456789', style: TextStyle(color: Colors.white60, fontSize: 13.sp)),
           ],
-        ),
-        SizedBox(height: 12.h),
-        Text('Shahriar', style: TextStyle(color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.bold)),
-        Text('123456789', style: TextStyle(color: Colors.white60, fontSize: 13.sp)),
-      ],
+        );
+      },
     );
   }
 
@@ -104,12 +168,18 @@ class ProfilePage extends StatelessWidget {
       ),
       child: Column(
         children: [
-          _buildTextField('Full name', 'ssssssssss'),
+          _buildTextField('Full name', 'ssssssssss', _nameController),
           SizedBox(height: 12.h),
-          _buildTextField('Email', 'ssssssssss'),
+          _buildTextField('Email', 'ssssssssss', _emailController, readOnly: true),
           SizedBox(height: 20.h),
-          const CustomButton(
-            buttonName: 'Save changes',
+          Consumer<ProfileController>(
+            builder: (context, profile, child) {
+              return CustomButton(
+                buttonName: 'Save changes',
+                isLoading: profile.inProgress,
+                onPressed: _handleSave,
+              );
+            },
           ),
         ],
       ),
@@ -213,22 +283,26 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(String label, String hint) {
+  Widget _buildTextField(String label, String hint, TextEditingController controller, {bool readOnly = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: TextStyle(color: Colors.white70, fontSize: 12.sp, fontWeight: FontWeight.w500)),
         SizedBox(height: 8.h),
-        Container(
-          height: 45.h,
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
-          decoration: BoxDecoration(
-            color: const Color(0xFF081414).withValues(alpha: 0.5),
-            borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(color: Colors.white10),
+        TextField(
+          controller: controller,
+          readOnly: readOnly,
+          style:  TextStyle(color: Colors.white, fontSize: 14.sp),
+          decoration: InputDecoration(
+            fillColor:  Color(0xFF081414).withValues(alpha: 0.5),
+            filled: true,
+            hintText: hint,
+            hintStyle: const TextStyle(color: Colors.white24),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: const BorderSide(color: Colors.white10)),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: const BorderSide(color: Colors.white10)),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: const BorderSide(color: Color(0xFF00D193))),
           ),
-          alignment: Alignment.centerLeft,
-          child: Text(hint, style: TextStyle(color: Colors.white38, fontSize: 14.sp)),
         ),
       ],
     );

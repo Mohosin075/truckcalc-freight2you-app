@@ -1,129 +1,72 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gathering_app/Utils/getStartedData.dart';
-import 'package:gathering_app/View/Screen/Onboarding_screen/interest_screen.dart';
-import 'package:gathering_app/View/Theme/theme_provider.dart';
-import 'package:provider/provider.dart';
+import 'package:truckcalc/Utils/getStartedData.dart';
+import 'package:truckcalc/View/Screen/Onboarding_screen/interest_screen.dart';
+import 'package:truckcalc/View/Widgets/app_background.dart';
+import 'package:truckcalc/View/Widgets/CustomButton.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-
-import '../../Widgets/CustomButton.dart';
 
 class GetStartScreen extends StatefulWidget {
   const GetStartScreen({super.key});
-
   static const String name = 'get-start-screen';
-
   @override
   State<GetStartScreen> createState() => _GetStartScreenState();
 }
 
-int currentPage = 0;
-
 class _GetStartScreenState extends State<GetStartScreen> {
   final PageController _controller = PageController();
-
-  void nextPage() {
-    if (currentPage < getStartedContent.getStartedData.length - 1) {
-      currentPage++;
-      _controller.animateToPage(
-        currentPage,
-        duration: const Duration(microseconds: 1),
-        curve: Curves.easeInOut,
-      );
-      setState(() {});
-    } else {
-      debugPrint('clicked');
-      Navigator.pushNamed(context, InterestScreen.name);
-    }
-  }
+  int currentPage = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      body: Center(
-        child: SingleChildScrollView(
-          physics: NeverScrollableScrollPhysics(),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                height: 200,
-                child: Consumer<ThemeProvider>(
-                  builder: (context, controller, child) => PageView.builder(
-                    itemCount: getStartedContent.getStartedData.length,
-                    controller: _controller,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      return Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(height: 20.h),
-                          Image.asset(
-                            getStartedContent.getStartedData[index].icon,
-                            color: controller.isDarkMode
-                                ? Colors.white
-                                : Colors.black,
-                            height: 48.h,
-                          ),
-                          SizedBox(height: 25.h),
-                          Text(
-                            getStartedContent.getStartedData[index].title,
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(
-                                  fontSize: 20.sp,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                            textAlign: TextAlign.center,
-                          ),
-                          SizedBox(height: 10.h),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                            ),
-                            child: Text(
-                              getStartedContent
-                                  .getStartedData[index]
-                                  .subtitle,
-                              style: Theme.of(context).textTheme.titleSmall
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.w400,
-                                    color: Color(0xFFA0A0B0),
-                                  ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
+      body: AppBackground(
+        child: Column(
+          children: [
+            Expanded(
+              child: PageView.builder(
+                itemCount: getStartedContent.getStartedData.length,
+                controller: _controller,
+                onPageChanged: (i) => setState(() => currentPage = i),
+                itemBuilder: (context, index) {
+                  final data = getStartedContent.getStartedData[index];
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(data.icon, height: 120.h, color: Colors.white),
+                      SizedBox(height: 40.h),
+                      Text(data.title, style: TextStyle(color: Colors.white, fontSize: 24.sp, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                      SizedBox(height: 16.h),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 40.w),
+                        child: Text(data.subtitle, style: TextStyle(color: Colors.white60, fontSize: 16.sp), textAlign: TextAlign.center),
+                      ),
+                    ],
+                  );
+                },
               ),
-
-              SizedBox(height: 20.h),
-
-              GestureDetector(
-                onTap: () => nextPage(),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: CustomButton(buttonName: 'Get Started'),
-                ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
+              child: CustomButton(
+                buttonName: currentPage == getStartedContent.getStartedData.length - 1 ? 'Get Started' : 'Next',
+                onPressed: () {
+                  if (currentPage < getStartedContent.getStartedData.length - 1) {
+                    _controller.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+                  } else {
+                    Navigator.pushNamed(context, InterestScreen.name);
+                  }
+                },
               ),
-              SizedBox(height: 15.h),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 20.0),
-                child: SmoothPageIndicator(
-                  controller: _controller,
-                  count: getStartedContent.getStartedData.length,
-                  effect: const SlideEffect(
-                    activeDotColor: Colors.purple,
-                    dotHeight: 8,
-                    dotWidth: 8,
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+            SizedBox(height: 20.h),
+            SmoothPageIndicator(
+              controller: _controller,
+              count: getStartedContent.getStartedData.length,
+              effect: const SlideEffect(activeDotColor: Color(0xFF00D193), dotColor: Colors.white24, dotHeight: 8, dotWidth: 8),
+            ),
+            SizedBox(height: 40.h),
+          ],
         ),
       ),
     );

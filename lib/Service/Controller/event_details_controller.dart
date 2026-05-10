@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:gathering_app/Model/get_single_event_model.dart';
-import 'package:gathering_app/Service/urls.dart';
+import 'package:truckcalc/Model/get_single_event_model.dart';
+import 'package:truckcalc/Service/urls.dart';
 import '../Api service/network_caller.dart';
 
 class EventDetailsController extends ChangeNotifier {

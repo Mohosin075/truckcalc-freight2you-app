@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:gathering_app/Service/Api%20service/network_caller.dart';
-import 'package:gathering_app/Service/urls.dart';
+import 'package:truckcalc/Service/Api%20service/network_caller.dart';
+import 'package:truckcalc/Service/urls.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:gathering_app/Model/get_all_event_model.dart';
+import 'package:truckcalc/Model/get_all_event_model.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'dart:ui' as ui;
 import 'dart:typed_data';
-import 'package:gathering_app/View/Widgets/customSnacBar.dart';
-import 'package:gathering_app/Utils/app_utils.dart';
+import 'package:truckcalc/View/Widgets/customSnacBar.dart';
+import 'package:truckcalc/Utils/app_utils.dart';
 
 class MapController with ChangeNotifier {
   /// ================= MAP + ROUTE =================

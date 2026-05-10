@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:gathering_app/Service/urls.dart';
+import 'package:truckcalc/Service/urls.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:flutter/foundation.dart';
 

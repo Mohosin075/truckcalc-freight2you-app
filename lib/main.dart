@@ -1,35 +1,35 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:gathering_app/firebase_options.dart';
-import 'package:gathering_app/Service/PushNotification/notification_service.dart';
-import 'package:gathering_app/Service/Controller/chat_controller.dart';
-import 'package:gathering_app/Service/Controller/bottom_nav_controller.dart';
+import 'package:truckcalc/firebase_options.dart';
+import 'package:truckcalc/Service/PushNotification/notification_service.dart';
+import 'package:truckcalc/Service/Controller/chat_controller.dart';
+import 'package:truckcalc/Service/Controller/bottom_nav_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gathering_app/Service/Controller/auth_controller.dart';
-import 'package:gathering_app/Service/Controller/email_verify_controller.dart';
-import 'package:gathering_app/Service/Controller/event_details_controller.dart';
-import 'package:gathering_app/Service/Controller/forgot_pass_controller.dart';
-import 'package:gathering_app/Service/Controller/getAllEvent_controller.dart';
-import 'package:gathering_app/Service/Controller/log_in_controller.dart';
-import 'package:gathering_app/Service/Controller/other_user_profile_controller.dart';
-import 'package:gathering_app/Service/Controller/otp_verify_controller.dart';
-import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
-import 'package:gathering_app/Service/Controller/live_chat_controller.dart';
-import 'package:gathering_app/Service/Controller/sign_up_controller.dart';
-import 'package:gathering_app/View/Theme/theme_provider.dart';
-import 'package:gathering_app/View/widget_controller/interestScreenController.dart';
-import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
-import 'package:gathering_app/Service/Controller/notification_controller.dart';
-import 'package:gathering_app/Service/Controller/create_event_controller.dart';
-import 'package:gathering_app/Service/Controller/user_event_controller.dart';
-import 'package:gathering_app/Service/Controller/map_controller.dart';
-import 'package:gathering_app/Service/Controller/calculation_controller.dart';
-import 'package:gathering_app/Service/Controller/subscription_controller.dart';
+import 'package:truckcalc/Service/Controller/auth_controller.dart';
+import 'package:truckcalc/Service/Controller/email_verify_controller.dart';
+import 'package:truckcalc/Service/Controller/event_details_controller.dart';
+import 'package:truckcalc/Service/Controller/forgot_pass_controller.dart';
+import 'package:truckcalc/Service/Controller/getAllEvent_controller.dart';
+import 'package:truckcalc/Service/Controller/log_in_controller.dart';
+import 'package:truckcalc/Service/Controller/other_user_profile_controller.dart';
+import 'package:truckcalc/Service/Controller/otp_verify_controller.dart';
+import 'package:truckcalc/Service/Controller/profile_page_controller.dart';
+import 'package:truckcalc/Service/Controller/live_chat_controller.dart';
+import 'package:truckcalc/Service/Controller/sign_up_controller.dart';
+import 'package:truckcalc/View/Theme/theme_provider.dart';
+import 'package:truckcalc/View/widget_controller/interestScreenController.dart';
+import 'package:truckcalc/View/view_controller/saved_event_controller.dart';
+import 'package:truckcalc/Service/Controller/notification_controller.dart';
+import 'package:truckcalc/Service/Controller/create_event_controller.dart';
+import 'package:truckcalc/Service/Controller/user_event_controller.dart';
+import 'package:truckcalc/Service/Controller/map_controller.dart';
+import 'package:truckcalc/Service/Controller/calculation_controller.dart';
+import 'package:truckcalc/Service/Controller/subscription_controller.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
-import 'package:gathering_app/Utils/app_utils.dart';
+import 'package:truckcalc/Utils/app_utils.dart';
 
-import 'package:gathering_app/Service/Api%20service/network_caller.dart';
+import 'package:truckcalc/Service/Api%20service/network_caller.dart';
 import 'Core/AppRoute/app_route.dart';
 import 'View/Screen/Onboarding_screen/splash_screen.dart';
 import 'View/Theme/theme.dart';
@@ -50,18 +50,19 @@ void main() async {
   // Run heavy initializations and await them
   await GetStorage.init();
 
+  final themeProvider = ThemeProvider();
   try {
-    final themeProvider = ThemeProvider();
     await themeProvider.init();
   } catch (e) {
     debugPrint('Initialization error: $e');
   }
 
-  runApp(const MyApp());
+  runApp(MyApp(themeProvider: themeProvider));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final ThemeProvider themeProvider;
+  const MyApp({super.key, required this.themeProvider});
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +75,7 @@ class MyApp extends StatelessWidget {
             return p;
           },
         ),
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider.value(value: themeProvider),
         ChangeNotifierProvider(create: (_) => InterestScreenController()),
         ChangeNotifierProvider(create: (_) => SavedEventController()),
         ChangeNotifierProvider(create: (_) => SignUpController()),

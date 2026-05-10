@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/load_calculator_page.dart';
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/rate_planner_page.dart';
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/costs_page.dart';
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/export_page.dart';
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/profile_page.dart';
-import 'package:gathering_app/Service/Controller/bottom_nav_controller.dart';
+import 'package:truckcalc/View/Screen/BottomNavBarScreen/load_calculator_page.dart';
+import 'package:truckcalc/View/Screen/BottomNavBarScreen/rate_planner_page.dart';
+import 'package:truckcalc/View/Screen/BottomNavBarScreen/costs_page.dart';
+import 'package:truckcalc/View/Screen/BottomNavBarScreen/export_page.dart';
+import 'package:truckcalc/View/Screen/BottomNavBarScreen/profile_page.dart';
+import 'package:truckcalc/Service/Controller/bottom_nav_controller.dart';
 import 'package:provider/provider.dart';
 
 class BottomNavBarScreen extends StatefulWidget {
@@ -34,10 +34,11 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
           extendBody: true,
           body: _pages[controller.selectedIndex],
           bottomNavigationBar: Container(
-            height: 80.h,
+            height: 85.h,
+            padding: EdgeInsets.only(top: 10.h),
             decoration: const BoxDecoration(
               color: Color(0xFF010B0B),
-              border: Border(top: BorderSide(color: Colors.white10)),
+              border: Border(top: BorderSide(color: Colors.white10, width: 0.5)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -57,14 +58,17 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
 
   Widget _buildNavItem(int index, IconData icon, String label, BottomNavController controller) {
     bool isSelected = controller.selectedIndex == index;
+    // The bright green color from the active tab in the screenshot
+    const Color activeColor = Color(0xFF00D193); 
+    
     return GestureDetector(
       onTap: () => controller.onItemTapped(index),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        width: 65.w,
+        duration: const Duration(milliseconds: 250),
+        width: 60.w,
         height: 55.h,
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF00D193) : Colors.transparent,
+          color: isSelected ? activeColor : Colors.transparent,
           borderRadius: BorderRadius.circular(12.r),
         ),
         child: Column(
@@ -72,16 +76,16 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
           children: [
             Icon(
               icon,
-              color: isSelected ? Colors.white : Colors.grey,
+              color: isSelected ? Colors.white : Colors.white54,
               size: 22.sp,
             ),
             SizedBox(height: 2.h),
             Text(
               label,
               style: TextStyle(
-                color: isSelected ? Colors.white : Colors.grey,
+                color: isSelected ? Colors.white : Colors.white54,
                 fontSize: 10.sp,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
               ),
             ),
           ],

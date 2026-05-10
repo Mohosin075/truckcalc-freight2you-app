@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
-import 'package:gathering_app/View/Widgets/app_background.dart';
+import 'package:truckcalc/Service/Controller/profile_page_controller.dart';
+import 'package:truckcalc/View/Widgets/app_background.dart';
 import 'package:provider/provider.dart';
 
 class ProfilePage extends StatefulWidget {

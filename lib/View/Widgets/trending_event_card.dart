@@ -1,9 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gathering_app/Model/get_all_event_model.dart';
-import 'package:gathering_app/Service/urls.dart';
-import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
+import 'package:truckcalc/Model/get_all_event_model.dart';
+import 'package:truckcalc/Service/urls.dart';
+import 'package:truckcalc/View/view_controller/saved_event_controller.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 

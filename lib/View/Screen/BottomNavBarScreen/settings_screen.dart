@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gathering_app/Service/Controller/auth_controller.dart';
-import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
-import 'package:gathering_app/View/Theme/theme_provider.dart';
-import 'package:gathering_app/View/Screen/authentication_screen/log_in_screen.dart';
-import 'package:gathering_app/View/Widgets/app_background.dart';
+import 'package:truckcalc/Service/Controller/auth_controller.dart';
+import 'package:truckcalc/Service/Controller/profile_page_controller.dart';
+import 'package:truckcalc/View/Theme/theme_provider.dart';
+import 'package:truckcalc/View/Screen/authentication_screen/log_in_screen.dart';
+import 'package:truckcalc/View/Widgets/app_background.dart';
 import 'package:provider/provider.dart';
 
 class SettingsScreen extends StatelessWidget {
