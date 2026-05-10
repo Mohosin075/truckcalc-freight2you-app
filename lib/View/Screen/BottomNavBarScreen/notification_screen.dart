@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/Service/Controller/notification_controller.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
+import 'package:gathering_app/View/Widgets/app_background.dart';
 import 'package:gathering_app/View/Widgets/CustomButton.dart';
 import 'package:provider/provider.dart';
 
@@ -29,10 +30,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
         automaticallyImplyLeading: false,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         title: Align(
           alignment: Alignment.centerLeft,
           child: Column(
@@ -40,15 +42,17 @@ class _NotificationScreenState extends State<NotificationScreen> {
             children: [
               Text(
                 'Notifications',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontSize: 20.sp.clamp(20, 22),
+                style: TextStyle(
+                      fontSize: 20.sp,
                       fontWeight: FontWeight.w600,
+                      color: Colors.white,
                     ),
               ),
               Text(
                 'Stay updated with your events',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: Colors.grey,
+                style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 12.sp,
                       fontWeight: FontWeight.w600,
                     ),
               ),
@@ -65,21 +69,20 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 width: 36.r,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12.r),
-                  color: controller.isDarkMode
-                      ? const Color(0xFF3E043F)
-                      : const Color(0xFF686868),
+                  color: Colors.white.withOpacity(0.1),
                 ),
                 child: Padding(
                   padding: EdgeInsets.all(10.r),
-                  child: Image.asset('assets/images/cross_icon.png'),
+                  child: Image.asset('assets/images/cross_icon.png', color: Colors.white),
                 ),
               ),
             ),
           ),
         ],
       ),
-      body: Consumer<NotificationController>(
-        builder: (context, notificationController, child) {
+      body: AppBackground(
+        child: Consumer<NotificationController>(
+          builder: (context, notificationController, child) {
           if (notificationController.inProgress) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -134,6 +137,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             ),
           );
         },
+      ),
       ),
     );
   }

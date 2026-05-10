@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/View/Widgets/app_background.dart';
+import 'package:gathering_app/View/Widgets/CustomButton.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/history_page.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/subscription_page.dart';
 
@@ -13,33 +14,38 @@ class ProfilePage extends StatelessWidget {
       body: AppBackground(
         child: SafeArea(
           child: SingleChildScrollView(
-            padding: EdgeInsets.all(16.w),
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
             child: Column(
               children: [
+                SizedBox(height: 10.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       'Profile',
-                      style: TextStyle(color: Colors.white, fontSize: 22.sp, fontWeight: FontWeight.bold),
+                      style: TextStyle(color: Colors.white, fontSize: 20.sp, fontWeight: FontWeight.w600),
                     ),
                     TextButton(
                       onPressed: () {},
-                      child: const Text('Log out', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w600)),
+                      child: Text('Log out', style: TextStyle(color: const Color(0xFFE57373), fontSize: 14.sp, fontWeight: FontWeight.w500)),
                     ),
                   ],
                 ),
-                SizedBox(height: 20.h),
+                SizedBox(height: 10.h),
                 _buildUserInfo(),
                 SizedBox(height: 24.h),
                 _buildEditForm(),
-                SizedBox(height: 16.h),
-                _buildGradientButton('View All History', () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const HistoryPage()));
-                }),
-                SizedBox(height: 20.h),
+                SizedBox(height: 12.h),
+                CustomButton(
+                  buttonName: 'View All History',
+                  isYellowGradient: true,
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const HistoryPage()));
+                  },
+                ),
+                SizedBox(height: 12.h),
                 _buildSubscriptionCard(context),
-                SizedBox(height: 20.h),
+                SizedBox(height: 12.h),
                 _buildStatsSection(),
                 SizedBox(height: 100.h),
               ],
@@ -54,12 +60,16 @@ class ProfilePage extends StatelessWidget {
     return Column(
       children: [
         Stack(
+          alignment: Alignment.center,
           children: [
-            CircleAvatar(
-              radius: 45.r,
-              backgroundColor: const Color(0xFF081414),
+            Container(
+              padding: EdgeInsets.all(3.r),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: const Color(0xFF7E57C2), width: 2),
+              ),
               child: CircleAvatar(
-                radius: 42.r,
+                radius: 40.r,
                 backgroundImage: const NetworkImage('https://i.pravatar.cc/150?img=11'),
               ),
             ),
@@ -67,16 +77,19 @@ class ProfilePage extends StatelessWidget {
               bottom: 0,
               right: 0,
               child: Container(
-                padding: EdgeInsets.all(6.w),
-                decoration: const BoxDecoration(color: Color(0xFF1A237E), shape: BoxShape.circle),
-                child: const Icon(Icons.edit, color: Colors.white, size: 14),
+                padding: EdgeInsets.all(4.r),
+                decoration: const BoxDecoration(
+                  color: Color(0xFF3F51B5),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.edit_note, color: Colors.white, size: 16.sp),
               ),
             ),
           ],
         ),
         SizedBox(height: 12.h),
         Text('Shahriar', style: TextStyle(color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.bold)),
-        Text('123456789', style: TextStyle(color: Colors.white38, fontSize: 13.sp)),
+        Text('123456789', style: TextStyle(color: Colors.white60, fontSize: 13.sp)),
       ],
     );
   }
@@ -85,28 +98,18 @@ class ProfilePage extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        color: Colors.white.withValues(alpha: 0.03),
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
       ),
       child: Column(
         children: [
           _buildTextField('Full name', 'ssssssssss'),
-          SizedBox(height: 16.h),
+          SizedBox(height: 12.h),
           _buildTextField('Email', 'ssssssssss'),
-          SizedBox(height: 24.h),
-          Container(
-            width: double.infinity,
-            height: 50.h,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12.r),
-              gradient: const LinearGradient(colors: [Color(0xFF004D40), Color(0xFF00D193)]),
-            ),
-            child: ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent),
-              child: Text('Save changes', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15.sp)),
-            ),
+          SizedBox(height: 20.h),
+          const CustomButton(
+            buttonName: 'Save changes',
           ),
         ],
       ),
@@ -117,23 +120,26 @@ class ProfilePage extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        color: Colors.white.withValues(alpha: 0.03),
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Subscription', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15.sp)),
+          Text('Subscription', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16.sp)),
           SizedBox(height: 16.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Free Trial', style: TextStyle(color: Colors.white70, fontSize: 14.sp)),
+              Text('Free Trial', style: TextStyle(color: Colors.white, fontSize: 14.sp, fontWeight: FontWeight.w500)),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                decoration: BoxDecoration(color: Colors.redAccent.withOpacity(0.8), borderRadius: BorderRadius.circular(10.r)),
-                child: const Text('5d left', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFD32F2F), 
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+                child: Text('5d left', style: TextStyle(color: Colors.white, fontSize: 10.sp, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -141,29 +147,13 @@ class ProfilePage extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: OutlinedButton(
-                  onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const SubscriptionPage()));
-                  },
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.white12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
-                    padding: EdgeInsets.symmetric(vertical: 12.h),
-                  ),
-                  child: Text('View Plans', style: TextStyle(color: Colors.white70, fontSize: 13.sp)),
-                ),
+                child: _buildOutlineButton('View Plans', () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const SubscriptionPage()));
+                }),
               ),
-              SizedBox(width: 16.w),
+              SizedBox(width: 12.w),
               Expanded(
-                child: OutlinedButton(
-                  onPressed: () {},
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.white12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
-                    padding: EdgeInsets.symmetric(vertical: 12.h),
-                  ),
-                  child: Text('Export Data', style: TextStyle(color: Colors.white70, fontSize: 13.sp)),
-                ),
+                child: _buildOutlineButton('Export Data', () {}),
               ),
             ],
           ),
@@ -172,18 +162,34 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
+  Widget _buildOutlineButton(String text, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12.r),
+      child: Container(
+        height: 45.h,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: Colors.white24),
+        ),
+        child: Text(text, style: TextStyle(color: Colors.white, fontSize: 14.sp, fontWeight: FontWeight.w500)),
+      ),
+    );
+  }
+
   Widget _buildStatsSection() {
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        color: Colors.white.withValues(alpha: 0.03),
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Stats', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15.sp)),
+          Text('Stats', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16.sp)),
           SizedBox(height: 20.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -200,29 +206,10 @@ class ProfilePage extends StatelessWidget {
   Widget _buildStatItem(String value, String label) {
     return Column(
       children: [
-        Text(value, style: TextStyle(color: Colors.white, fontSize: 24.sp, fontWeight: FontWeight.bold)),
-        Text(label, style: TextStyle(color: Colors.white30, fontSize: 11.sp)),
+        Text(value, style: TextStyle(color: Colors.white, fontSize: 22.sp, fontWeight: FontWeight.bold)),
+        SizedBox(height: 4.h),
+        Text(label, style: TextStyle(color: Colors.white60, fontSize: 11.sp)),
       ],
-    );
-  }
-
-  Widget _buildGradientButton(String text, VoidCallback onTap) {
-    return Container(
-      width: double.infinity,
-      height: 50.h,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12.r),
-        gradient: const LinearGradient(
-          colors: [Color(0xFFFBC02D), Color(0xFF00D193)],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
-      ),
-      child: ElevatedButton(
-        onPressed: onTap,
-        style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent),
-        child: Text(text, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15.sp)),
-      ),
     );
   }
 
@@ -232,17 +219,16 @@ class ProfilePage extends StatelessWidget {
       children: [
         Text(label, style: TextStyle(color: Colors.white70, fontSize: 12.sp, fontWeight: FontWeight.w500)),
         SizedBox(height: 8.h),
-        TextField(
-          style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            fillColor: const Color(0xFF081414),
-            filled: true,
-            hintText: hint,
-            hintStyle: const TextStyle(color: Colors.white12),
-            contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: const BorderSide(color: Colors.white10)),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: const BorderSide(color: Colors.white10)),
+        Container(
+          height: 45.h,
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          decoration: BoxDecoration(
+            color: const Color(0xFF081414).withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(12.r),
+            border: Border.all(color: Colors.white10),
           ),
+          alignment: Alignment.centerLeft,
+          child: Text(hint, style: TextStyle(color: Colors.white38, fontSize: 14.sp)),
         ),
       ],
     );

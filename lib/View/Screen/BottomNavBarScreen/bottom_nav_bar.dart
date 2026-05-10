@@ -59,29 +59,33 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
     bool isSelected = controller.selectedIndex == index;
     return GestureDetector(
       onTap: () => controller.onItemTapped(index),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
-            decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFF00D193).withOpacity(0.2) : Colors.transparent,
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            child: Icon(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: 65.w,
+        height: 55.h,
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF00D193) : Colors.transparent,
+          borderRadius: BorderRadius.circular(12.r),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
               icon,
-              color: isSelected ? const Color(0xFF00D193) : Colors.grey,
+              color: isSelected ? Colors.white : Colors.grey,
+              size: 22.sp,
             ),
-          ),
-          SizedBox(height: 4.h),
-          Text(
-            label,
-            style: TextStyle(
-              color: isSelected ? const Color(0xFF00D193) : Colors.grey,
-              fontSize: 10.sp,
+            SizedBox(height: 2.h),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? Colors.white : Colors.grey,
+                fontSize: 10.sp,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

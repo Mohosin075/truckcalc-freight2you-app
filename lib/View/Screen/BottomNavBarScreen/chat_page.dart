@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gathering_app/Model/ChatModel.dart';
 import 'package:gathering_app/Service/Controller/auth_controller.dart';
 import 'package:gathering_app/Service/Controller/chat_controller.dart';
 import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/user_chat_screen.dart';
 import 'package:gathering_app/Service/urls.dart';
+import 'package:gathering_app/View/Widgets/app_background.dart';
 import 'package:provider/provider.dart';
 
 import '../../Widgets/serch_textfield.dart';
@@ -47,164 +47,71 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-
-      // AppBar (Messages + Search)
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor: Colors.transparent,
         automaticallyImplyLeading: false,
         surfaceTintColor: Colors.transparent,
-        title: Align(
-          alignment: Alignment.centerLeft,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("Messages", style: Theme.of(context).textTheme.titleLarge),
-            ],
-          ),
-        ),
+        title: Text("Messages", style: TextStyle(color: Colors.white, fontSize: 20.sp, fontWeight: FontWeight.bold)),
+        elevation: 0,
       ),
-
-      // Body
-      body: Column(
-        children: [
-          // Search Bar
-          SearchTextField(hintText: 'Search Conversation...'),
-
-          // Chat List
-          Expanded(
-            child: Consumer<ChatController>(
-              builder: (context, controller, child) {
-                debugPrint(
-                  "🔄 ChatPage rebuild - inProgress: ${controller.inProgress}, chatCount: ${controller.chatList.length}",
-                );
-
-                if (controller.inProgress && controller.chatList.isEmpty) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                if (controller.chatList.isEmpty) {
-                  if (controller.errorMessage != null) {
-                    return Center(
-                      child: Text("Error: ${controller.errorMessage!}"),
-                    );
+      body: AppBackground(
+        child: Column(
+          children: [
+            SearchTextField(hintText: 'Search Conversation...'),
+            Expanded(
+              child: Consumer<ChatController>(
+                builder: (context, controller, child) {
+                  if (controller.inProgress && controller.chatList.isEmpty) {
+                    return const Center(child: CircularProgressIndicator(color: Color(0xFF00D193)));
                   }
-                  return const Center(child: Text("No conversations yet"));
-                }
-
-                // Show the actual data for debugging
-                debugPrint(
-                  "📱 Displaying ${controller.chatList.length} chats:",
-                );
-                for (var chat in controller.chatList) {
-                  debugPrint("  - ${chat.name}: ${chat.currentMessage}");
-                }
-                return RefreshIndicator(
-                  onRefresh: () async {
-                    await context.read<ChatController>().getChats();
-                  },
-                  child: ListView.builder(
-                    itemCount: controller.chatList.length,
-                    itemBuilder: (context, index) {
-                      final userChat = controller.chatList[index];
-                      return ListTile(
-                        leading: CircleAvatar(
-                          radius: 26.r,
-                          backgroundColor: Colors
-                              .primaries[userChat.name.hashCode %
-                                  Colors.primaries.length]
-                              .withOpacity(0.2),
-                          backgroundImage:
-                              (userChat.imageIcon != null &&
-                                  userChat.imageIcon!.isNotEmpty)
-                              ? NetworkImage(
-                                  userChat.imageIcon!.startsWith('http')
-                                      ? userChat.imageIcon!
-                                      : '${Urls.baseUrl}${userChat.imageIcon!.startsWith('/') ? '' : '/'}${userChat.imageIcon!}',
-                                )
-                              : null,
-                          child:
-                              (userChat.imageIcon == null ||
-                                  userChat.imageIcon!.isEmpty)
-                              ? Text(
-                                  (userChat.name != null &&
-                                          userChat.name!.isNotEmpty)
-                                      ? userChat.name![0].toUpperCase()
-                                      : "?",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color:
-                                        Colors.primaries[userChat
-                                                .name
-                                                .hashCode %
-                                            Colors.primaries.length],
-                                  ),
-                                )
-                              : null,
-                        ),
-                        title: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                userChat.name ?? 'Unknown',
-                                style: TextStyle(
-                                  fontWeight: userChat.isSeen == false
-                                      ? FontWeight.bold
-                                      : FontWeight.w600,
-                                  fontSize: 14.sp,
-                                  color: userChat.isSeen == false
-                                      ? Theme.of(
-                                          context,
-                                        ).textTheme.titleMedium?.color
-                                      : Theme.of(context)
-                                            .textTheme
-                                            .titleMedium
-                                            ?.color
-                                            ?.withOpacity(0.8),
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                        subtitle: Text(
-                          userChat.currentMessage ?? '',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: userChat.isSeen == false
-                                ? Theme.of(context).textTheme.bodyMedium?.color
-                                : Theme.of(context).textTheme.bodyMedium?.color
-                                      ?.withOpacity(0.6),
-                            fontWeight: userChat.isSeen == false
-                                ? FontWeight.bold
-                                : FontWeight.normal,
+                  if (controller.chatList.isEmpty) {
+                    return Center(child: Text(controller.errorMessage ?? "No conversations yet", style: const TextStyle(color: Colors.white60)));
+                  }
+                  return RefreshIndicator(
+                    onRefresh: () async => await context.read<ChatController>().getChats(),
+                    child: ListView.builder(
+                      itemCount: controller.chatList.length,
+                      itemBuilder: (context, index) {
+                        final userChat = controller.chatList[index];
+                        return ListTile(
+                          leading: CircleAvatar(
+                            radius: 26.r,
+                            backgroundColor: Colors.white.withOpacity(0.1),
+                            backgroundImage: (userChat.imageIcon != null && userChat.imageIcon!.isNotEmpty)
+                                ? NetworkImage(userChat.imageIcon!.startsWith('http') ? userChat.imageIcon! : '${Urls.baseUrl}/${userChat.imageIcon!}')
+                                : null,
+                            child: (userChat.imageIcon == null || userChat.imageIcon!.isEmpty)
+                                ? Text(userChat.name?[0].toUpperCase() ?? "?", style: const TextStyle(color: Colors.white))
+                                : null,
                           ),
-                        ),
-                        trailing: Text(
-                          _formatTime(userChat.time),
-                          style: TextStyle(color: Colors.grey, fontSize: 12.sp),
-                        ),
-                        onTap: () async {
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => UserChatScreen(chat: userChat),
+                          title: Text(
+                            userChat.name ?? 'Unknown',
+                            style: TextStyle(
+                              fontWeight: userChat.isSeen == false ? FontWeight.bold : FontWeight.w600,
+                              fontSize: 15.sp,
+                              color: Colors.white,
                             ),
-                          );
-                          // When returning, if we have a chat ID, mark it as seen locally for immediate feedback
-                          if (userChat.id != null) {
-                            controller.markChatAsSeenLocally(userChat.id!);
-                          }
-                        },
-                      );
-                    },
-                  ),
-                );
-              },
+                          ),
+                          subtitle: Text(
+                            userChat.currentMessage ?? '',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(color: userChat.isSeen == false ? Colors.white : Colors.white60),
+                          ),
+                          trailing: Text(_formatTime(userChat.time), style: TextStyle(color: Colors.white38, fontSize: 11.sp)),
+                          onTap: () async {
+                            await Navigator.push(context, MaterialPageRoute(builder: (_) => UserChatScreen(chat: userChat)));
+                            if (userChat.id != null) controller.markChatAsSeenLocally(userChat.id!);
+                          },
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -213,18 +120,10 @@ class _ChatPageState extends State<ChatPage> {
     if (timeStr == null || timeStr.isEmpty) return '';
     try {
       final DateTime date = DateTime.parse(timeStr).toLocal();
-      final DateTime now = DateTime.now();
-      final Duration difference = now.difference(date);
-
-      if (difference.inMinutes < 60) {
-        return '${difference.inMinutes} minutes ago';
-      } else if (difference.inHours < 24) {
-        return '${difference.inHours} hours ago';
-      } else {
-        return '${difference.inDays} days ago';
-      }
-    } catch (e) {
-      return '';
-    }
+      final difference = DateTime.now().difference(date);
+      if (difference.inMinutes < 60) return '${difference.inMinutes}m ago';
+      if (difference.inHours < 24) return '${difference.inHours}h ago';
+      return '${difference.inDays}d ago';
+    } catch (e) { return ''; }
   }
 }

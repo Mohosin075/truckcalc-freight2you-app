@@ -11,6 +11,7 @@ import 'package:gathering_app/Service/urls.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/notification_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/view_event_screen.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
+import 'package:gathering_app/View/Widgets/app_background.dart';
 import 'package:gathering_app/View/Widgets/serch_textfield.dart';
 import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
 import 'package:gathering_app/View/Widgets/custom_item_container.dart';
@@ -79,11 +80,11 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      body: AppBackground(
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
             Stack(
               children: [
                 Center(
@@ -433,6 +434,7 @@ class _HomePageState extends State<HomePage> {
             // এখানে SmartRefresher শেষ
           ],
         ),
+      ),
       ),
     );
   }
