@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AppBackground extends StatelessWidget {
   final Widget child;
+  final String? imagePath;
 
-  const AppBackground({super.key, required this.child});
+  const AppBackground({super.key, required this.child, this.imagePath});
 
   @override
   Widget build(BuildContext context) {
@@ -15,44 +17,74 @@ class AppBackground extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          // Left Side Glow
+          // Background Image with Pattern - Increased visibility
+          Positioned.fill(
+            child: Opacity(
+              opacity: 0.6,
+              child: Image.asset(
+                imagePath ?? 'assets/images/authimg.png',
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          
+          // Left Top Glow - More vibrant
           Positioned(
-            left: -150,
-            top: 100,
+            left: -80.w,
+            top: -50.h,
             child: Container(
-              width: 400,
-              height: 600,
+              width: 350.w,
+              height: 350.h,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    const Color(0xFF00D193).withOpacity(0.15),
+                    const Color(0xFF00D193).withOpacity(0.25),
                     Colors.transparent,
                   ],
                 ),
               ),
             ),
           ),
-          // Right Side Glow
+          
+          // Right Middle Glow
           Positioned(
-            right: -150,
-            bottom: 50,
+            right: -100.w,
+            top: 250.h,
             child: Container(
-              width: 400,
-              height: 600,
+              width: 450.w,
+              height: 450.h,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    const Color(0xFF00D193).withOpacity(0.2),
-                    const Color(0xFF00D193).withOpacity(0.05),
+                    const Color(0xFF00D193).withOpacity(0.3),
                     Colors.transparent,
                   ],
                 ),
               ),
             ),
           ),
-          // Subtle grid pattern or texture could be added here if needed
+
+          // Left Bottom Glow
+          Positioned(
+            left: -120.w,
+            bottom: -50.h,
+            child: Container(
+              width: 450.w,
+              height: 450.h,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    const Color(0xFF00D193).withOpacity(0.3),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
+
           child,
         ],
       ),
