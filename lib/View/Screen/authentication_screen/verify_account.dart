@@ -69,7 +69,7 @@ class _VerifyAccountState extends State<VerifyAccount> {
             children: [
               SizedBox(height: 60.h),
               Image.asset(
-                'assets/images/logo-cal.png',
+                'assets/images/new_logo.svg',
                 width: 100.w,
                 height: 60.h,
                 fit: BoxFit.contain,
