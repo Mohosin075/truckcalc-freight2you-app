@@ -31,6 +31,12 @@ class NetworkCaller {
     },
   ));
 
+  static const FlutterSecureStorage _storage = FlutterSecureStorage(
+    aOptions: AndroidOptions(
+      encryptedSharedPreferences: true,
+    ),
+  );
+
   static bool _isRefreshing = false;
   static List<Map<String, dynamic>> _failedRequestsQueue = [];
 
@@ -42,12 +48,13 @@ class NetworkCaller {
         
         // If requireAuth header is not explicitly false, add token
         if (options.headers['requireAuth'] != false) {
-          const storage = FlutterSecureStorage();
-          final token = await storage.read(key: 'access_token');
+          final token = await _storage.read(key: 'access_token');
           
           if (token != null && token.isNotEmpty) {
             options.headers['Authorization'] = 'Bearer $token';
             debugPrint('🔑 Token added to header');
+          } else {
+            debugPrint('⚠️ No token found in storage for path: ${options.path}');
           }
         }
         
@@ -84,8 +91,7 @@ class NetworkCaller {
             if (success) {
               try {
                 final options = e.requestOptions;
-                const storage = FlutterSecureStorage();
-                final token = await storage.read(key: 'access_token');
+                final token = await _storage.read(key: 'access_token');
                 if (token != null) {
                   options.headers['Authorization'] = 'Bearer $token';
                 }
@@ -140,8 +146,7 @@ class NetworkCaller {
 
   static Future<bool> _refreshToken() async {
     try {
-      const storage = FlutterSecureStorage();
-      final refreshToken = await storage.read(key: 'refresh_token');
+      final refreshToken = await _storage.read(key: 'refresh_token');
 
       if (refreshToken == null) return false;
 
@@ -157,7 +162,7 @@ class NetworkCaller {
 
       if (response.statusCode == 200 && response.data['success'] == true) {
         final newAccessToken = response.data['data']['accessToken'];
-        await storage.write(key: 'access_token', value: newAccessToken);
+        await _storage.write(key: 'access_token', value: newAccessToken);
         AuthController().saveTokens(
           accessToken: newAccessToken,
           refreshToken: refreshToken,

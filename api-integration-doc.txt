@@ -67,22 +67,170 @@
 | GET | `/faq/all` | না | |
 | DELETE | `/faq/:id` | admin | |
 
-### ৪.৪ Calculations (ট্রাক ক্যালক) — `/calculations`
+### 4.4 Calculations — `/calculations`
 
-সব রুট: `user`, `admin`, `super_admin`।
+All routes require authentication: `user`, `admin`, or `super_admin`.
 
-| মেথড | পাথ | বডি / কুয়েরি |
-|--------|------|----------------|
-| POST | `/` | `type`: `LOAD` \| `GOAL` \| `COST`; `loadData` / `goalData` / `costData` — স্কিমা ব্যাকএন্ড `calculation.validation.ts` এর সাথে মিল রাখুন (সব সংখ্যা ডাবল) |
-| GET | `/` | লিস্ট |
-| GET | `/stats` | স্ট্যাটস |
-| GET | `/export` | এক্সপোর্ট ডেটা |
-| GET | `/:id` | একক |
-| DELETE | `/:id` | ডিলিট |
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/` | Create a new calculation record |
+| GET | `/` | List calculations (with pagination/filtering) |
+| GET | `/stats` | Get calculation statistics for the current user |
+| GET | `/export` | Export all user calculations in flattened format |
+| GET | `/:id` | Get one calculation by ID |
+| DELETE | `/:id` | Delete one calculation by ID |
 
-`LOAD` এর জন্য নমুনা ফিল্ড (সব number): `baseRate`, `fuelSurcharge`, `loadedMiles`, `tolls`, `dhMiles`, `dhRate`, `bonus`, `driverPercentage`, `totalRevenue`, `totalProfit`, … (সম্পূর্ণ তালিকা সার্ভার ফাইলে)।
+#### Request body for POST /api/v1/calculations
 
-### ৪.৫ Upload (S3 প্রিসাইন) — `/upload`
+```json
+{
+  "type": "LOAD" | "GOAL" | "COST",
+  "loadData": { ... },
+  "goalData": { ... },
+  "costData": { ... }
+}
+```
+
+- `type` is required.
+- For `LOAD`, include `loadData`.
+- For `GOAL`, include `goalData`.
+- For `COST`, include `costData`.
+- The backend validation currently requires all numeric fields defined in the schema, including calculated result fields.
+
+#### `loadData` fields (LOAD calculator)
+
+- `baseRate`: number
+- `fuelSurcharge`: number
+- `loadedMiles`: number
+- `tolls`: number
+- `dhMiles`: number
+- `dhRate`: number
+- `bonus`: number
+- `driverPercentage`: number
+- `costPerMile`: number
+- `totalRevenue`: number
+- `totalProfit`: number
+- `totalFSC`: number
+- `totalDH`: number
+- `totalMiles`: number
+- `compensationPerMile`: number
+- `totalCost`: number
+- `profitPerMile`: number
+- `driverPay`: number
+- `ownerPay`: number
+
+The server recalculates derived values for LOAD, such as:
+- `totalFSC`
+- `totalDH`
+- `totalRevenue`
+- `totalMiles`
+- `compensationPerMile`
+- `totalCost`
+- `profitPerMile`
+- `totalProfit`
+- `driverPay`
+- `ownerPay`
+
+#### `goalData` fields (GOAL calculator)
+
+- `desiredWeeklyProfit`: number
+- `costPerMile`: number
+- `deadheadPayPerMile`: number
+- `daysPerWeek`: number
+- `maxMilesPerDay`: number
+- `driverPercentage`: number
+- `loadedMilesNeeded`: number
+- `minTargetRate`: number
+- `totalRevenue`: number
+- `totalCost`: number
+- `maxDHPerDay`: number
+- `maxDHPerWeek`: number
+- `driverPay`: number
+- `ownerPay`: number
+
+The server recalculates GOAL output values such as:
+- `loadedMilesNeeded`
+- `minTargetRate`
+- `maxDHPerDay`
+- `maxDHPerWeek`
+- `totalRevenue`
+- `totalCost`
+- `driverPay`
+- `ownerPay`
+
+#### `costData` fields (COST calculator)
+
+- `insurance`: number
+- `truckPayment`: number
+- `escrow`: number
+- `repairSavings`: number
+- `driverPayFixed`: number
+- `permits`: number
+- `otherFixed`: number
+- `milesPerWeek`: number
+- `avgMPG`: number
+- `fuelPrice`: number
+- `oilChangesPerYear`: number
+- `costPerOilChange`: number
+- `tireCostPerYear`: number
+- `maintenanceCostPerYear`: number
+- `totalWeeklyFixed`: number
+- `weeklyFuelCost`: number
+- `weeklyOilChangeCost`: number
+- `weeklyTireCost`: number
+- `weeklyMaintenanceCost`: number
+- `totalWeeklyVariable`: number
+- `totalWeeklyOperatingCost`: number
+- `trueCPM`: number
+
+The server recalculates COST output values such as:
+- `totalWeeklyFixed`
+- `weeklyFuelCost`
+- `weeklyOilChangeCost`
+- `weeklyTireCost`
+- `weeklyMaintenanceCost`
+- `totalWeeklyVariable`
+- `totalWeeklyOperatingCost`
+- `trueCPM`
+
+#### GET /api/v1/calculations
+
+Returns a paginated list of calculation records for the authenticated user.
+
+Supported query parameters:
+- `page` (default 1)
+- `limit` (default 10)
+- `sort` (e.g. `-createdAt`)
+- `fields` (comma-separated field list)
+- `searchTerm`
+- any exact field filter for calculation fields
+
+#### GET /api/v1/calculations/stats
+
+Returns user-specific calculation statistics:
+- `totalCalculations`
+- `planLeftDays`
+- `subscriptionStatus`
+- `planName`
+
+#### GET /api/v1/calculations/export
+
+Returns all calculations for the user in a flattened format suitable for export.
+Each exported row contains:
+- `id`
+- `type`
+- `createdAt`
+- all fields from the selected calculator object (`loadData`, `goalData`, or `costData`)
+
+#### GET /api/v1/calculations/:id
+
+Returns a single calculation record.
+
+#### DELETE /api/v1/calculations/:id
+
+Deletes a single calculation record for the authenticated user.
+
+### 4.5 Upload (S3 presign) — `/upload`
 
 | মেথড | পাথ | অথ | বডি |
 |--------|------|-----|------|
