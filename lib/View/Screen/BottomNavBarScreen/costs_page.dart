@@ -1,10 +1,145 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
+import 'package:truckcalc/Service/Controller/calculation_controller.dart';
 import 'package:truckcalc/View/Widgets/app_background.dart';
 import 'package:truckcalc/View/Widgets/customSnacBar.dart';
 
-class CostsPage extends StatelessWidget {
+class CostsPage extends StatefulWidget {
   const CostsPage({super.key});
+
+  @override
+  State<CostsPage> createState() => _CostsPageState();
+}
+
+class _CostsPageState extends State<CostsPage> {
+  // Fixed costs controllers
+  final TextEditingController _insuranceController = TextEditingController(text: '0.00');
+  final TextEditingController _truckPaymentController = TextEditingController(text: '0.00');
+  final TextEditingController _escrowController = TextEditingController(text: '0.00');
+  final TextEditingController _repairSavingsController = TextEditingController(text: '0.00');
+  final TextEditingController _driverPayController = TextEditingController(text: '0.00');
+  final TextEditingController _permitsController = TextEditingController(text: '0.00');
+  final TextEditingController _otherFixedCostsController = TextEditingController(text: '0.00');
+
+  // Variable costs controllers
+  final TextEditingController _milesPerWeekController = TextEditingController(text: '2500');
+  final TextEditingController _avgMPGController = TextEditingController(text: '6.5');
+  final TextEditingController _fuelPriceController = TextEditingController(text: '3.50');
+  final TextEditingController _oilChangesYearController = TextEditingController(text: '12');
+  final TextEditingController _costPerOilChangeController = TextEditingController(text: '300');
+  final TextEditingController _tireCostYearController = TextEditingController(text: '5000');
+  final TextEditingController _maintenanceCostYearController = TextEditingController(text: '8000');
+
+  double totalWeeklyFixedCosts = 0.0;
+  double fuelCost = 0.0;
+  double weeklyOilChangeCost = 0.0;
+  double weeklyTireCost = 0.0;
+  double weeklyMaintenanceCost = 0.0;
+  double totalWeeklyVariableCosts = 0.0;
+  double totalWeeklyOperatingCost = 0.0;
+  double trueCPM = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    List<TextEditingController> controllers = [
+      _insuranceController, _truckPaymentController, _escrowController,
+      _repairSavingsController, _driverPayController, _permitsController,
+      _otherFixedCostsController, _milesPerWeekController, _avgMPGController,
+      _fuelPriceController, _oilChangesYearController, _costPerOilChangeController,
+      _tireCostYearController, _maintenanceCostYearController
+    ];
+    for (var c in controllers) {
+      c.addListener(_calculate);
+    }
+    _calculate();
+  }
+
+  void _calculate() {
+    double insurance = double.tryParse(_insuranceController.text) ?? 0.0;
+    double truckPayment = double.tryParse(_truckPaymentController.text) ?? 0.0;
+    double escrow = double.tryParse(_escrowController.text) ?? 0.0;
+    double repairSavings = double.tryParse(_repairSavingsController.text) ?? 0.0;
+    double driverPay = double.tryParse(_driverPayController.text) ?? 0.0;
+    double permits = double.tryParse(_permitsController.text) ?? 0.0;
+    double otherFixed = double.tryParse(_otherFixedCostsController.text) ?? 0.0;
+
+    totalWeeklyFixedCosts = insurance + truckPayment + escrow + repairSavings + driverPay + permits + otherFixed;
+
+    int milesPerWeek = int.tryParse(_milesPerWeekController.text) ?? 0;
+    double avgMPG = double.tryParse(_avgMPGController.text) ?? 0.0;
+    double fuelPrice = double.tryParse(_fuelPriceController.text) ?? 0.0;
+
+    fuelCost = (avgMPG > 0) ? (milesPerWeek / avgMPG) * fuelPrice : 0.0;
+
+    int oilChangesYear = int.tryParse(_oilChangesYearController.text) ?? 0;
+    double costPerOilChange = double.tryParse(_costPerOilChangeController.text) ?? 0.0;
+    weeklyOilChangeCost = (oilChangesYear * costPerOilChange) / 52.14;
+
+    double tireCostYear = double.tryParse(_tireCostYearController.text) ?? 0.0;
+    weeklyTireCost = tireCostYear / 52.14;
+
+    double maintenanceCostYear = double.tryParse(_maintenanceCostYearController.text) ?? 0.0;
+    weeklyMaintenanceCost = maintenanceCostYear / 52.14;
+
+    totalWeeklyVariableCosts = fuelCost + weeklyOilChangeCost + weeklyTireCost + weeklyMaintenanceCost;
+    totalWeeklyOperatingCost = totalWeeklyFixedCosts + totalWeeklyVariableCosts;
+    trueCPM = (milesPerWeek > 0) ? totalWeeklyOperatingCost / milesPerWeek : 0.0;
+
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    // Dispose all controllers
+    super.dispose();
+  }
+
+  Future<void> _saveCalculation() async {
+    final controller = Provider.of<CalculationController>(context, listen: false);
+
+    final payload = {
+      "type": "COST",
+      "costData": {
+        "insurance": double.tryParse(_insuranceController.text) ?? 0.0,
+        "truckPayment": double.tryParse(_truckPaymentController.text) ?? 0.0,
+        "escrow": double.tryParse(_escrowController.text) ?? 0.0,
+        "repairSavings": double.tryParse(_repairSavingsController.text) ?? 0.0,
+        "driverPay": double.tryParse(_driverPayController.text) ?? 0.0,
+        "permits": double.tryParse(_permitsController.text) ?? 0.0,
+        "otherFixedCosts": double.tryParse(_otherFixedCostsController.text) ?? 0.0,
+        "totalWeeklyFixedCosts": totalWeeklyFixedCosts,
+        "milesPerWeek": int.tryParse(_milesPerWeekController.text) ?? 0,
+        "avgMPG": double.tryParse(_avgMPGController.text) ?? 0.0,
+        "fuelPrice": double.tryParse(_fuelPriceController.text) ?? 0.0,
+        "fuelCost": fuelCost,
+        "oilChangesPerYear": int.tryParse(_oilChangesYearController.text) ?? 0,
+        "costPerOilChange": double.tryParse(_costPerOilChangeController.text) ?? 0.0,
+        "weeklyOilChangeCost": weeklyOilChangeCost,
+        "tireCostPerYear": double.tryParse(_tireCostYearController.text) ?? 0.0,
+        "weeklyTireCost": weeklyTireCost,
+        "maintenanceCostPerYear": double.tryParse(_maintenanceCostYearController.text) ?? 0.0,
+        "weeklyMaintenanceCost": weeklyMaintenanceCost,
+        "totalWeeklyVariableCosts": totalWeeklyVariableCosts,
+        "totalWeeklyOperatingCost": totalWeeklyOperatingCost,
+        "trueCPM": trueCPM,
+      }
+    };
+
+    final success = await controller.createCalculation(payload);
+    if (success) {
+      if (mounted) {
+        showCustomSnackBar(context: context, message: "Operating costs saved!", isError: false);
+      }
+    } else {
+      if (mounted) {
+        showCustomSnackBar(context: context, message: controller.errorMessage ?? "Failed to save", isError: true);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,17 +158,21 @@ class CostsPage extends StatelessWidget {
                       'CPM Calculator',
                       style: TextStyle(color: Colors.white, fontSize: 22.sp, fontWeight: FontWeight.bold),
                     ),
-                    ElevatedButton(
-                      onPressed: () {
-                        showCustomSnackBar(context: context, message: "Operating costs saved!", isError: false);
+                    Consumer<CalculationController>(
+                      builder: (context, controller, child) {
+                        return ElevatedButton(
+                          onPressed: controller.inProgress ? null : _saveCalculation,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF00D193),
+                            minimumSize: Size(80.w, 36.h),
+                            padding: EdgeInsets.zero,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
+                          ),
+                          child: controller.inProgress
+                              ? SizedBox(height: 20.h, width: 20.h, child: const CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                              : const Text('Save', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                        );
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF00D193),
-                        minimumSize: Size(80.w, 36.h),
-                        padding: EdgeInsets.zero,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-                      ),
-                      child: const Text('Save', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
@@ -75,9 +214,9 @@ class CostsPage extends StatelessWidget {
           SizedBox(height: 16.h),
           Row(
             children: [
-              _buildSummaryItem('Weekly Total', r'$0.00'),
+              _buildSummaryItem('Weekly Total', '\$${totalWeeklyOperatingCost.toStringAsFixed(2)}'),
               SizedBox(width: 40.w),
-              _buildSummaryItem('True CPM', r'$0.00'),
+              _buildSummaryItem('True CPM', '\$${trueCPM.toStringAsFixed(2)}'),
             ],
           ),
         ],
@@ -121,15 +260,15 @@ class CostsPage extends StatelessWidget {
       ),
       child: Column(
         children: [
-          _buildInputField('Weekly Insurance Payment', '0.00'),
-          _buildInputField('Weekly Truck Payment', '0.00'),
-          _buildInputField('Weekly Escrow Contribution', '0.00'),
-          _buildInputField('Weekly Repair Savings', '0.00'),
-          _buildInputField('Weekly Self/Driver Pay', '0.00'),
-          _buildInputField('Weekly Permits/Subscriptions', '0.00'),
-          _buildInputField('Other Weekly Costs', '0.00'),
+          _buildInputField('Weekly Insurance Payment', _insuranceController),
+          _buildInputField('Weekly Truck Payment', _truckPaymentController),
+          _buildInputField('Weekly Escrow Contribution', _escrowController),
+          _buildInputField('Weekly Repair Savings', _repairSavingsController),
+          _buildInputField('Weekly Self/Driver Pay', _driverPayController),
+          _buildInputField('Weekly Permits/Subscriptions', _permitsController),
+          _buildInputField('Other Weekly Costs', _otherFixedCostsController),
           SizedBox(height: 16.h),
-          _buildDarkResultBox('TOTAL WEEKLY FIXED COSTS', r'$0.00'),
+          _buildDarkResultBox('TOTAL WEEKLY FIXED COSTS', '\$${totalWeeklyFixedCosts.toStringAsFixed(2)}'),
         ],
       ),
     );
@@ -145,32 +284,32 @@ class CostsPage extends StatelessWidget {
       ),
       child: Column(
         children: [
-          _buildInputField('Miles Driven Per Week', '2500'),
+          _buildInputField('Miles Driven Per Week', _milesPerWeekController, isInt: true),
           Row(
             children: [
-              Expanded(child: _buildInputField('Average MPG', '6.5')),
+              Expanded(child: _buildInputField('Average MPG', _avgMPGController)),
               SizedBox(width: 16.w),
-              Expanded(child: _buildInputField('Avg Fuel Price (\$ /gal)', '3.50')),
+              Expanded(child: _buildInputField('Avg Fuel Price (\$ /gal)', _fuelPriceController)),
             ],
           ),
-          _buildDarkResultBox('WEEKLY FUEL COST', r'$0.00'),
+          _buildDarkResultBox('WEEKLY FUEL COST', '\$${fuelCost.toStringAsFixed(2)}'),
           SizedBox(height: 16.h),
           Row(
             children: [
-              Expanded(child: _buildInputField('Oil Changes/Year', '12')),
+              Expanded(child: _buildInputField('Oil Changes/Year', _oilChangesYearController, isInt: true)),
               SizedBox(width: 16.w),
-              Expanded(child: _buildInputField('Cost Per Oil Change', '300')),
+              Expanded(child: _buildInputField('Cost Per Oil Change', _costPerOilChangeController)),
             ],
           ),
-          _buildDarkResultBox('WEEKLY OIL CHANGE COST', r'$0.00'),
+          _buildDarkResultBox('WEEKLY OIL CHANGE COST', '\$${weeklyOilChangeCost.toStringAsFixed(2)}'),
           SizedBox(height: 16.h),
-          _buildInputField('Tire Cost Per Year', '5000'),
-          _buildDarkResultBox('WEEKLY TIRE COST', r'$0.00'),
+          _buildInputField('Tire Cost Per Year', _tireCostYearController),
+          _buildDarkResultBox('WEEKLY TIRE COST', '\$${weeklyTireCost.toStringAsFixed(2)}'),
           SizedBox(height: 16.h),
-          _buildInputField('Maintenance Cost Per Year', '8000'),
-          _buildDarkResultBox('WEEKLY MAINTENANCE COST', r'$0.00'),
+          _buildInputField('Maintenance Cost Per Year', _maintenanceCostYearController),
+          _buildDarkResultBox('WEEKLY MAINTENANCE COST', '\$${weeklyMaintenanceCost.toStringAsFixed(2)}'),
           SizedBox(height: 16.h),
-          _buildDarkResultBox('TOTAL WEEKLY VARIABLE COSTS', r'$0.00', isLargeValue: true),
+          _buildDarkResultBox('TOTAL WEEKLY VARIABLE COSTS', '\$${totalWeeklyVariableCosts.toStringAsFixed(2)}', isLargeValue: true),
         ],
       ),
     );
@@ -188,17 +327,17 @@ class CostsPage extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(child: _buildResultSubBox('Total Fixed', r'$0.00')),
+              Expanded(child: _buildResultSubBox('Total Fixed', '\$${totalWeeklyFixedCosts.toStringAsFixed(2)}')),
               SizedBox(width: 16.w),
-              Expanded(child: _buildResultSubBox('Total Variable', r'$0.00')),
+              Expanded(child: _buildResultSubBox('Total Variable', '\$${totalWeeklyVariableCosts.toStringAsFixed(2)}')),
             ],
           ),
           SizedBox(height: 12.h),
-          _buildDarkResultBox('TOTAL WEEKLY OPERATING COST', r'$0.00', isLargeValue: true),
+          _buildDarkResultBox('TOTAL WEEKLY OPERATING COST', '\$${totalWeeklyOperatingCost.toStringAsFixed(2)}', isLargeValue: true),
           SizedBox(height: 12.h),
-          _buildDarkResultBox('Miles Driven Per Week', '0 miles', isMiles: true),
+          _buildDarkResultBox('Miles Driven Per Week', '${_milesPerWeekController.text} miles', isMiles: true),
           SizedBox(height: 12.h),
-          _buildDarkResultBox('TRUE COST PER MILE', r'$0.00', isLargeValue: true),
+          _buildDarkResultBox('TRUE COST PER MILE', '\$${trueCPM.toStringAsFixed(2)}', isLargeValue: true),
         ],
       ),
     );
@@ -276,7 +415,7 @@ class CostsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildInputField(String label, String hint) {
+  Widget _buildInputField(String label, TextEditingController controller, {bool isInt = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -285,11 +424,13 @@ class CostsPage extends StatelessWidget {
           child: Text(label, style: TextStyle(color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.w600)),
         ),
         TextField(
+          controller: controller,
+          keyboardType: TextInputType.numberWithOptions(decimal: !isInt),
           style: TextStyle(color: Colors.black, fontSize: 15.sp, fontWeight: FontWeight.w500),
           decoration: InputDecoration(
             fillColor: Colors.white,
             filled: true,
-            hintText: hint,
+            hintText: '0.00',
             hintStyle: TextStyle(color: Colors.grey.shade400),
             contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.r), borderSide: BorderSide.none),

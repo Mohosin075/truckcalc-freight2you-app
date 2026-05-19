@@ -43,4 +43,39 @@ class CalculationController extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<bool> deleteCalculation(String id) async {
+    _inProgress = true;
+    notifyListeners();
+
+    final response = await CalculationService.deleteCalculation(id);
+
+    _inProgress = false;
+    if (response.isSuccess) {
+      _calculations.removeWhere((element) => element.id == id);
+      notifyListeners();
+      return true;
+    } else {
+      _errorMessage = response.errorMessage ?? "Failed to delete calculation";
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<String?> exportData() async {
+    _inProgress = true;
+    notifyListeners();
+
+    final response = await CalculationService.exportData();
+
+    _inProgress = false;
+    notifyListeners();
+
+    if (response.isSuccess && response.body != null) {
+      return response.body!['data']['url'];
+    } else {
+      _errorMessage = response.errorMessage ?? "Failed to export data";
+      return null;
+    }
+  }
 }

@@ -1,9 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
+import 'package:truckcalc/Model/calculation_model.dart';
+import 'package:truckcalc/Service/Controller/calculation_controller.dart';
 import 'package:truckcalc/View/Widgets/app_background.dart';
+import 'package:intl/intl.dart';
+import 'package:truckcalc/View/Widgets/customSnacBar.dart';
 
-class HistoryPage extends StatelessWidget {
+class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
+
+  @override
+  State<HistoryPage> createState() => _HistoryPageState();
+}
+
+class _HistoryPageState extends State<HistoryPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<CalculationController>(context, listen: false).fetchCalculations();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +42,9 @@ class HistoryPage extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
                 child: TextField(
                   style: const TextStyle(color: Colors.white),
+                  onChanged: (value) {
+                    // Implement search if needed
+                  },
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.search, color: Colors.grey),
                     hintText: 'Search calculations...',
@@ -37,30 +58,26 @@ class HistoryPage extends StatelessWidget {
                 ),
               ),
               Expanded(
-                child: ListView(
-                  padding: EdgeInsets.all(16.w),
-                  children: [
-                    _buildHistoryCard(
-                      'Weekly Costs: Fixed \$34.00 + Variable \$22227.54',
-                      '= Total: \$22261.54, CPM: \$1.00',
-                      '4/24/2026, 2:18',
-                    ),
-                    _buildHistoryCard(
-                      'Weekly Goal: \$2222222, 2 days',
-                      '= Need 100mi @ \$22222.00/mi',
-                      '4/24/2026, 2:18',
-                    ),
-                    _buildHistoryCard(
-                      'Load: 22222222mi + 2222DH @ \$22222222/mi',
-                      '= Revenue: \$543209888396296.00, Profit: \$543209888374074.00',
-                      '4/24/2026, 2:18',
-                    ),
-                    _buildHistoryCard(
-                      'Load: 22222222mi + 0DH @ \$22222222/mi',
-                      '= Revenue: \$543209883456790.00, Profit: \$543209883456790.00',
-                      '4/24/2026, 2:17',
-                    ),
-                  ],
+                child: Consumer<CalculationController>(
+                  builder: (context, controller, child) {
+                    if (controller.inProgress && controller.calculations.isEmpty) {
+                      return const Center(child: CircularProgressIndicator(color: Color(0xFF00D193)));
+                    }
+                    if (controller.calculations.isEmpty) {
+                      return const Center(child: Text("No calculations found", style: TextStyle(color: Colors.white70)));
+                    }
+                    return RefreshIndicator(
+                      onRefresh: () => controller.fetchCalculations(),
+                      child: ListView.builder(
+                        padding: EdgeInsets.all(16.w),
+                        itemCount: controller.calculations.length,
+                        itemBuilder: (context, index) {
+                          final calculation = controller.calculations[index];
+                          return _buildHistoryCard(calculation);
+                        },
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
@@ -70,7 +87,34 @@ class HistoryPage extends StatelessWidget {
     );
   }
 
-  Widget _buildHistoryCard(String header, String result, String time) {
+  Widget _buildHistoryCard(CalculationModel calculation) {
+    String header = "";
+    String result = "";
+    
+    if (calculation.type == 'LOAD' && calculation.loadData != null) {
+      final ld = calculation.loadData!;
+      header = 'Load: ${ld.loadedMiles ?? 0}mi + ${ld.dhMiles ?? 0}DH @ \$${ld.baseRate?.toStringAsFixed(2) ?? "0.00"}/mi';
+      result = '= Revenue: \$${ld.totalRevenue?.toStringAsFixed(2) ?? "0.00"}, Profit: \$${ld.totalProfit?.toStringAsFixed(2) ?? "0.00"}';
+    } else if (calculation.type == 'GOAL' && calculation.goalData != null) {
+      final gd = calculation.goalData!;
+      header = 'Weekly Goal: \$${gd.desiredWeeklyProfit?.toStringAsFixed(2) ?? "0.00"}, ${gd.desiredDaysPerWeek ?? 0} days';
+      result = '= Need ${gd.milesNeeded ?? 0}mi @ \$${gd.minRatePerMile?.toStringAsFixed(2) ?? "0.00"}/mi';
+    } else if (calculation.type == 'COST' && calculation.costData != null) {
+      final cd = calculation.costData!;
+      header = 'Weekly Costs: Fixed \$${cd.totalWeeklyFixedCosts?.toStringAsFixed(2) ?? "0.00"} + Variable \$${cd.totalWeeklyVariableCosts?.toStringAsFixed(2) ?? "0.00"}';
+      result = '= Total: \$${cd.totalWeeklyOperatingCost?.toStringAsFixed(2) ?? "0.00"}, CPM: \$${cd.trueCPM?.toStringAsFixed(2) ?? "0.00"}';
+    }
+
+    String time = "";
+    if (calculation.createdAt != null) {
+      try {
+        DateTime dt = DateTime.parse(calculation.createdAt!).toLocal();
+        time = DateFormat('M/d/yyyy, H:mm').format(dt);
+      } catch (e) {
+        time = calculation.createdAt!;
+      }
+    }
+
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
       padding: EdgeInsets.all(16.w),
@@ -90,7 +134,7 @@ class HistoryPage extends StatelessWidget {
                 SizedBox(height: 10.h),
                 Text(
                   result,
-                  style: TextStyle(color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: Colors.white, fontSize: 15.sp, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 6.h),
                 Text(time, style: TextStyle(color: Colors.white24, fontSize: 10.sp)),
@@ -98,13 +142,25 @@ class HistoryPage extends StatelessWidget {
             ),
           ),
           SizedBox(width: 10.w),
-          Container(
-            padding: EdgeInsets.all(8.w),
-            decoration: BoxDecoration(
-              color: Colors.redAccent.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(8.r),
+          GestureDetector(
+            onTap: () async {
+              if (calculation.id != null) {
+                final success = await Provider.of<CalculationController>(context, listen: false).deleteCalculation(calculation.id!);
+                if (success) {
+                  if (mounted) {
+                    showCustomSnackBar(context: context, message: "Calculation deleted", isError: false);
+                  }
+                }
+              }
+            },
+            child: Container(
+              padding: EdgeInsets.all(8.w),
+              decoration: BoxDecoration(
+                color: Colors.redAccent.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: const Icon(Icons.close, color: Colors.redAccent, size: 18),
             ),
-            child: const Icon(Icons.close, color: Colors.redAccent, size: 18),
           ),
         ],
       ),

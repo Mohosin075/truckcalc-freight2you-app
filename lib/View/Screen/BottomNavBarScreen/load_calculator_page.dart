@@ -1,10 +1,133 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
+import 'package:truckcalc/Service/Controller/calculation_controller.dart';
 import 'package:truckcalc/View/Widgets/app_background.dart';
 import 'package:truckcalc/View/Widgets/customSnacBar.dart';
 
-class LoadCalculatorPage extends StatelessWidget {
+class LoadCalculatorPage extends StatefulWidget {
   const LoadCalculatorPage({super.key});
+
+  @override
+  State<LoadCalculatorPage> createState() => _LoadCalculatorPageState();
+}
+
+class _LoadCalculatorPageState extends State<LoadCalculatorPage> {
+  final TextEditingController _baseRateController = TextEditingController(text: '0.00');
+  final TextEditingController _fscController = TextEditingController(text: '0.00');
+  final TextEditingController _loadedMilesController = TextEditingController(text: '0');
+  final TextEditingController _tollsController = TextEditingController(text: '0.00');
+  final TextEditingController _dhMilesController = TextEditingController(text: '0');
+  final TextEditingController _dhRateController = TextEditingController(text: '0.00');
+  final TextEditingController _bonusController = TextEditingController(text: '0.00');
+  final TextEditingController _driverPercentController = TextEditingController(text: '100');
+  final TextEditingController _costPerMileController = TextEditingController(text: '0.00');
+
+  double totalFSC = 0.0;
+  double totalDH = 0.0;
+  double totalRevenue = 0.0;
+  int totalMiles = 0;
+  double compensationPerMile = 0.0;
+  double profitPerMile = 0.0;
+  double totalProfit = 0.0;
+  double totalCost = 0.0;
+  double driverPay = 0.0;
+  double ownerPay = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _baseRateController.addListener(_calculate);
+    _fscController.addListener(_calculate);
+    _loadedMilesController.addListener(_calculate);
+    _tollsController.addListener(_calculate);
+    _dhMilesController.addListener(_calculate);
+    _dhRateController.addListener(_calculate);
+    _bonusController.addListener(_calculate);
+    _driverPercentController.addListener(_calculate);
+    _costPerMileController.addListener(_calculate);
+  }
+
+  void _calculate() {
+    double baseRate = double.tryParse(_baseRateController.text) ?? 0.0;
+    double fsc = double.tryParse(_fscController.text) ?? 0.0;
+    int loadedMiles = int.tryParse(_loadedMilesController.text) ?? 0;
+    double tolls = double.tryParse(_tollsController.text) ?? 0.0;
+    int dhMiles = int.tryParse(_dhMilesController.text) ?? 0;
+    double dhRate = double.tryParse(_dhRateController.text) ?? 0.0;
+    double bonus = double.tryParse(_bonusController.text) ?? 0.0;
+    int driverPercent = int.tryParse(_driverPercentController.text) ?? 100;
+    double costPerMile = double.tryParse(_costPerMileController.text) ?? 0.0;
+
+    totalFSC = fsc * loadedMiles;
+    totalDH = dhRate * dhMiles;
+    totalRevenue = (baseRate * loadedMiles) + totalFSC + totalDH + bonus + tolls;
+    totalMiles = loadedMiles + dhMiles;
+    compensationPerMile = totalMiles > 0 ? totalRevenue / totalMiles : 0.0;
+    profitPerMile = compensationPerMile - costPerMile;
+    totalProfit = profitPerMile * totalMiles;
+    totalCost = costPerMile * totalMiles;
+    driverPay = totalRevenue * (driverPercent / 100);
+    ownerPay = totalRevenue - driverPay;
+
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    _baseRateController.dispose();
+    _fscController.dispose();
+    _loadedMilesController.dispose();
+    _tollsController.dispose();
+    _dhMilesController.dispose();
+    _dhRateController.dispose();
+    _bonusController.dispose();
+    _driverPercentController.dispose();
+    _costPerMileController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _saveCalculation() async {
+    final controller = Provider.of<CalculationController>(context, listen: false);
+    
+    final payload = {
+      "type": "LOAD",
+      "loadData": {
+        "baseRate": double.tryParse(_baseRateController.text) ?? 0.0,
+        "fuelSurcharge": double.tryParse(_fscController.text) ?? 0.0,
+        "loadedMiles": int.tryParse(_loadedMilesController.text) ?? 0,
+        "tolls": double.tryParse(_tollsController.text) ?? 0.0,
+        "dhMiles": int.tryParse(_dhMilesController.text) ?? 0,
+        "dhRate": double.tryParse(_dhRateController.text) ?? 0.0,
+        "bonus": double.tryParse(_bonusController.text) ?? 0.0,
+        "driverPercentage": int.tryParse(_driverPercentController.text) ?? 100,
+        "totalRevenue": totalRevenue,
+        "totalProfit": totalProfit,
+        "totalFSC": totalFSC,
+        "totalDH": totalDH,
+        "totalMiles": totalMiles,
+        "compensationPerMile": compensationPerMile,
+        "costPerMile": double.tryParse(_costPerMileController.text) ?? 0.0,
+        "totalCost": totalCost,
+        "profitPerMile": profitPerMile,
+        "driverPay": driverPay,
+        "ownerPay": ownerPay,
+      }
+    };
+
+    final success = await controller.createCalculation(payload);
+    if (success) {
+      if (mounted) {
+        showCustomSnackBar(context: context, message: "Load calculation saved!", isError: false);
+      }
+    } else {
+      if (mounted) {
+        showCustomSnackBar(context: context, message: controller.errorMessage ?? "Failed to save", isError: true);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,17 +146,21 @@ class LoadCalculatorPage extends StatelessWidget {
                       'Load Calculator',
                       style: TextStyle(color: Colors.white, fontSize: 22.sp, fontWeight: FontWeight.bold),
                     ),
-                    ElevatedButton(
-                      onPressed: () {
-                        showCustomSnackBar(context: context, message: "Load calculation saved!", isError: false);
+                    Consumer<CalculationController>(
+                      builder: (context, controller, child) {
+                        return ElevatedButton(
+                          onPressed: controller.inProgress ? null : _saveCalculation,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF00D193),
+                            minimumSize: Size(80.w, 36.h),
+                            padding: EdgeInsets.zero,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
+                          ),
+                          child: controller.inProgress
+                              ? SizedBox(height: 20.h, width: 20.h, child: const CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                              : const Text('Save', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                        );
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF00D193),
-                        minimumSize: Size(80.w, 36.h),
-                        padding: EdgeInsets.zero,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-                      ),
-                      child: const Text('Save', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
@@ -74,9 +201,9 @@ class LoadCalculatorPage extends StatelessWidget {
           SizedBox(height: 16.h),
           Row(
             children: [
-              _buildSummaryItem('Total Revenue', r'$0.00'),
+              _buildSummaryItem('Total Revenue', '\$${totalRevenue.toStringAsFixed(2)}'),
               SizedBox(width: 40.w),
-              _buildSummaryItem('Total Profit', r'$0.00'),
+              _buildSummaryItem('Total Profit', '\$${totalProfit.toStringAsFixed(2)}'),
             ],
           ),
         ],
@@ -101,21 +228,21 @@ class LoadCalculatorPage extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(child: _buildInputField('Base Rate Per Mile', '0.00')),
+              Expanded(child: _buildInputField('Base Rate Per Mile', _baseRateController)),
               SizedBox(width: 16.w),
-              Expanded(child: _buildInputField('Fuel Surcharge/Mile', '0.00')),
+              Expanded(child: _buildInputField('Fuel Surcharge/Mile', _fscController)),
             ],
           ),
           SizedBox(height: 16.h),
           Row(
             children: [
-              Expanded(child: _buildInputField('Loaded Miles', '0')),
+              Expanded(child: _buildInputField('Loaded Miles', _loadedMilesController, isInt: true)),
               SizedBox(width: 16.w),
-              Expanded(child: _buildInputField('Tolls (\$)', '0.00')),
+              Expanded(child: _buildInputField('Tolls (\$)', _tollsController)),
             ],
           ),
           SizedBox(height: 16.h),
-          _buildDarkResultBox(r'Total FSC $', r'$0.00'),
+          _buildDarkResultBox(r'Total FSC $', '\$${totalFSC.toStringAsFixed(2)}'),
         ],
       ),
     );
@@ -128,15 +255,15 @@ class LoadCalculatorPage extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(child: _buildInputField('DH Miles', '0')),
+              Expanded(child: _buildInputField('DH Miles', _dhMilesController, isInt: true)),
               SizedBox(width: 16.w),
-              Expanded(child: _buildInputField('DH Rate Per Mile', '0.00')),
+              Expanded(child: _buildInputField('DH Rate Per Mile', _dhRateController)),
             ],
           ),
           SizedBox(height: 16.h),
-          _buildDarkResultBox(r'Total DH $', r'$0.00'),
+          _buildDarkResultBox(r'Total DH $', '\$${totalDH.toStringAsFixed(2)}'),
           SizedBox(height: 16.h),
-          _buildInputField('Bonus/Accessorial Pay', '0.00'),
+          _buildInputField('Bonus/Accessorial Pay', _bonusController),
         ],
       ),
     );
@@ -149,13 +276,13 @@ class LoadCalculatorPage extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(child: _buildDarkResultBox('Total Revenue', r'$0.00', small: true)),
+              Expanded(child: _buildDarkResultBox('Total Revenue', '\$${totalRevenue.toStringAsFixed(2)}', small: true)),
               SizedBox(width: 16.w),
-              Expanded(child: _buildDarkResultBox('Total Miles', '0', small: true)),
+              Expanded(child: _buildDarkResultBox('Total Miles', '$totalMiles', small: true)),
             ],
           ),
           SizedBox(height: 12.h),
-          _buildDarkResultBox('Compensation Per Mile', r'$0.00'),
+          _buildDarkResultBox('Compensation Per Mile', '\$${compensationPerMile.toStringAsFixed(2)}'),
         ],
       ),
     );
@@ -168,15 +295,15 @@ class LoadCalculatorPage extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(child: _buildLabelValue('Profit Per Mile', r'$0.00')),
-              Expanded(child: _buildLabelValue('Cost Per Mile', r'$0.00')),
+              Expanded(child: _buildLabelValue('Profit Per Mile', '\$${profitPerMile.toStringAsFixed(2)}')),
+              Expanded(child: _buildInputField('Cost Per Mile', _costPerMileController)),
             ],
           ),
           SizedBox(height: 16.h),
           Row(
             children: [
-              Expanded(child: _buildLabelValue('Total Profit', r'$0.00')),
-              Expanded(child: _buildLabelValue('Total Cost', r'$0.00')),
+              Expanded(child: _buildLabelValue('Total Profit', '\$${totalProfit.toStringAsFixed(2)}')),
+              Expanded(child: _buildLabelValue('Total Cost', '\$${totalCost.toStringAsFixed(2)}')),
             ],
           ),
         ],
@@ -185,15 +312,16 @@ class LoadCalculatorPage extends StatelessWidget {
   }
 
   Widget _buildEarningsSplitCard() {
+    double driverPercentValue = (double.tryParse(_driverPercentController.text) ?? 100);
     return _buildSectionCard(
       title: 'Earnings Split',
       child: Column(
         children: [
-          _buildInputField('Driver Percentage (%)', '100'),
+          _buildInputField('Driver Percentage (%)', _driverPercentController, isInt: true),
           SizedBox(height: 16.h),
-          _buildSplitItem('DRIVER', '100.0%', r'$0.00'),
+          _buildSplitItem('DRIVER', '${driverPercentValue.toStringAsFixed(1)}%', '\$${driverPay.toStringAsFixed(2)}'),
           SizedBox(height: 12.h),
-          _buildSplitItem('OWNER', '0.0%', r'$0.00', color: const Color(0xFF4C86FF)),
+          _buildSplitItem('OWNER', '${(100 - driverPercentValue).toStringAsFixed(1)}%', '\$${ownerPay.toStringAsFixed(2)}', color: const Color(0xFF4C86FF)),
         ],
       ),
     );
@@ -273,18 +401,20 @@ class LoadCalculatorPage extends StatelessWidget {
     );
   }
 
-  Widget _buildInputField(String label, String hint) {
+  Widget _buildInputField(String label, TextEditingController controller, {bool isInt = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: TextStyle(color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.w600)),
         SizedBox(height: 8.h),
         TextField(
+          controller: controller,
+          keyboardType: TextInputType.numberWithOptions(decimal: !isInt),
           style: TextStyle(color: Colors.black, fontSize: 15.sp, fontWeight: FontWeight.w500),
           decoration: InputDecoration(
             fillColor: Colors.white,
             filled: true,
-            hintText: hint,
+            hintText: '0',
             hintStyle: TextStyle(color: Colors.grey.shade400),
             contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.r), borderSide: BorderSide.none),

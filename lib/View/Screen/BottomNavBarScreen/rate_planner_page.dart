@@ -1,10 +1,120 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
+import 'package:truckcalc/Service/Controller/calculation_controller.dart';
 import 'package:truckcalc/View/Widgets/app_background.dart';
 import 'package:truckcalc/View/Widgets/customSnacBar.dart';
 
-class RatePlannerPage extends StatelessWidget {
+class RatePlannerPage extends StatefulWidget {
   const RatePlannerPage({super.key});
+
+  @override
+  State<RatePlannerPage> createState() => _RatePlannerPageState();
+}
+
+class _RatePlannerPageState extends State<RatePlannerPage> {
+  final TextEditingController _desiredProfitController = TextEditingController(text: '1500');
+  final TextEditingController _costPerMileController = TextEditingController(text: '0.50');
+  final TextEditingController _dhPayPerMileController = TextEditingController(text: '0.25');
+  final TextEditingController _daysPerWeekController = TextEditingController(text: '5');
+  final TextEditingController _maxMilesPerDayController = TextEditingController(text: '500');
+  final TextEditingController _driverPercentController = TextEditingController(text: '100');
+
+  int milesNeeded = 0;
+  double minRatePerMile = 0.0;
+  double totalRevenue = 0.0;
+  double totalCost = 0.0;
+  int maxDHPerDay = 0;
+  int maxDHPerWeek = 0;
+  double driverPay = 0.0;
+  double ownerPay = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _desiredProfitController.addListener(_calculate);
+    _costPerMileController.addListener(_calculate);
+    _dhPayPerMileController.addListener(_calculate);
+    _daysPerWeekController.addListener(_calculate);
+    _maxMilesPerDayController.addListener(_calculate);
+    _driverPercentController.addListener(_calculate);
+    _calculate();
+  }
+
+  void _calculate() {
+    double desiredProfit = double.tryParse(_desiredProfitController.text) ?? 0.0;
+    double costPerMile = double.tryParse(_costPerMileController.text) ?? 0.0;
+    double dhPayPerMile = double.tryParse(_dhPayPerMileController.text) ?? 0.0;
+    int daysPerWeek = int.tryParse(_daysPerWeekController.text) ?? 0;
+    int maxMilesPerDay = int.tryParse(_maxMilesPerDayController.text) ?? 0;
+    int driverPercent = int.tryParse(_driverPercentController.text) ?? 100;
+
+    int totalMilesPerWeek = daysPerWeek * maxMilesPerDay;
+    maxDHPerWeek = (totalMilesPerWeek * 0.15).toInt(); // 15% Deadhead
+    maxDHPerDay = (maxMilesPerDay * 0.15).toInt();
+    milesNeeded = totalMilesPerWeek - maxDHPerWeek;
+
+    if (milesNeeded > 0) {
+      // desiredProfit = (milesNeeded * minRatePerMile) + (maxDHPerWeek * dhPayPerMile) - (totalMilesPerWeek * costPerMile)
+      minRatePerMile = (desiredProfit + (totalMilesPerWeek * costPerMile) - (maxDHPerWeek * dhPayPerMile)) / milesNeeded;
+    } else {
+      minRatePerMile = 0.0;
+    }
+
+    totalRevenue = (milesNeeded * minRatePerMile) + (maxDHPerWeek * dhPayPerMile);
+    totalCost = totalMilesPerWeek * costPerMile;
+    
+    driverPay = totalRevenue * (driverPercent / 100);
+    ownerPay = totalRevenue - driverPay;
+
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    _desiredProfitController.dispose();
+    _costPerMileController.dispose();
+    _dhPayPerMileController.dispose();
+    _daysPerWeekController.dispose();
+    _maxMilesPerDayController.dispose();
+    _driverPercentController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _saveCalculation() async {
+    final controller = Provider.of<CalculationController>(context, listen: false);
+
+    final payload = {
+      "type": "GOAL",
+      "goalData": {
+        "desiredWeeklyProfit": double.tryParse(_desiredProfitController.text) ?? 0.0,
+        "costPerMile": double.tryParse(_costPerMileController.text) ?? 0.0,
+        "deadheadPayPerMile": double.tryParse(_dhPayPerMileController.text) ?? 0.0,
+        "desiredDaysPerWeek": int.tryParse(_daysPerWeekController.text) ?? 0,
+        "desiredMaxMilesPerDay": int.tryParse(_maxMilesPerDayController.text) ?? 0,
+        "driverPercentage": int.tryParse(_driverPercentController.text) ?? 100,
+        "milesNeeded": milesNeeded,
+        "minRatePerMile": minRatePerMile,
+        "totalRevenue": totalRevenue,
+        "totalCost": totalCost,
+        "maxDHPerDay": maxDHPerDay,
+        "maxDHPerWeek": maxDHPerWeek,
+      }
+    };
+
+    final success = await controller.createCalculation(payload);
+    if (success) {
+      if (mounted) {
+        showCustomSnackBar(context: context, message: "Rate plan saved!", isError: false);
+      }
+    } else {
+      if (mounted) {
+        showCustomSnackBar(context: context, message: controller.errorMessage ?? "Failed to save", isError: true);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,17 +133,21 @@ class RatePlannerPage extends StatelessWidget {
                       'Rate Planner',
                       style: TextStyle(color: Colors.white, fontSize: 22.sp, fontWeight: FontWeight.bold),
                     ),
-                    ElevatedButton(
-                      onPressed: () {
-                        showCustomSnackBar(context: context, message: "Rate plan saved!", isError: false);
+                    Consumer<CalculationController>(
+                      builder: (context, controller, child) {
+                        return ElevatedButton(
+                          onPressed: controller.inProgress ? null : _saveCalculation,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF00D193),
+                            minimumSize: Size(80.w, 36.h),
+                            padding: EdgeInsets.zero,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
+                          ),
+                          child: controller.inProgress
+                              ? SizedBox(height: 20.h, width: 20.h, child: const CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                              : const Text('Save', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                        );
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF00D193),
-                        minimumSize: Size(80.w, 36.h),
-                        padding: EdgeInsets.zero,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-                      ),
-                      child: const Text('Save', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
@@ -71,9 +185,9 @@ class RatePlannerPage extends StatelessWidget {
           SizedBox(height: 16.h),
           Row(
             children: [
-              _buildTargetItem('Miles Needed', '0'),
+              _buildTargetItem('Miles Needed', '$milesNeeded'),
               SizedBox(width: 40.w),
-              _buildTargetItem('Min Rate/Mile', r'$0.00'),
+              _buildTargetItem('Min Rate/Mile', '\$${minRatePerMile.toStringAsFixed(2)}'),
             ],
           ),
         ],
@@ -96,14 +210,14 @@ class RatePlannerPage extends StatelessWidget {
       title: 'Goal Settings',
       child: Column(
         children: [
-          _buildInputField(r'Desired Weekly Profit ($)', '1500'),
-          _buildInputField(r'Cost Per Mile ($)', '0.50'),
-          _buildInputField(r'Deadhead Pay Per Mile ($)', '0.25'),
+          _buildInputField(r'Desired Weekly Profit ($)', _desiredProfitController),
+          _buildInputField(r'Cost Per Mile ($)', _costPerMileController),
+          _buildInputField(r'Deadhead Pay Per Mile ($)', _dhPayPerMileController),
           Row(
             children: [
-              Expanded(child: _buildInputField('Desired # of Days/Week', '5')),
+              Expanded(child: _buildInputField('Desired # of Days/Week', _daysPerWeekController, isInt: true)),
               SizedBox(width: 16.w),
-              Expanded(child: _buildInputField('Desired Max Miles/Day', '500')),
+              Expanded(child: _buildInputField('Desired Max Miles/Day', _maxMilesPerDayController, isInt: true)),
             ],
           ),
         ],
@@ -116,15 +230,15 @@ class RatePlannerPage extends StatelessWidget {
       title: 'Calculated Targets',
       child: Column(
         children: [
-          _buildDarkResultBox('LOADED MILES NEEDED PER WEEK', '0 miles', isGlow: true),
+          _buildDarkResultBox('LOADED MILES NEEDED PER WEEK', '$milesNeeded miles', isGlow: true),
           SizedBox(height: 12.h),
-          _buildDarkResultBox('MINIMUM TARGET RATE PER MILE', r'$0.00', isGlow: true),
+          _buildDarkResultBox('MINIMUM TARGET RATE PER MILE', '\$${minRatePerMile.toStringAsFixed(2)}', isGlow: true),
           SizedBox(height: 12.h),
           Row(
             children: [
-              Expanded(child: _buildResultSubBox('Total Revenue', r'$0.00')),
+              Expanded(child: _buildResultSubBox('Total Revenue', '\$${totalRevenue.toStringAsFixed(2)}')),
               SizedBox(width: 16.w),
-              Expanded(child: _buildResultSubBox('Total Cost', r'$0.00')),
+              Expanded(child: _buildResultSubBox('Total Cost', '\$${totalCost.toStringAsFixed(2)}')),
             ],
           ),
         ],
@@ -137,24 +251,25 @@ class RatePlannerPage extends StatelessWidget {
       title: 'Deadhead Suggestions',
       child: Row(
         children: [
-          Expanded(child: _buildResultSubBox('Max DH Per Day', '0 mi')),
+          Expanded(child: _buildResultSubBox('Max DH Per Day', '$maxDHPerDay mi')),
           SizedBox(width: 16.w),
-          Expanded(child: _buildResultSubBox('Max DH Per Week', '0 mi')),
+          Expanded(child: _buildResultSubBox('Max DH Per Week', '$maxDHPerWeek mi')),
         ],
       ),
     );
   }
 
   Widget _buildEarningsSplitCard() {
+    double driverPercentValue = (double.tryParse(_driverPercentController.text) ?? 100);
     return _buildSectionCard(
       title: 'Earnings Split',
       child: Column(
         children: [
-          _buildInputField('Driver Percentage (%)', '100'),
+          _buildInputField('Driver Percentage (%)', _driverPercentController, isInt: true),
           SizedBox(height: 16.h),
-          _buildSplitItem('DRIVER', '100.0%', r'$0.00'),
+          _buildSplitItem('DRIVER', '${driverPercentValue.toStringAsFixed(1)}%', '\$${driverPay.toStringAsFixed(2)}'),
           SizedBox(height: 12.h),
-          _buildSplitItem('OWNER', '0.0%', r'$0.00', color: const Color(0xFF4C86FF)),
+          _buildSplitItem('OWNER', '${(100 - driverPercentValue).toStringAsFixed(1)}%', '\$${ownerPay.toStringAsFixed(2)}', color: const Color(0xFF4C86FF)),
         ],
       ),
     );
@@ -250,18 +365,20 @@ class RatePlannerPage extends StatelessWidget {
     );
   }
 
-  Widget _buildInputField(String label, String hint) {
+  Widget _buildInputField(String label, TextEditingController controller, {bool isInt = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: TextStyle(color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.w600)),
         SizedBox(height: 8.h),
         TextField(
+          controller: controller,
+          keyboardType: TextInputType.numberWithOptions(decimal: !isInt),
           style: TextStyle(color: Colors.black, fontSize: 15.sp, fontWeight: FontWeight.w500),
           decoration: InputDecoration(
             fillColor: Colors.white,
             filled: true,
-            hintText: hint,
+            hintText: '0',
             hintStyle: TextStyle(color: Colors.grey.shade400),
             contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.r), borderSide: BorderSide.none),
