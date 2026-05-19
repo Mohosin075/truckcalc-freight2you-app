@@ -1,3 +1,4 @@
+// Updated Calculation Model with accurate field names as per API docs
 class CalculationModel {
   String? id;
   String? type;
@@ -28,15 +29,9 @@ class CalculationModel {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['_id'] = id;
     data['type'] = type;
-    if (loadData != null) {
-      data['loadData'] = loadData!.toJson();
-    }
-    if (goalData != null) {
-      data['goalData'] = goalData!.toJson();
-    }
-    if (costData != null) {
-      data['costData'] = costData!.toJson();
-    }
+    if (loadData != null) data['loadData'] = loadData!.toJson();
+    if (goalData != null) data['goalData'] = goalData!.toJson();
+    if (costData != null) data['costData'] = costData!.toJson();
     data['createdAt'] = createdAt;
     return data;
   }
@@ -51,13 +46,13 @@ class LoadData {
   double? dhRate;
   double? bonus;
   int? driverPercentage;
+  double? costPerMile;
   double? totalRevenue;
   double? totalProfit;
   double? totalFSC;
   double? totalDH;
   int? totalMiles;
   double? compensationPerMile;
-  double? costPerMile;
   double? totalCost;
   double? profitPerMile;
   double? driverPay;
@@ -72,13 +67,13 @@ class LoadData {
     this.dhRate,
     this.bonus,
     this.driverPercentage,
+    this.costPerMile,
     this.totalRevenue,
     this.totalProfit,
     this.totalFSC,
     this.totalDH,
     this.totalMiles,
     this.compensationPerMile,
-    this.costPerMile,
     this.totalCost,
     this.profitPerMile,
     this.driverPay,
@@ -94,13 +89,13 @@ class LoadData {
     dhRate = (json['dhRate'] as num?)?.toDouble();
     bonus = (json['bonus'] as num?)?.toDouble();
     driverPercentage = (json['driverPercentage'] as num?)?.toInt();
+    costPerMile = (json['costPerMile'] as num?)?.toDouble();
     totalRevenue = (json['totalRevenue'] as num?)?.toDouble();
     totalProfit = (json['totalProfit'] as num?)?.toDouble();
     totalFSC = (json['totalFSC'] as num?)?.toDouble();
     totalDH = (json['totalDH'] as num?)?.toDouble();
     totalMiles = (json['totalMiles'] as num?)?.toInt();
     compensationPerMile = (json['compensationPerMile'] as num?)?.toDouble();
-    costPerMile = (json['costPerMile'] as num?)?.toDouble();
     totalCost = (json['totalCost'] as num?)?.toDouble();
     profitPerMile = (json['profitPerMile'] as num?)?.toDouble();
     driverPay = (json['driverPay'] as num?)?.toDouble();
@@ -108,27 +103,27 @@ class LoadData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['baseRate'] = baseRate;
-    data['fuelSurcharge'] = fuelSurcharge;
-    data['loadedMiles'] = loadedMiles;
-    data['tolls'] = tolls;
-    data['dhMiles'] = dhMiles;
-    data['dhRate'] = dhRate;
-    data['bonus'] = bonus;
-    data['driverPercentage'] = driverPercentage;
-    data['totalRevenue'] = totalRevenue;
-    data['totalProfit'] = totalProfit;
-    data['totalFSC'] = totalFSC;
-    data['totalDH'] = totalDH;
-    data['totalMiles'] = totalMiles;
-    data['compensationPerMile'] = compensationPerMile;
-    data['costPerMile'] = costPerMile;
-    data['totalCost'] = totalCost;
-    data['profitPerMile'] = profitPerMile;
-    data['driverPay'] = driverPay;
-    data['ownerPay'] = ownerPay;
-    return data;
+    return {
+      'baseRate': baseRate,
+      'fuelSurcharge': fuelSurcharge,
+      'loadedMiles': loadedMiles,
+      'tolls': tolls,
+      'dhMiles': dhMiles,
+      'dhRate': dhRate,
+      'bonus': bonus,
+      'driverPercentage': driverPercentage,
+      'costPerMile': costPerMile,
+      'totalRevenue': totalRevenue,
+      'totalProfit': totalProfit,
+      'totalFSC': totalFSC,
+      'totalDH': totalDH,
+      'totalMiles': totalMiles,
+      'compensationPerMile': compensationPerMile,
+      'totalCost': totalCost,
+      'profitPerMile': profitPerMile,
+      'driverPay': driverPay,
+      'ownerPay': ownerPay,
+    };
   }
 }
 
@@ -136,61 +131,69 @@ class GoalData {
   double? desiredWeeklyProfit;
   double? costPerMile;
   double? deadheadPayPerMile;
-  int? desiredDaysPerWeek;
-  int? desiredMaxMilesPerDay;
+  int? daysPerWeek;
+  int? maxMilesPerDay;
   int? driverPercentage;
-  int? milesNeeded;
-  double? minRatePerMile;
+  int? loadedMilesNeeded;
+  double? minTargetRate;
   double? totalRevenue;
   double? totalCost;
   int? maxDHPerDay;
   int? maxDHPerWeek;
+  double? driverPay;
+  double? ownerPay;
 
   GoalData({
     this.desiredWeeklyProfit,
     this.costPerMile,
     this.deadheadPayPerMile,
-    this.desiredDaysPerWeek,
-    this.desiredMaxMilesPerDay,
+    this.daysPerWeek,
+    this.maxMilesPerDay,
     this.driverPercentage,
-    this.milesNeeded,
-    this.minRatePerMile,
+    this.loadedMilesNeeded,
+    this.minTargetRate,
     this.totalRevenue,
     this.totalCost,
     this.maxDHPerDay,
     this.maxDHPerWeek,
+    this.driverPay,
+    this.ownerPay,
   });
 
   GoalData.fromJson(Map<String, dynamic> json) {
     desiredWeeklyProfit = (json['desiredWeeklyProfit'] as num?)?.toDouble();
     costPerMile = (json['costPerMile'] as num?)?.toDouble();
     deadheadPayPerMile = (json['deadheadPayPerMile'] as num?)?.toDouble();
-    desiredDaysPerWeek = (json['desiredDaysPerWeek'] as num?)?.toInt();
-    desiredMaxMilesPerDay = (json['desiredMaxMilesPerDay'] as num?)?.toInt();
+    daysPerWeek = (json['daysPerWeek'] as num?)?.toInt();
+    maxMilesPerDay = (json['maxMilesPerDay'] as num?)?.toInt();
     driverPercentage = (json['driverPercentage'] as num?)?.toInt();
-    milesNeeded = (json['milesNeeded'] as num?)?.toInt();
-    minRatePerMile = (json['minRatePerMile'] as num?)?.toDouble();
+    loadedMilesNeeded = (json['loadedMilesNeeded'] as num?)?.toInt();
+    minTargetRate = (json['minTargetRate'] as num?)?.toDouble();
     totalRevenue = (json['totalRevenue'] as num?)?.toDouble();
     totalCost = (json['totalCost'] as num?)?.toDouble();
     maxDHPerDay = (json['maxDHPerDay'] as num?)?.toInt();
     maxDHPerWeek = (json['maxDHPerWeek'] as num?)?.toInt();
+    driverPay = (json['driverPay'] as num?)?.toDouble();
+    ownerPay = (json['ownerPay'] as num?)?.toDouble();
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['desiredWeeklyProfit'] = desiredWeeklyProfit;
-    data['costPerMile'] = costPerMile;
-    data['deadheadPayPerMile'] = deadheadPayPerMile;
-    data['desiredDaysPerWeek'] = desiredDaysPerWeek;
-    data['desiredMaxMilesPerDay'] = desiredMaxMilesPerDay;
-    data['driverPercentage'] = driverPercentage;
-    data['milesNeeded'] = milesNeeded;
-    data['minRatePerMile'] = minRatePerMile;
-    data['totalRevenue'] = totalRevenue;
-    data['totalCost'] = totalCost;
-    data['maxDHPerDay'] = maxDHPerDay;
-    data['maxDHPerWeek'] = maxDHPerWeek;
-    return data;
+    return {
+      'desiredWeeklyProfit': desiredWeeklyProfit,
+      'costPerMile': costPerMile,
+      'deadheadPayPerMile': deadheadPayPerMile,
+      'daysPerWeek': daysPerWeek,
+      'maxMilesPerDay': maxMilesPerDay,
+      'driverPercentage': driverPercentage,
+      'loadedMilesNeeded': loadedMilesNeeded,
+      'minTargetRate': minTargetRate,
+      'totalRevenue': totalRevenue,
+      'totalCost': totalCost,
+      'maxDHPerDay': maxDHPerDay,
+      'maxDHPerWeek': maxDHPerWeek,
+      'driverPay': driverPay,
+      'ownerPay': ownerPay,
+    };
   }
 }
 
@@ -199,22 +202,22 @@ class CostData {
   double? truckPayment;
   double? escrow;
   double? repairSavings;
-  double? driverPay;
+  double? driverPayFixed;
   double? permits;
-  double? otherFixedCosts;
-  double? totalWeeklyFixedCosts;
+  double? otherFixed;
   int? milesPerWeek;
   double? avgMPG;
   double? fuelPrice;
-  double? fuelCost;
   int? oilChangesPerYear;
   double? costPerOilChange;
-  double? weeklyOilChangeCost;
   double? tireCostPerYear;
-  double? weeklyTireCost;
   double? maintenanceCostPerYear;
+  double? totalWeeklyFixed;
+  double? weeklyFuelCost;
+  double? weeklyOilChangeCost;
+  double? weeklyTireCost;
   double? weeklyMaintenanceCost;
-  double? totalWeeklyVariableCosts;
+  double? totalWeeklyVariable;
   double? totalWeeklyOperatingCost;
   double? trueCPM;
 
@@ -223,22 +226,22 @@ class CostData {
     this.truckPayment,
     this.escrow,
     this.repairSavings,
-    this.driverPay,
+    this.driverPayFixed,
     this.permits,
-    this.otherFixedCosts,
-    this.totalWeeklyFixedCosts,
+    this.otherFixed,
     this.milesPerWeek,
     this.avgMPG,
     this.fuelPrice,
-    this.fuelCost,
     this.oilChangesPerYear,
     this.costPerOilChange,
-    this.weeklyOilChangeCost,
     this.tireCostPerYear,
-    this.weeklyTireCost,
     this.maintenanceCostPerYear,
+    this.totalWeeklyFixed,
+    this.weeklyFuelCost,
+    this.weeklyOilChangeCost,
+    this.weeklyTireCost,
     this.weeklyMaintenanceCost,
-    this.totalWeeklyVariableCosts,
+    this.totalWeeklyVariable,
     this.totalWeeklyOperatingCost,
     this.trueCPM,
   });
@@ -248,50 +251,50 @@ class CostData {
     truckPayment = (json['truckPayment'] as num?)?.toDouble();
     escrow = (json['escrow'] as num?)?.toDouble();
     repairSavings = (json['repairSavings'] as num?)?.toDouble();
-    driverPay = (json['driverPay'] as num?)?.toDouble();
+    driverPayFixed = (json['driverPayFixed'] as num?)?.toDouble();
     permits = (json['permits'] as num?)?.toDouble();
-    otherFixedCosts = (json['otherFixedCosts'] as num?)?.toDouble();
-    totalWeeklyFixedCosts = (json['totalWeeklyFixedCosts'] as num?)?.toDouble();
+    otherFixed = (json['otherFixed'] as num?)?.toDouble();
     milesPerWeek = (json['milesPerWeek'] as num?)?.toInt();
     avgMPG = (json['avgMPG'] as num?)?.toDouble();
     fuelPrice = (json['fuelPrice'] as num?)?.toDouble();
-    fuelCost = (json['fuelCost'] as num?)?.toDouble();
     oilChangesPerYear = (json['oilChangesPerYear'] as num?)?.toInt();
     costPerOilChange = (json['costPerOilChange'] as num?)?.toDouble();
-    weeklyOilChangeCost = (json['weeklyOilChangeCost'] as num?)?.toDouble();
     tireCostPerYear = (json['tireCostPerYear'] as num?)?.toDouble();
-    weeklyTireCost = (json['weeklyTireCost'] as num?)?.toDouble();
     maintenanceCostPerYear = (json['maintenanceCostPerYear'] as num?)?.toDouble();
+    totalWeeklyFixed = (json['totalWeeklyFixed'] as num?)?.toDouble();
+    weeklyFuelCost = (json['weeklyFuelCost'] as num?)?.toDouble();
+    weeklyOilChangeCost = (json['weeklyOilChangeCost'] as num?)?.toDouble();
+    weeklyTireCost = (json['weeklyTireCost'] as num?)?.toDouble();
     weeklyMaintenanceCost = (json['weeklyMaintenanceCost'] as num?)?.toDouble();
-    totalWeeklyVariableCosts = (json['totalWeeklyVariableCosts'] as num?)?.toDouble();
+    totalWeeklyVariable = (json['totalWeeklyVariable'] as num?)?.toDouble();
     totalWeeklyOperatingCost = (json['totalWeeklyOperatingCost'] as num?)?.toDouble();
     trueCPM = (json['trueCPM'] as num?)?.toDouble();
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['insurance'] = insurance;
-    data['truckPayment'] = truckPayment;
-    data['escrow'] = escrow;
-    data['repairSavings'] = repairSavings;
-    data['driverPay'] = driverPay;
-    data['permits'] = permits;
-    data['otherFixedCosts'] = otherFixedCosts;
-    data['totalWeeklyFixedCosts'] = totalWeeklyFixedCosts;
-    data['milesPerWeek'] = milesPerWeek;
-    data['avgMPG'] = avgMPG;
-    data['fuelPrice'] = fuelPrice;
-    data['fuelCost'] = fuelCost;
-    data['oilChangesPerYear'] = oilChangesPerYear;
-    data['costPerOilChange'] = costPerOilChange;
-    data['weeklyOilChangeCost'] = weeklyOilChangeCost;
-    data['tireCostPerYear'] = tireCostPerYear;
-    data['weeklyTireCost'] = weeklyTireCost;
-    data['maintenanceCostPerYear'] = maintenanceCostPerYear;
-    data['weeklyMaintenanceCost'] = weeklyMaintenanceCost;
-    data['totalWeeklyVariableCosts'] = totalWeeklyVariableCosts;
-    data['totalWeeklyOperatingCost'] = totalWeeklyOperatingCost;
-    data['trueCPM'] = trueCPM;
-    return data;
+    return {
+      'insurance': insurance,
+      'truckPayment': truckPayment,
+      'escrow': escrow,
+      'repairSavings': repairSavings,
+      'driverPayFixed': driverPayFixed,
+      'permits': permits,
+      'otherFixed': otherFixed,
+      'milesPerWeek': milesPerWeek,
+      'avgMPG': avgMPG,
+      'fuelPrice': fuelPrice,
+      'oilChangesPerYear': oilChangesPerYear,
+      'costPerOilChange': costPerOilChange,
+      'tireCostPerYear': tireCostPerYear,
+      'maintenanceCostPerYear': maintenanceCostPerYear,
+      'totalWeeklyFixed': totalWeeklyFixed,
+      'weeklyFuelCost': weeklyFuelCost,
+      'weeklyOilChangeCost': weeklyOilChangeCost,
+      'weeklyTireCost': weeklyTireCost,
+      'weeklyMaintenanceCost': weeklyMaintenanceCost,
+      'totalWeeklyVariable': totalWeeklyVariable,
+      'totalWeeklyOperatingCost': totalWeeklyOperatingCost,
+      'trueCPM': trueCPM,
+    };
   }
 }

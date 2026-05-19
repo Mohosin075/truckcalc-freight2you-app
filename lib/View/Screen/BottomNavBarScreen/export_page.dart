@@ -181,9 +181,9 @@ class _ExportPageState extends State<ExportPage> {
           if (calc.type == 'LOAD' && calc.loadData != null) {
             text = 'Load: ${calc.loadData!.loadedMiles}mi + ${calc.loadData!.dhMiles}DH = Profit: \$${calc.loadData!.totalProfit?.toStringAsFixed(0)}';
           } else if (calc.type == 'GOAL' && calc.goalData != null) {
-            text = 'Goal: \$${calc.goalData!.desiredWeeklyProfit} = Need ${calc.goalData!.milesNeeded}mi';
+            text = 'Goal: \$${calc.goalData!.desiredWeeklyProfit} = Need ${calc.goalData!.loadedMilesNeeded}mi';
           } else if (calc.type == 'COST' && calc.costData != null) {
-            text = 'Costs: Fixed \$${calc.costData!.totalWeeklyFixedCosts?.toStringAsFixed(0)} + Variable \$${calc.costData!.totalWeeklyVariableCosts?.toStringAsFixed(0)}';
+            text = 'Costs: Fixed \$${calc.costData!.totalWeeklyFixed?.toStringAsFixed(0)} + Variable \$${calc.costData!.totalWeeklyVariable?.toStringAsFixed(0)}';
           }
           return _previewItem(text);
         }).toList(),

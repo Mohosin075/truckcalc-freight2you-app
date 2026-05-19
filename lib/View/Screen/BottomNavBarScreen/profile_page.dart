@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:truckcalc/Service/Controller/auth_controller.dart';
+import 'package:truckcalc/Service/Controller/calculation_controller.dart';
 import 'package:truckcalc/Service/Controller/profile_page_controller.dart';
 import 'package:truckcalc/View/Widgets/app_background.dart';
 import 'package:truckcalc/View/Widgets/CustomButton.dart';
@@ -30,6 +31,7 @@ class _ProfilePageState extends State<ProfilePage> {
         _nameController.text = profile.currentUser?.name ?? '';
         _emailController.text = profile.currentUser?.email ?? '';
       }
+      Provider.of<CalculationController>(context, listen: false).fetchStats();
     });
   }
 
@@ -127,7 +129,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   child: CircleAvatar(
                     radius: 40.r,
-                    backgroundImage: (profile.currentUser?.profile != null)
+                    backgroundImage: (profile.currentUser?.profile != null && profile.currentUser!.profile!.isNotEmpty)
                         ? NetworkImage(profile.currentUser!.profile!)
                         : const NetworkImage('https://i.pravatar.cc/150?img=11'),
                   ),
@@ -162,15 +164,15 @@ class _ProfilePageState extends State<ProfilePage> {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.03),
+        color: Colors.white.withOpacity(0.03),
         borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        border: Border.all(color: Colors.white.withOpacity(0.08)),
       ),
       child: Column(
         children: [
-          _buildTextField('Full name', 'ssssssssss', _nameController),
+          _buildTextField('Full name', 'Shahriar', _nameController),
           SizedBox(height: 12.h),
-          _buildTextField('Email', 'ssssssssss', _emailController, readOnly: true),
+          _buildTextField('Email', 'you@email.com', _emailController, readOnly: true),
           SizedBox(height: 20.h),
           Consumer<ProfileController>(
             builder: (context, profile, child) {
@@ -187,48 +189,57 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildSubscriptionCard(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.03),
-        borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Subscription', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16.sp)),
-          SizedBox(height: 16.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Consumer<CalculationController>(
+      builder: (context, controller, child) {
+        final planName = controller.stats?['planName'] ?? 'No Plan';
+        final daysLeft = controller.stats?['planLeftDays'] ?? 0;
+        
+        return Container(
+          padding: EdgeInsets.all(16.w),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.03),
+            borderRadius: BorderRadius.circular(20.r),
+            border: Border.all(color: Colors.white.withOpacity(0.08)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Free Trial', style: TextStyle(color: Colors.white, fontSize: 14.sp, fontWeight: FontWeight.w500)),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFD32F2F), 
-                  borderRadius: BorderRadius.circular(10.r),
-                ),
-                child: Text('5d left', style: TextStyle(color: Colors.white, fontSize: 10.sp, fontWeight: FontWeight.bold)),
+              Text('Subscription', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16.sp)),
+              SizedBox(height: 16.h),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(planName, style: TextStyle(color: Colors.white, fontSize: 14.sp, fontWeight: FontWeight.w500)),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                    decoration: BoxDecoration(
+                      color: daysLeft < 7 ? const Color(0xFFD32F2F) : const Color(0xFF00D193), 
+                      borderRadius: BorderRadius.circular(10.r),
+                    ),
+                    child: Text('${daysLeft}d left', style: TextStyle(color: Colors.white, fontSize: 10.sp, fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
+              SizedBox(height: 20.h),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildOutlineButton('View Plans', () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const SubscriptionPage()));
+                    }),
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: _buildOutlineButton('Export Data', () {
+                      // Handled in export page, but could go there
+                    }),
+                  ),
+                ],
               ),
             ],
           ),
-          SizedBox(height: 20.h),
-          Row(
-            children: [
-              Expanded(
-                child: _buildOutlineButton('View Plans', () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const SubscriptionPage()));
-                }),
-              ),
-              SizedBox(width: 12.w),
-              Expanded(
-                child: _buildOutlineButton('Export Data', () {}),
-              ),
-            ],
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -249,27 +260,34 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildStatsSection() {
-    return Container(
-      padding: EdgeInsets.all(20.w),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.03),
-        borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Stats', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16.sp)),
-          SizedBox(height: 20.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+    return Consumer<CalculationController>(
+      builder: (context, controller, child) {
+        final totalCalc = controller.stats?['totalCalculations'] ?? 0;
+        final daysLeft = controller.stats?['planLeftDays'] ?? 0;
+
+        return Container(
+          padding: EdgeInsets.all(20.w),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.03),
+            borderRadius: BorderRadius.circular(20.r),
+            border: Border.all(color: Colors.white.withOpacity(0.08)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildStatItem('3', 'Calculations'),
-              _buildStatItem('5d', 'Plan left'),
+              Text('Stats', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16.sp)),
+              SizedBox(height: 20.h),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildStatItem('$totalCalc', 'Calculations'),
+                  _buildStatItem('${daysLeft}d', 'Plan left'),
+                ],
+              ),
             ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -294,7 +312,7 @@ class _ProfilePageState extends State<ProfilePage> {
           readOnly: readOnly,
           style:  TextStyle(color: Colors.white, fontSize: 14.sp),
           decoration: InputDecoration(
-            fillColor:  Color(0xFF081414).withValues(alpha: 0.5),
+            fillColor:  const Color(0xFF081414).withOpacity(0.5),
             filled: true,
             hintText: hint,
             hintStyle: const TextStyle(color: Colors.white24),

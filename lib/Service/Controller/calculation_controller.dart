@@ -5,10 +5,12 @@ import 'package:truckcalc/Service/Api%20service/calculation_service.dart';
 class CalculationController extends ChangeNotifier {
   bool _inProgress = false;
   List<CalculationModel> _calculations = [];
+  Map<String, dynamic>? _stats;
   String? _errorMessage;
 
   bool get inProgress => _inProgress;
   List<CalculationModel> get calculations => _calculations;
+  Map<String, dynamic>? get stats => _stats;
   String? get errorMessage => _errorMessage;
 
   Future<bool> createCalculation(Map<String, dynamic> payload) async {
@@ -36,10 +38,19 @@ class CalculationController extends ChangeNotifier {
 
     try {
       _calculations = await CalculationService.getMyCalculations();
+      await fetchStats(); // Fetch stats as well
     } catch (e) {
       _errorMessage = "Failed to load calculations";
     } finally {
       _inProgress = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> fetchStats() async {
+    final response = await CalculationService.getStats();
+    if (response.isSuccess && response.body != null) {
+      _stats = response.body!['data'];
       notifyListeners();
     }
   }

@@ -49,7 +49,7 @@ class _HistoryPageState extends State<HistoryPage> {
                     prefixIcon: const Icon(Icons.search, color: Colors.grey),
                     hintText: 'Search calculations...',
                     hintStyle: const TextStyle(color: Colors.white30),
-                    fillColor: Colors.white.withOpacity(0.05),
+                    fillColor: Colors.white.withValues(alpha: 0.05),
                     filled: true,
                     contentPadding: EdgeInsets.symmetric(vertical: 12.h),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide.none),
@@ -97,11 +97,11 @@ class _HistoryPageState extends State<HistoryPage> {
       result = '= Revenue: \$${ld.totalRevenue?.toStringAsFixed(2) ?? "0.00"}, Profit: \$${ld.totalProfit?.toStringAsFixed(2) ?? "0.00"}';
     } else if (calculation.type == 'GOAL' && calculation.goalData != null) {
       final gd = calculation.goalData!;
-      header = 'Weekly Goal: \$${gd.desiredWeeklyProfit?.toStringAsFixed(2) ?? "0.00"}, ${gd.desiredDaysPerWeek ?? 0} days';
-      result = '= Need ${gd.milesNeeded ?? 0}mi @ \$${gd.minRatePerMile?.toStringAsFixed(2) ?? "0.00"}/mi';
+      header = 'Weekly Goal: \$${gd.desiredWeeklyProfit?.toStringAsFixed(2) ?? "0.00"}, ${gd.daysPerWeek ?? 0} days';
+      result = '= Need ${gd.loadedMilesNeeded ?? 0}mi @ \$${gd.minTargetRate?.toStringAsFixed(2) ?? "0.00"}/mi';
     } else if (calculation.type == 'COST' && calculation.costData != null) {
       final cd = calculation.costData!;
-      header = 'Weekly Costs: Fixed \$${cd.totalWeeklyFixedCosts?.toStringAsFixed(2) ?? "0.00"} + Variable \$${cd.totalWeeklyVariableCosts?.toStringAsFixed(2) ?? "0.00"}';
+      header = 'Weekly Costs: Fixed \$${cd.totalWeeklyFixed?.toStringAsFixed(2) ?? "0.00"} + Variable \$${cd.totalWeeklyVariable?.toStringAsFixed(2) ?? "0.00"}';
       result = '= Total: \$${cd.totalWeeklyOperatingCost?.toStringAsFixed(2) ?? "0.00"}, CPM: \$${cd.trueCPM?.toStringAsFixed(2) ?? "0.00"}';
     }
 
@@ -119,9 +119,9 @@ class _HistoryPageState extends State<HistoryPage> {
       margin: EdgeInsets.only(bottom: 16.h),
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF081414).withOpacity(0.8),
+        color: const Color(0xFF081414).withValues(alpha: 0.8),
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -156,7 +156,7 @@ class _HistoryPageState extends State<HistoryPage> {
             child: Container(
               padding: EdgeInsets.all(8.w),
               decoration: BoxDecoration(
-                color: Colors.redAccent.withOpacity(0.15),
+                color: Colors.redAccent.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(8.r),
               ),
               child: const Icon(Icons.close, color: Colors.redAccent, size: 18),

@@ -18,9 +18,9 @@ class _CostsPageState extends State<CostsPage> {
   final TextEditingController _truckPaymentController = TextEditingController(text: '0.00');
   final TextEditingController _escrowController = TextEditingController(text: '0.00');
   final TextEditingController _repairSavingsController = TextEditingController(text: '0.00');
-  final TextEditingController _driverPayController = TextEditingController(text: '0.00');
+  final TextEditingController _driverPayFixedController = TextEditingController(text: '0.00');
   final TextEditingController _permitsController = TextEditingController(text: '0.00');
-  final TextEditingController _otherFixedCostsController = TextEditingController(text: '0.00');
+  final TextEditingController _otherFixedController = TextEditingController(text: '0.00');
 
   // Variable costs controllers
   final TextEditingController _milesPerWeekController = TextEditingController(text: '2500');
@@ -31,12 +31,12 @@ class _CostsPageState extends State<CostsPage> {
   final TextEditingController _tireCostYearController = TextEditingController(text: '5000');
   final TextEditingController _maintenanceCostYearController = TextEditingController(text: '8000');
 
-  double totalWeeklyFixedCosts = 0.0;
-  double fuelCost = 0.0;
+  double totalWeeklyFixed = 0.0;
+  double weeklyFuelCost = 0.0;
   double weeklyOilChangeCost = 0.0;
   double weeklyTireCost = 0.0;
   double weeklyMaintenanceCost = 0.0;
-  double totalWeeklyVariableCosts = 0.0;
+  double totalWeeklyVariable = 0.0;
   double totalWeeklyOperatingCost = 0.0;
   double trueCPM = 0.0;
 
@@ -45,8 +45,8 @@ class _CostsPageState extends State<CostsPage> {
     super.initState();
     List<TextEditingController> controllers = [
       _insuranceController, _truckPaymentController, _escrowController,
-      _repairSavingsController, _driverPayController, _permitsController,
-      _otherFixedCostsController, _milesPerWeekController, _avgMPGController,
+      _repairSavingsController, _driverPayFixedController, _permitsController,
+      _otherFixedController, _milesPerWeekController, _avgMPGController,
       _fuelPriceController, _oilChangesYearController, _costPerOilChangeController,
       _tireCostYearController, _maintenanceCostYearController
     ];
@@ -61,17 +61,17 @@ class _CostsPageState extends State<CostsPage> {
     double truckPayment = double.tryParse(_truckPaymentController.text) ?? 0.0;
     double escrow = double.tryParse(_escrowController.text) ?? 0.0;
     double repairSavings = double.tryParse(_repairSavingsController.text) ?? 0.0;
-    double driverPay = double.tryParse(_driverPayController.text) ?? 0.0;
+    double driverPayFixed = double.tryParse(_driverPayFixedController.text) ?? 0.0;
     double permits = double.tryParse(_permitsController.text) ?? 0.0;
-    double otherFixed = double.tryParse(_otherFixedCostsController.text) ?? 0.0;
+    double otherFixed = double.tryParse(_otherFixedController.text) ?? 0.0;
 
-    totalWeeklyFixedCosts = insurance + truckPayment + escrow + repairSavings + driverPay + permits + otherFixed;
+    totalWeeklyFixed = insurance + truckPayment + escrow + repairSavings + driverPayFixed + permits + otherFixed;
 
     int milesPerWeek = int.tryParse(_milesPerWeekController.text) ?? 0;
     double avgMPG = double.tryParse(_avgMPGController.text) ?? 0.0;
     double fuelPrice = double.tryParse(_fuelPriceController.text) ?? 0.0;
 
-    fuelCost = (avgMPG > 0) ? (milesPerWeek / avgMPG) * fuelPrice : 0.0;
+    weeklyFuelCost = (avgMPG > 0) ? (milesPerWeek / avgMPG) * fuelPrice : 0.0;
 
     int oilChangesYear = int.tryParse(_oilChangesYearController.text) ?? 0;
     double costPerOilChange = double.tryParse(_costPerOilChangeController.text) ?? 0.0;
@@ -83,8 +83,8 @@ class _CostsPageState extends State<CostsPage> {
     double maintenanceCostYear = double.tryParse(_maintenanceCostYearController.text) ?? 0.0;
     weeklyMaintenanceCost = maintenanceCostYear / 52.14;
 
-    totalWeeklyVariableCosts = fuelCost + weeklyOilChangeCost + weeklyTireCost + weeklyMaintenanceCost;
-    totalWeeklyOperatingCost = totalWeeklyFixedCosts + totalWeeklyVariableCosts;
+    totalWeeklyVariable = weeklyFuelCost + weeklyOilChangeCost + weeklyTireCost + weeklyMaintenanceCost;
+    totalWeeklyOperatingCost = totalWeeklyFixed + totalWeeklyVariable;
     trueCPM = (milesPerWeek > 0) ? totalWeeklyOperatingCost / milesPerWeek : 0.0;
 
     if (mounted) {
@@ -95,6 +95,20 @@ class _CostsPageState extends State<CostsPage> {
   @override
   void dispose() {
     // Dispose all controllers
+    _insuranceController.dispose();
+    _truckPaymentController.dispose();
+    _escrowController.dispose();
+    _repairSavingsController.dispose();
+    _driverPayFixedController.dispose();
+    _permitsController.dispose();
+    _otherFixedController.dispose();
+    _milesPerWeekController.dispose();
+    _avgMPGController.dispose();
+    _fuelPriceController.dispose();
+    _oilChangesYearController.dispose();
+    _costPerOilChangeController.dispose();
+    _tireCostYearController.dispose();
+    _maintenanceCostYearController.dispose();
     super.dispose();
   }
 
@@ -108,14 +122,14 @@ class _CostsPageState extends State<CostsPage> {
         "truckPayment": double.tryParse(_truckPaymentController.text) ?? 0.0,
         "escrow": double.tryParse(_escrowController.text) ?? 0.0,
         "repairSavings": double.tryParse(_repairSavingsController.text) ?? 0.0,
-        "driverPay": double.tryParse(_driverPayController.text) ?? 0.0,
+        "driverPayFixed": double.tryParse(_driverPayFixedController.text) ?? 0.0,
         "permits": double.tryParse(_permitsController.text) ?? 0.0,
-        "otherFixedCosts": double.tryParse(_otherFixedCostsController.text) ?? 0.0,
-        "totalWeeklyFixedCosts": totalWeeklyFixedCosts,
+        "otherFixed": double.tryParse(_otherFixedController.text) ?? 0.0,
+        "totalWeeklyFixed": totalWeeklyFixed,
         "milesPerWeek": int.tryParse(_milesPerWeekController.text) ?? 0,
         "avgMPG": double.tryParse(_avgMPGController.text) ?? 0.0,
         "fuelPrice": double.tryParse(_fuelPriceController.text) ?? 0.0,
-        "fuelCost": fuelCost,
+        "weeklyFuelCost": weeklyFuelCost,
         "oilChangesPerYear": int.tryParse(_oilChangesYearController.text) ?? 0,
         "costPerOilChange": double.tryParse(_costPerOilChangeController.text) ?? 0.0,
         "weeklyOilChangeCost": weeklyOilChangeCost,
@@ -123,7 +137,7 @@ class _CostsPageState extends State<CostsPage> {
         "weeklyTireCost": weeklyTireCost,
         "maintenanceCostPerYear": double.tryParse(_maintenanceCostYearController.text) ?? 0.0,
         "weeklyMaintenanceCost": weeklyMaintenanceCost,
-        "totalWeeklyVariableCosts": totalWeeklyVariableCosts,
+        "totalWeeklyVariable": totalWeeklyVariable,
         "totalWeeklyOperatingCost": totalWeeklyOperatingCost,
         "trueCPM": trueCPM,
       }
@@ -264,11 +278,11 @@ class _CostsPageState extends State<CostsPage> {
           _buildInputField('Weekly Truck Payment', _truckPaymentController),
           _buildInputField('Weekly Escrow Contribution', _escrowController),
           _buildInputField('Weekly Repair Savings', _repairSavingsController),
-          _buildInputField('Weekly Self/Driver Pay', _driverPayController),
+          _buildInputField('Weekly Self/Driver Pay', _driverPayFixedController),
           _buildInputField('Weekly Permits/Subscriptions', _permitsController),
-          _buildInputField('Other Weekly Costs', _otherFixedCostsController),
+          _buildInputField('Other Weekly Costs', _otherFixedController),
           SizedBox(height: 16.h),
-          _buildDarkResultBox('TOTAL WEEKLY FIXED COSTS', '\$${totalWeeklyFixedCosts.toStringAsFixed(2)}'),
+          _buildDarkResultBox('TOTAL WEEKLY FIXED COSTS', '\$${totalWeeklyFixed.toStringAsFixed(2)}'),
         ],
       ),
     );
@@ -292,7 +306,7 @@ class _CostsPageState extends State<CostsPage> {
               Expanded(child: _buildInputField('Avg Fuel Price (\$ /gal)', _fuelPriceController)),
             ],
           ),
-          _buildDarkResultBox('WEEKLY FUEL COST', '\$${fuelCost.toStringAsFixed(2)}'),
+          _buildDarkResultBox('WEEKLY FUEL COST', '\$${weeklyFuelCost.toStringAsFixed(2)}'),
           SizedBox(height: 16.h),
           Row(
             children: [
@@ -309,7 +323,7 @@ class _CostsPageState extends State<CostsPage> {
           _buildInputField('Maintenance Cost Per Year', _maintenanceCostYearController),
           _buildDarkResultBox('WEEKLY MAINTENANCE COST', '\$${weeklyMaintenanceCost.toStringAsFixed(2)}'),
           SizedBox(height: 16.h),
-          _buildDarkResultBox('TOTAL WEEKLY VARIABLE COSTS', '\$${totalWeeklyVariableCosts.toStringAsFixed(2)}', isLargeValue: true),
+          _buildDarkResultBox('TOTAL WEEKLY VARIABLE COSTS', '\$${totalWeeklyVariable.toStringAsFixed(2)}', isLargeValue: true),
         ],
       ),
     );
@@ -327,9 +341,9 @@ class _CostsPageState extends State<CostsPage> {
         children: [
           Row(
             children: [
-              Expanded(child: _buildResultSubBox('Total Fixed', '\$${totalWeeklyFixedCosts.toStringAsFixed(2)}')),
+              Expanded(child: _buildResultSubBox('Total Fixed', '\$${totalWeeklyFixed.toStringAsFixed(2)}')),
               SizedBox(width: 16.w),
-              Expanded(child: _buildResultSubBox('Total Variable', '\$${totalWeeklyVariableCosts.toStringAsFixed(2)}')),
+              Expanded(child: _buildResultSubBox('Total Variable', '\$${totalWeeklyVariable.toStringAsFixed(2)}')),
             ],
           ),
           SizedBox(height: 12.h),
