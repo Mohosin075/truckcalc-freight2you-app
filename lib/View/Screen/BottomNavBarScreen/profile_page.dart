@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:truckcalc/Service/Controller/auth_controller.dart';
+import 'package:truckcalc/Service/Controller/bottom_nav_controller.dart';
 import 'package:truckcalc/Service/Controller/calculation_controller.dart';
 import 'package:truckcalc/Service/Controller/profile_page_controller.dart';
 import 'package:truckcalc/View/Widgets/app_background.dart';
@@ -231,7 +232,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   SizedBox(width: 12.w),
                   Expanded(
                     child: _buildOutlineButton('Export Data', () {
-                      // Handled in export page, but could go there
+                      Provider.of<BottomNavController>(context, listen: false).onItemTapped(3);
                     }),
                   ),
                 ],

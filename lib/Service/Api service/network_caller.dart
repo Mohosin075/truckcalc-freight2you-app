@@ -10,7 +10,7 @@ class NetworkResponse {
   final String? errorMessage;
   final bool isSuccess;
   final int statusCode;
-  final Map<String, dynamic>? body;
+  final dynamic body;
 
   NetworkResponse({
     required this.isSuccess,
@@ -339,14 +339,14 @@ class NetworkCaller {
       return NetworkResponse(
         isSuccess: true,
         statusCode: response.statusCode!,
-        body: body is Map<String, dynamic> ? body : null,
+        body: body,
       );
     } else {
       return NetworkResponse(
         isSuccess: false,
         statusCode: response.statusCode ?? -1,
-        errorMessage: body?['message'] ?? 'Something went wrong',
-        body: body is Map<String, dynamic> ? body : null,
+        errorMessage: (body is Map) ? (body['message'] ?? 'Something went wrong') : 'Something went wrong',
+        body: body,
       );
     }
   }

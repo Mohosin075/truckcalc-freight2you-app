@@ -1,4 +1,5 @@
 import 'package:truckcalc/Model/calculation_model.dart';
+import 'package:truckcalc/Model/exported_calculation.dart';
 import 'package:truckcalc/Service/Api%20service/network_caller.dart';
 import 'package:truckcalc/Service/urls.dart';
 
@@ -29,6 +30,27 @@ class CalculationService {
 
   static Future<NetworkResponse> exportData() async {
     return await NetworkCaller.getRequest(url: Urls.calculationExportUrl);
+  }
+
+  static Future<List<ExportedCalculation>> exportCalculationsFlat() async {
+    final response = await NetworkCaller.getRequest(
+      url: Urls.calculationExportUrl,
+    );
+
+    if (response.isSuccess && response.body != null) {
+      final dynamic bodyData = response.body;
+      List<dynamic> list = [];
+      if (bodyData is List) {
+        list = bodyData;
+      } else if (bodyData is Map && bodyData['success'] == true) {
+        list = bodyData['data'] ?? [];
+      } else if (bodyData is Map && bodyData['data'] is List) {
+        list = bodyData['data'];
+      }
+      return list.map((json) => ExportedCalculation.fromJson(json)).toList();
+    } else {
+      return [];
+    }
   }
 
   static Future<NetworkResponse> getSingleCalculation(String id) async {

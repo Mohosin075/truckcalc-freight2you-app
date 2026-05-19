@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:truckcalc/Model/userModel.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:truckcalc/Service/Api%20service/network_caller.dart';
+import 'package:truckcalc/Service/Api%20service/user_service.dart';
 import 'package:truckcalc/Service/Controller/auth_controller.dart';
 import 'package:truckcalc/Service/urls.dart';
 import 'package:image_picker/image_picker.dart';
@@ -133,9 +134,8 @@ class ProfileController extends ChangeNotifier {
         return true;
       }
 
-      final response = await NetworkCaller.patchRequest(
-        url: Urls.updateProfileUrl,
-        body: updateData,
+      final response = await UserService.updateProfile(
+        fields: updateData,
       );
 
       //  success check
@@ -206,12 +206,8 @@ class ProfileController extends ChangeNotifier {
         finalPath = targetPath;
       }
 
-      final response = await NetworkCaller.multipartRequest(
-        url: Urls.updateProfileUrl,
-        method: 'PATCH',
-        fileKey: 'images',
-        files: {'images': File(finalPath)},
-        requireAuth: true,
+      final response = await UserService.updateProfile(
+        profileImage: File(finalPath),
       );
 
       if (response.isSuccess) {
@@ -287,9 +283,8 @@ class ProfileController extends ChangeNotifier {
     try {
       final body = {"settings": _currentUser!.settings!.toJson()};
 
-      final response = await NetworkCaller.patchRequest(
-        url: Urls.updateProfileUrl,
-        body: body,
+      final response = await UserService.updateProfile(
+        fields: body,
       );
 
       if (response.isSuccess) {

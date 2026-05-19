@@ -26,19 +26,20 @@ class _ExportPageState extends State<ExportPage> {
 
   Future<void> _handleExport() async {
     final controller = Provider.of<CalculationController>(context, listen: false);
-    final url = await controller.exportData();
-    if (url != null) {
-      final uri = Uri.parse(url);
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri);
+    final filePath = await controller.exportData();
+    if (mounted) {
+      if (filePath != null) {
+        showCustomSnackBar(
+          context: context,
+          message: "Calculations exported successfully!",
+          isError: false,
+        );
       } else {
-        if (mounted) {
-          showCustomSnackBar(context: context, message: "Could not launch export URL", isError: true);
-        }
-      }
-    } else {
-      if (mounted) {
-        showCustomSnackBar(context: context, message: controller.errorMessage ?? "Export failed", isError: true);
+        showCustomSnackBar(
+          context: context,
+          message: controller.errorMessage ?? "Export failed",
+          isError: true,
+        );
       }
     }
   }

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:truckcalc/Service/Api%20service/network_caller.dart';
 import 'package:truckcalc/Service/urls.dart';
@@ -11,12 +12,23 @@ class UserService {
     Map<String, dynamic>? fields,
     File? profileImage,
   }) async {
-    return await NetworkCaller.multipartRequest(
-      url: Urls.userProfileUrl,
-      method: 'PATCH',
-      fields: fields,
-      files: profileImage != null ? {'profile': profileImage} : null,
-    );
+    if (profileImage != null) {
+      final Map<String, dynamic> multipartFields = {};
+      if (fields != null) {
+        multipartFields['data'] = jsonEncode(fields);
+      }
+      return await NetworkCaller.multipartRequest(
+        url: Urls.userProfileUrl,
+        method: 'PATCH',
+        fields: multipartFields,
+        files: {'images': profileImage},
+      );
+    } else {
+      return await NetworkCaller.patchRequest(
+        url: Urls.userProfileUrl,
+        body: fields,
+      );
+    }
   }
 
   static Future<NetworkResponse> deleteProfile() async {
