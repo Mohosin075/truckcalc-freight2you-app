@@ -41,6 +41,10 @@ class Urls {
   static const String createCheckoutSessionUrl = "$baseUrl/subscription/checkout-session";
   static const String billingPortalUrl = "$baseUrl/subscription/billing-portal";
 
+  // IAP API Endpoints
+  static const String verifyIapReceiptUrl = "$baseUrl/iap/verify-receipt";
+  static const String getMyIapUrl = "$baseUrl/iap/my-iap";
+
   static const String addSaveEvent = "$baseUrl/saved";
   static const String getMySaveEvents = '$baseUrl/saved?filter=all';
   static String deleteSavedEvent(String id) => "$baseUrl/saved/$id";

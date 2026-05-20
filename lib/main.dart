@@ -25,6 +25,7 @@ import 'package:truckcalc/Service/Controller/user_event_controller.dart';
 import 'package:truckcalc/Service/Controller/map_controller.dart';
 import 'package:truckcalc/Service/Controller/calculation_controller.dart';
 import 'package:truckcalc/Service/Controller/subscription_controller.dart';
+import 'package:truckcalc/Service/Controller/iap_controller.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:truckcalc/Utils/app_utils.dart';
@@ -108,6 +109,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => UserEventController()),
         ChangeNotifierProvider(create: (_) => CalculationController()),
         ChangeNotifierProvider(create: (_) => SubscriptionController()),
+        ChangeNotifierProvider(create: (_) => IapController()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(439, 956),
