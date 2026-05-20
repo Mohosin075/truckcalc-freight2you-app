@@ -7,9 +7,12 @@ void showCustomSnackBar({
   bool isError = false,
   Duration duration = const Duration(seconds: 4),
 }) {
-  AppUtils.scaffoldMessengerKey.currentState?.clearSnackBars();
+  final scaffoldMessenger = ScaffoldMessenger.maybeOf(context) ??
+      AppUtils.scaffoldMessengerKey.currentState;
 
-  AppUtils.scaffoldMessengerKey.currentState?.showSnackBar(
+  scaffoldMessenger?.clearSnackBars();
+
+  scaffoldMessenger?.showSnackBar(
     SnackBar(
       content: Row(
         children: [
@@ -40,7 +43,7 @@ void showCustomSnackBar({
             ),
           ),
           GestureDetector(
-            onTap: () => AppUtils.scaffoldMessengerKey.currentState?.hideCurrentSnackBar(),
+            onTap: () => scaffoldMessenger?.hideCurrentSnackBar(),
             child: const Icon(
               Icons.close_rounded,
               color: Colors.white70,
@@ -83,10 +86,6 @@ void showCustomSnackBar({
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 10,
       duration: duration,
-      animation: CurvedAnimation(
-        parent: const AlwaysStoppedAnimation(1),
-        curve: Curves.easeOutCubic,
-      ),
     ),
   );
 }

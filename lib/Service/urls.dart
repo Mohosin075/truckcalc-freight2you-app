@@ -1,7 +1,7 @@
 class Urls {
   // Base URL - 10.0.2.2 for Android Emulator, machine IP for physical device
-  static const String baseUrl = "http://10.10.7.50:5002/api/v1";
-  // static const String baseUrl = "http://195.35.6.13:5002/api/v1";
+  // static const String baseUrl = "http://10.10.7.50:5002/api/v1";
+  static const String baseUrl = "http://195.35.6.13:5009/api/v1";
   static const String googleMapsApiKey = "AIzaSyA6w5wid9n0Vii4W6YxQTn9BG69jI_scuM";
 
   //auth api
