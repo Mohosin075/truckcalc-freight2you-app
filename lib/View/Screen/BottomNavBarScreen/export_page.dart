@@ -24,20 +24,40 @@ class _ExportPageState extends State<ExportPage> {
     });
   }
 
-  Future<void> _handleExport() async {
+  Future<void> _handleExportCSV() async {
     final controller = Provider.of<CalculationController>(context, listen: false);
     final filePath = await controller.exportData();
     if (mounted) {
       if (filePath != null) {
         showCustomSnackBar(
           context: context,
-          message: "Calculations exported successfully!",
+          message: "Calculations downloaded successfully to your device!",
           isError: false,
         );
-      } else {
+      } else if (controller.errorMessage != null) {
         showCustomSnackBar(
           context: context,
-          message: controller.errorMessage ?? "Export failed",
+          message: controller.errorMessage!,
+          isError: true,
+        );
+      }
+    }
+  }
+
+  Future<void> _handleExportPDF() async {
+    final controller = Provider.of<CalculationController>(context, listen: false);
+    final filePath = await controller.exportDataAsPDF();
+    if (mounted) {
+      if (filePath != null) {
+        showCustomSnackBar(
+          context: context,
+          message: "PDF Report downloaded successfully to your device!",
+          isError: false,
+        );
+      } else if (controller.errorMessage != null) {
+        showCustomSnackBar(
+          context: context,
+          message: controller.errorMessage!,
           isError: true,
         );
       }
@@ -82,6 +102,7 @@ class _ExportPageState extends State<ExportPage> {
                       'Download CSV',
                       Icons.insert_drive_file,
                       controller.inProgress,
+                      _handleExportCSV,
                     ),
                     SizedBox(height: 16.h),
                     _buildExportCard(
@@ -91,6 +112,7 @@ class _ExportPageState extends State<ExportPage> {
                       'Download PDF',
                       Icons.picture_as_pdf,
                       controller.inProgress,
+                      _handleExportPDF,
                     ),
                     SizedBox(height: 30.h),
                     Text(
@@ -110,7 +132,7 @@ class _ExportPageState extends State<ExportPage> {
     );
   }
 
-  Widget _buildExportCard(String title, String subtitle, String desc, String btnText, IconData icon, bool isLoading) {
+  Widget _buildExportCard(String title, String subtitle, String desc, String btnText, IconData icon, bool isLoading, VoidCallback onPressed) {
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
@@ -147,7 +169,7 @@ class _ExportPageState extends State<ExportPage> {
           CustomButton(
             buttonName: btnText,
             isYellowGradient: true,
-            onPressed: isLoading ? () {} : _handleExport,
+            onPressed: isLoading ? () {} : onPressed,
           ),
         ],
       ),

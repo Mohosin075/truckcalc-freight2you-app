@@ -15,7 +15,7 @@ class ExportedCalculation {
     return ExportedCalculation(
       id: json['id'] ?? json['_id'] ?? '',
       type: json['type'] ?? '',
-      createdAt: DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
+      createdAt: DateTime.tryParse(json['createdAt']?.toString() ?? '') ?? DateTime.now(),
       rawData: Map<String, dynamic>.from(json)
         ..remove('id')
         ..remove('_id')

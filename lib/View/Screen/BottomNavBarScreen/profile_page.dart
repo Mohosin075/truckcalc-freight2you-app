@@ -11,6 +11,7 @@ import 'package:truckcalc/View/Screen/BottomNavBarScreen/subscription_page.dart'
 import 'package:truckcalc/View/Screen/authentication_screen/log_in_screen.dart';
 import 'package:truckcalc/View/Widgets/customSnacBar.dart';
 import 'package:provider/provider.dart';
+import 'package:truckcalc/Service/urls.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -131,7 +132,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: CircleAvatar(
                     radius: 40.r,
                     backgroundImage: (profile.currentUser?.profile != null && profile.currentUser!.profile!.isNotEmpty)
-                        ? NetworkImage(profile.currentUser!.profile!)
+                        ? NetworkImage(profile.currentUser!.profile!.startsWith('http')
+                            ? "${profile.currentUser!.profile!}?t=${profile.profileImageSalt}"
+                            : "${Urls.baseUrl.replaceAll('/api/v1', '')}${profile.currentUser!.profile!.startsWith('/') ? '' : '/'}${profile.currentUser!.profile!}?t=${profile.profileImageSalt}")
                         : const NetworkImage('https://i.pravatar.cc/150?img=11'),
                   ),
                 ),

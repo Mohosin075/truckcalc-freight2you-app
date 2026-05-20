@@ -300,7 +300,10 @@ class NetworkCaller {
         for (var entry in files.entries) {
           formData.files.add(MapEntry(
             entry.key,
-            await MultipartFile.fromFile(entry.value.path),
+            await MultipartFile.fromFile(
+              entry.value.path,
+              filename: entry.value.path.split('/').last,
+            ),
           ));
         }
       }
@@ -309,7 +312,10 @@ class NetworkCaller {
         for (var file in fileList) {
           formData.files.add(MapEntry(
             fileKey,
-            await MultipartFile.fromFile(file.path),
+            await MultipartFile.fromFile(
+              file.path,
+              filename: file.path.split('/').last,
+            ),
           ));
         }
       }

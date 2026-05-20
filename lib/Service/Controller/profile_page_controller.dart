@@ -18,10 +18,12 @@ class ProfileController extends ChangeNotifier {
   UserProfileModel? _currentUser;
   bool _inProgress = false;
   String? _errorMessage;
+  int _profileImageSalt = DateTime.now().millisecondsSinceEpoch;
 
   UserProfileModel? get currentUser => _currentUser;
   bool get inProgress => _inProgress;
   String? get errorMessage => _errorMessage;
+  int get profileImageSalt => _profileImageSalt;
   bool get hasData => _currentUser != null;
 
   // App start-এ cached profile load
@@ -214,6 +216,8 @@ class ProfileController extends ChangeNotifier {
         // Since response.body['data'] is a String message now, we must fetch the profile
         // to get the updated image URL.
         await fetchProfile(forceRefresh: true);
+        _profileImageSalt = DateTime.now().millisecondsSinceEpoch;
+        notifyListeners();
         return true;
       } else {
         _errorMessage = response.errorMessage ?? "Failed to upload image";
