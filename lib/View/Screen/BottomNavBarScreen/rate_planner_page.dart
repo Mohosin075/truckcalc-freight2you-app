@@ -13,12 +13,12 @@ class RatePlannerPage extends StatefulWidget {
 }
 
 class _RatePlannerPageState extends State<RatePlannerPage> {
-  final TextEditingController _desiredProfitController = TextEditingController(text: '1500');
-  final TextEditingController _costPerMileController = TextEditingController(text: '0.50');
-  final TextEditingController _dhPayPerMileController = TextEditingController(text: '0.25');
-  final TextEditingController _daysPerWeekController = TextEditingController(text: '5');
-  final TextEditingController _maxMilesPerDayController = TextEditingController(text: '500');
-  final TextEditingController _driverPercentController = TextEditingController(text: '100');
+  final TextEditingController _desiredProfitController = TextEditingController();
+  final TextEditingController _costPerMileController = TextEditingController();
+  final TextEditingController _dhPayPerMileController = TextEditingController();
+  final TextEditingController _daysPerWeekController = TextEditingController();
+  final TextEditingController _maxMilesPerDayController = TextEditingController();
+  final TextEditingController _driverPercentController = TextEditingController();
 
   int loadedMilesNeeded = 0;
   double minTargetRate = 0.0;
@@ -212,14 +212,14 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
       title: 'Goal Settings',
       child: Column(
         children: [
-          _buildInputField(r'Desired Weekly Profit ($)', _desiredProfitController),
-          _buildInputField(r'Cost Per Mile ($)', _costPerMileController),
-          _buildInputField(r'Deadhead Pay Per Mile ($)', _dhPayPerMileController),
+          _buildInputField(r'Desired Weekly Profit ($)', _desiredProfitController, hintText: '2000'),
+          _buildInputField(r'Cost Per Mile ($)', _costPerMileController, hintText: '1.50'),
+          _buildInputField(r'Deadhead Pay Per Mile ($)', _dhPayPerMileController, hintText: '1.00'),
           Row(
             children: [
-              Expanded(child: _buildInputField('Desired # of Days/Week', _daysPerWeekController, isInt: true)),
+              Expanded(child: _buildInputField('Desired # of Days/Week', _daysPerWeekController, isInt: true, hintText: '5')),
               SizedBox(width: 16.w),
-              Expanded(child: _buildInputField('Desired Max Miles/Day', _maxMilesPerDayController, isInt: true)),
+              Expanded(child: _buildInputField('Desired Max Miles/Day', _maxMilesPerDayController, isInt: true, hintText: '600')),
             ],
           ),
         ],
@@ -267,7 +267,7 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
       title: 'Earnings Split',
       child: Column(
         children: [
-          _buildInputField('Driver Percentage (%)', _driverPercentController, isInt: true),
+          _buildInputField('Driver Percentage (%)', _driverPercentController, isInt: true, hintText: '25'),
           SizedBox(height: 16.h),
           _buildSplitItem('DRIVER', '${driverPercentValue.toStringAsFixed(1)}%', '\$${driverPay.toStringAsFixed(2)}'),
           SizedBox(height: 12.h),
@@ -367,7 +367,7 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
     );
   }
 
-  Widget _buildInputField(String label, TextEditingController controller, {bool isInt = false}) {
+  Widget _buildInputField(String label, TextEditingController controller, {bool isInt = false, String? hintText}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -380,7 +380,7 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
           decoration: InputDecoration(
             fillColor: Colors.white,
             filled: true,
-            hintText: '0',
+            hintText: hintText ?? (isInt ? '0' : '0.00'),
             hintStyle: TextStyle(color: Colors.grey.shade400),
             contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.r), borderSide: BorderSide.none),

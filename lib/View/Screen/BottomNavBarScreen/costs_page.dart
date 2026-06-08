@@ -14,22 +14,22 @@ class CostsPage extends StatefulWidget {
 
 class _CostsPageState extends State<CostsPage> {
   // Fixed costs controllers
-  final TextEditingController _insuranceController = TextEditingController(text: '0.00');
-  final TextEditingController _truckPaymentController = TextEditingController(text: '0.00');
-  final TextEditingController _escrowController = TextEditingController(text: '0.00');
-  final TextEditingController _repairSavingsController = TextEditingController(text: '0.00');
-  final TextEditingController _driverPayFixedController = TextEditingController(text: '0.00');
-  final TextEditingController _permitsController = TextEditingController(text: '0.00');
-  final TextEditingController _otherFixedController = TextEditingController(text: '0.00');
+  final TextEditingController _insuranceController = TextEditingController();
+  final TextEditingController _truckPaymentController = TextEditingController();
+  final TextEditingController _escrowController = TextEditingController();
+  final TextEditingController _repairSavingsController = TextEditingController();
+  final TextEditingController _driverPayFixedController = TextEditingController();
+  final TextEditingController _permitsController = TextEditingController();
+  final TextEditingController _otherFixedController = TextEditingController();
 
   // Variable costs controllers
-  final TextEditingController _milesPerWeekController = TextEditingController(text: '2500');
-  final TextEditingController _avgMPGController = TextEditingController(text: '6.5');
-  final TextEditingController _fuelPriceController = TextEditingController(text: '3.50');
-  final TextEditingController _oilChangesYearController = TextEditingController(text: '12');
-  final TextEditingController _costPerOilChangeController = TextEditingController(text: '300');
-  final TextEditingController _tireCostYearController = TextEditingController(text: '5000');
-  final TextEditingController _maintenanceCostYearController = TextEditingController(text: '8000');
+  final TextEditingController _milesPerWeekController = TextEditingController();
+  final TextEditingController _avgMPGController = TextEditingController();
+  final TextEditingController _fuelPriceController = TextEditingController();
+  final TextEditingController _oilChangesYearController = TextEditingController();
+  final TextEditingController _costPerOilChangeController = TextEditingController();
+  final TextEditingController _tireCostYearController = TextEditingController();
+  final TextEditingController _maintenanceCostYearController = TextEditingController();
 
   double totalWeeklyFixed = 0.0;
   double weeklyFuelCost = 0.0;
@@ -274,13 +274,13 @@ class _CostsPageState extends State<CostsPage> {
       ),
       child: Column(
         children: [
-          _buildInputField('Weekly Insurance Payment', _insuranceController),
-          _buildInputField('Weekly Truck Payment', _truckPaymentController),
-          _buildInputField('Weekly Escrow Contribution', _escrowController),
-          _buildInputField('Weekly Repair Savings', _repairSavingsController),
-          _buildInputField('Weekly Self/Driver Pay', _driverPayFixedController),
-          _buildInputField('Weekly Permits/Subscriptions', _permitsController),
-          _buildInputField('Other Weekly Costs', _otherFixedController),
+          _buildInputField('Weekly Insurance Payment', _insuranceController, hintText: '200.00'),
+          _buildInputField('Weekly Truck Payment', _truckPaymentController, hintText: '350.00'),
+          _buildInputField('Weekly Escrow Contribution', _escrowController, hintText: '50.00'),
+          _buildInputField('Weekly Repair Savings', _repairSavingsController, hintText: '100.00'),
+          _buildInputField('Weekly Self/Driver Pay', _driverPayFixedController, hintText: '0.00'),
+          _buildInputField('Weekly Permits/Subscriptions', _permitsController, hintText: '20.00'),
+          _buildInputField('Other Weekly Costs', _otherFixedController, hintText: '50.00'),
           SizedBox(height: 16.h),
           _buildDarkResultBox('TOTAL WEEKLY FIXED COSTS', '\$${totalWeeklyFixed.toStringAsFixed(2)}'),
         ],
@@ -298,29 +298,29 @@ class _CostsPageState extends State<CostsPage> {
       ),
       child: Column(
         children: [
-          _buildInputField('Miles Driven Per Week', _milesPerWeekController, isInt: true),
+          _buildInputField('Miles Driven Per Week', _milesPerWeekController, isInt: true, hintText: '2500'),
           Row(
             children: [
-              Expanded(child: _buildInputField('Average MPG', _avgMPGController)),
+              Expanded(child: _buildInputField('Average MPG', _avgMPGController, hintText: '6.5')),
               SizedBox(width: 16.w),
-              Expanded(child: _buildInputField('Avg Fuel Price (\$ /gal)', _fuelPriceController)),
+              Expanded(child: _buildInputField('Avg Fuel Price (\$ /gal)', _fuelPriceController, hintText: '3.50')),
             ],
           ),
           _buildDarkResultBox('WEEKLY FUEL COST', '\$${weeklyFuelCost.toStringAsFixed(2)}'),
           SizedBox(height: 16.h),
           Row(
             children: [
-              Expanded(child: _buildInputField('Oil Changes/Year', _oilChangesYearController, isInt: true)),
+              Expanded(child: _buildInputField('Oil Changes/Year', _oilChangesYearController, isInt: true, hintText: '12')),
               SizedBox(width: 16.w),
-              Expanded(child: _buildInputField('Cost Per Oil Change', _costPerOilChangeController)),
+              Expanded(child: _buildInputField('Cost Per Oil Change', _costPerOilChangeController, hintText: '300')),
             ],
           ),
           _buildDarkResultBox('WEEKLY OIL CHANGE COST', '\$${weeklyOilChangeCost.toStringAsFixed(2)}'),
           SizedBox(height: 16.h),
-          _buildInputField('Tire Cost Per Year', _tireCostYearController),
+          _buildInputField('Tire Cost Per Year', _tireCostYearController, hintText: '3000'),
           _buildDarkResultBox('WEEKLY TIRE COST', '\$${weeklyTireCost.toStringAsFixed(2)}'),
           SizedBox(height: 16.h),
-          _buildInputField('Maintenance Cost Per Year', _maintenanceCostYearController),
+          _buildInputField('Maintenance Cost Per Year', _maintenanceCostYearController, hintText: '5000'),
           _buildDarkResultBox('WEEKLY MAINTENANCE COST', '\$${weeklyMaintenanceCost.toStringAsFixed(2)}'),
           SizedBox(height: 16.h),
           _buildDarkResultBox('TOTAL WEEKLY VARIABLE COSTS', '\$${totalWeeklyVariable.toStringAsFixed(2)}', isLargeValue: true),
@@ -429,7 +429,7 @@ class _CostsPageState extends State<CostsPage> {
     );
   }
 
-  Widget _buildInputField(String label, TextEditingController controller, {bool isInt = false}) {
+  Widget _buildInputField(String label, TextEditingController controller, {bool isInt = false, String? hintText}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -444,7 +444,7 @@ class _CostsPageState extends State<CostsPage> {
           decoration: InputDecoration(
             fillColor: Colors.white,
             filled: true,
-            hintText: '0.00',
+            hintText: hintText ?? (isInt ? '0' : '0.00'),
             hintStyle: TextStyle(color: Colors.grey.shade400),
             contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.r), borderSide: BorderSide.none),

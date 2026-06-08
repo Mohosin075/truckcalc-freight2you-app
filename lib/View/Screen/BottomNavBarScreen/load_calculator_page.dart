@@ -14,15 +14,15 @@ class LoadCalculatorPage extends StatefulWidget {
 
 class _LoadCalculatorPageState extends State<LoadCalculatorPage> {
   final TextEditingController _loadNumberController = TextEditingController();
-  final TextEditingController _baseRateController = TextEditingController(text: '0.00');
-  final TextEditingController _fscController = TextEditingController(text: '0.00');
-  final TextEditingController _loadedMilesController = TextEditingController(text: '0');
-  final TextEditingController _tollsController = TextEditingController(text: '0.00');
-  final TextEditingController _dhMilesController = TextEditingController(text: '0');
-  final TextEditingController _dhRateController = TextEditingController(text: '0.00');
-  final TextEditingController _bonusController = TextEditingController(text: '0.00');
-  final TextEditingController _driverPercentController = TextEditingController(text: '100');
-  final TextEditingController _costPerMileController = TextEditingController(text: '0.00');
+  final TextEditingController _baseRateController = TextEditingController();
+  final TextEditingController _fscController = TextEditingController();
+  final TextEditingController _loadedMilesController = TextEditingController();
+  final TextEditingController _tollsController = TextEditingController();
+  final TextEditingController _dhMilesController = TextEditingController();
+  final TextEditingController _dhRateController = TextEditingController();
+  final TextEditingController _bonusController = TextEditingController();
+  final TextEditingController _driverPercentController = TextEditingController();
+  final TextEditingController _costPerMileController = TextEditingController();
 
   double totalFSC = 0.0;
   double totalDH = 0.0;
@@ -47,6 +47,7 @@ class _LoadCalculatorPageState extends State<LoadCalculatorPage> {
     _bonusController.addListener(_calculate);
     _driverPercentController.addListener(_calculate);
     _costPerMileController.addListener(_calculate);
+    _calculate();
   }
 
   void _calculate() {
@@ -233,17 +234,17 @@ class _LoadCalculatorPageState extends State<LoadCalculatorPage> {
         children: [
           Row(
             children: [
-              Expanded(child: _buildInputField('Base Rate Per Mile', _baseRateController)),
+              Expanded(child: _buildInputField('Base Rate Per Mile', _baseRateController, hintText: '2.50')),
               SizedBox(width: 16.w),
-              Expanded(child: _buildInputField('Fuel Surcharge/Mile', _fscController)),
+              Expanded(child: _buildInputField('Fuel Surcharge/Mile', _fscController, hintText: '0.50')),
             ],
           ),
           SizedBox(height: 16.h),
           Row(
             children: [
-              Expanded(child: _buildInputField('Loaded Miles', _loadedMilesController, isInt: true)),
+              Expanded(child: _buildInputField('Loaded Miles', _loadedMilesController, isInt: true, hintText: '1000')),
               SizedBox(width: 16.w),
-              Expanded(child: _buildInputField('Tolls (\$)', _tollsController)),
+              Expanded(child: _buildInputField('Tolls (\$)', _tollsController, hintText: '50.00')),
             ],
           ),
           SizedBox(height: 16.h),
@@ -260,15 +261,15 @@ class _LoadCalculatorPageState extends State<LoadCalculatorPage> {
         children: [
           Row(
             children: [
-              Expanded(child: _buildInputField('DH Miles', _dhMilesController, isInt: true)),
+              Expanded(child: _buildInputField('DH Miles', _dhMilesController, isInt: true, hintText: '100')),
               SizedBox(width: 16.w),
-              Expanded(child: _buildInputField('DH Rate Per Mile', _dhRateController)),
+              Expanded(child: _buildInputField('DH Rate Per Mile', _dhRateController, hintText: '0.00')),
             ],
           ),
           SizedBox(height: 16.h),
           _buildDarkResultBox(r'Total DH $', '\$${totalDH.toStringAsFixed(2)}'),
           SizedBox(height: 16.h),
-          _buildInputField('Bonus/Accessorial Pay', _bonusController),
+          _buildInputField('Bonus/Accessorial Pay', _bonusController, hintText: '0.00'),
         ],
       ),
     );
@@ -301,7 +302,7 @@ class _LoadCalculatorPageState extends State<LoadCalculatorPage> {
           Row(
             children: [
               Expanded(child: _buildLabelValue('Profit Per Mile', '\$${profitPerMile.toStringAsFixed(2)}')),
-              Expanded(child: _buildInputField('Cost Per Mile', _costPerMileController)),
+              Expanded(child: _buildInputField('Cost Per Mile', _costPerMileController, hintText: '1.50')),
             ],
           ),
           SizedBox(height: 16.h),
@@ -322,7 +323,7 @@ class _LoadCalculatorPageState extends State<LoadCalculatorPage> {
       title: 'Earnings Split',
       child: Column(
         children: [
-          _buildInputField('Driver Percentage (%)', _driverPercentController, isInt: true),
+          _buildInputField('Driver Percentage (%)', _driverPercentController, isInt: true, hintText: '25'),
           SizedBox(height: 16.h),
           _buildSplitItem('DRIVER', '${driverPercentValue.toStringAsFixed(1)}%', '\$${driverPay.toStringAsFixed(2)}'),
           SizedBox(height: 12.h),
