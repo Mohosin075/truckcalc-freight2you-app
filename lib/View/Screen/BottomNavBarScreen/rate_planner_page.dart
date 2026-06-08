@@ -55,13 +55,14 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
     loadedMilesNeeded = totalMilesPerWeek - maxDHPerWeek;
 
     if (loadedMilesNeeded > 0) {
-      minTargetRate = (desiredProfit + (totalMilesPerWeek * costPerMile) - (maxDHPerWeek * dhPayPerMile)) / loadedMilesNeeded;
+      minTargetRate = (desiredProfit + (loadedMilesNeeded * costPerMile) - ((maxDHPerWeek * dhPayPerMile) / loadedMilesNeeded)) / loadedMilesNeeded;
+      totalRevenue = (loadedMilesNeeded * minTargetRate) + ((maxDHPerWeek * dhPayPerMile) / loadedMilesNeeded);
     } else {
       minTargetRate = 0.0;
+      totalRevenue = 0.0;
     }
 
-    totalRevenue = (loadedMilesNeeded * minTargetRate) + (maxDHPerWeek * dhPayPerMile);
-    totalCost = totalMilesPerWeek * costPerMile;
+    totalCost = loadedMilesNeeded * costPerMile;
     
     driverPay = totalRevenue * (driverPercent / 100);
     ownerPay = totalRevenue - driverPay;
