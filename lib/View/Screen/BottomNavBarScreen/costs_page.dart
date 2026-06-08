@@ -75,13 +75,13 @@ class _CostsPageState extends State<CostsPage> {
 
     int oilChangesYear = int.tryParse(_oilChangesYearController.text) ?? 0;
     double costPerOilChange = double.tryParse(_costPerOilChangeController.text) ?? 0.0;
-    weeklyOilChangeCost = (oilChangesYear * costPerOilChange) / 52.14;
+    weeklyOilChangeCost = (oilChangesYear * costPerOilChange) / 52;
 
     double tireCostYear = double.tryParse(_tireCostYearController.text) ?? 0.0;
-    weeklyTireCost = tireCostYear / 52.14;
+    weeklyTireCost = tireCostYear / 52;
 
     double maintenanceCostYear = double.tryParse(_maintenanceCostYearController.text) ?? 0.0;
-    weeklyMaintenanceCost = maintenanceCostYear / 52.14;
+    weeklyMaintenanceCost = maintenanceCostYear / 52;
 
     totalWeeklyVariable = weeklyFuelCost + weeklyOilChangeCost + weeklyTireCost + weeklyMaintenanceCost;
     totalWeeklyOperatingCost = totalWeeklyFixed + totalWeeklyVariable;
