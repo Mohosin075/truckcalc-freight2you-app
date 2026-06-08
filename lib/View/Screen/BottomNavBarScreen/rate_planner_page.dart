@@ -84,6 +84,47 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
   }
 
   Future<void> _saveCalculation() async {
+    final desiredProfit = double.tryParse(_desiredProfitController.text.trim());
+    final costPerMile = double.tryParse(_costPerMileController.text.trim());
+    final daysPerWeek = int.tryParse(_daysPerWeekController.text.trim());
+    final maxMilesPerDay = int.tryParse(_maxMilesPerDayController.text.trim());
+
+    if (desiredProfit == null || desiredProfit <= 0) {
+      showCustomSnackBar(
+        context: context,
+        message: "Please enter a valid Desired Profit greater than 0!",
+        isError: true,
+      );
+      return;
+    }
+
+    if (costPerMile == null || costPerMile <= 0) {
+      showCustomSnackBar(
+        context: context,
+        message: "Please enter a valid Cost Per Mile greater than 0!",
+        isError: true,
+      );
+      return;
+    }
+
+    if (daysPerWeek == null || daysPerWeek <= 0 || daysPerWeek > 7) {
+      showCustomSnackBar(
+        context: context,
+        message: "Please enter valid Days Per Week (1-7)!",
+        isError: true,
+      );
+      return;
+    }
+
+    if (maxMilesPerDay == null || maxMilesPerDay <= 0) {
+      showCustomSnackBar(
+        context: context,
+        message: "Please enter valid Max Miles Per Day greater than 0!",
+        isError: true,
+      );
+      return;
+    }
+
     final controller = Provider.of<CalculationController>(context, listen: false);
 
     final payload = {

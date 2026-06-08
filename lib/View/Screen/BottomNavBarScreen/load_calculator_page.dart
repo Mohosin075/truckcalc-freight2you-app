@@ -93,6 +93,27 @@ class _LoadCalculatorPageState extends State<LoadCalculatorPage> {
   }
 
   Future<void> _saveCalculation() async {
+    final baseRate = double.tryParse(_baseRateController.text.trim());
+    final loadedMiles = int.tryParse(_loadedMilesController.text.trim());
+
+    if (baseRate == null || baseRate <= 0) {
+      showCustomSnackBar(
+        context: context,
+        message: "Please enter a valid Base Rate greater than 0!",
+        isError: true,
+      );
+      return;
+    }
+
+    if (loadedMiles == null || loadedMiles <= 0) {
+      showCustomSnackBar(
+        context: context,
+        message: "Please enter valid Loaded Miles greater than 0!",
+        isError: true,
+      );
+      return;
+    }
+
     final controller = Provider.of<CalculationController>(context, listen: false);
     
     final payload = {

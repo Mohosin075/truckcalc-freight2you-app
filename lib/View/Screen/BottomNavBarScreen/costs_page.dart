@@ -113,6 +113,41 @@ class _CostsPageState extends State<CostsPage> {
   }
 
   Future<void> _saveCalculation() async {
+    final milesPerWeek = int.tryParse(_milesPerWeekController.text.trim());
+    if (milesPerWeek == null || milesPerWeek <= 0) {
+      showCustomSnackBar(
+        context: context,
+        message: "Please enter valid Miles Per Week greater than 0!",
+        isError: true,
+      );
+      return;
+    }
+
+    // Check if at least one cost field has been entered
+    final hasFixed = _insuranceController.text.trim().isNotEmpty ||
+        _truckPaymentController.text.trim().isNotEmpty ||
+        _escrowController.text.trim().isNotEmpty ||
+        _repairSavingsController.text.trim().isNotEmpty ||
+        _driverPayFixedController.text.trim().isNotEmpty ||
+        _permitsController.text.trim().isNotEmpty ||
+        _otherFixedController.text.trim().isNotEmpty;
+
+    final hasVariable = _avgMPGController.text.trim().isNotEmpty ||
+        _fuelPriceController.text.trim().isNotEmpty ||
+        _oilChangesYearController.text.trim().isNotEmpty ||
+        _costPerOilChangeController.text.trim().isNotEmpty ||
+        _tireCostYearController.text.trim().isNotEmpty ||
+        _maintenanceCostYearController.text.trim().isNotEmpty;
+
+    if (!hasFixed && !hasVariable) {
+      showCustomSnackBar(
+        context: context,
+        message: "Please enter at least one operating cost field!",
+        isError: true,
+      );
+      return;
+    }
+
     final controller = Provider.of<CalculationController>(context, listen: false);
 
     final payload = {
