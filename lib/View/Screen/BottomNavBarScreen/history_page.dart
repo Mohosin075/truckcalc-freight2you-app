@@ -93,7 +93,8 @@ class _HistoryPageState extends State<HistoryPage> {
     
     if (calculation.type == 'LOAD' && calculation.loadData != null) {
       final ld = calculation.loadData!;
-      header = 'Load: ${ld.loadedMiles ?? 0}mi + ${ld.dhMiles ?? 0}DH @ \$${ld.baseRate?.toStringAsFixed(2) ?? "0.00"}/mi';
+      final loadNoStr = (ld.loadNumber != null && ld.loadNumber!.isNotEmpty) ? 'Load #${ld.loadNumber}: ' : 'Load: ';
+      header = '$loadNoStr${ld.loadedMiles ?? 0}mi + ${ld.dhMiles ?? 0}DH @ \$${ld.baseRate?.toStringAsFixed(2) ?? "0.00"}/mi';
       result = '= Revenue: \$${ld.totalRevenue?.toStringAsFixed(2) ?? "0.00"}, Profit: \$${ld.totalProfit?.toStringAsFixed(2) ?? "0.00"}';
     } else if (calculation.type == 'GOAL' && calculation.goalData != null) {
       final gd = calculation.goalData!;

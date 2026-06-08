@@ -38,6 +38,7 @@ class CalculationModel {
 }
 
 class LoadData {
+  String? loadNumber;
   double? baseRate;
   double? fuelSurcharge;
   int? loadedMiles;
@@ -59,6 +60,7 @@ class LoadData {
   double? ownerPay;
 
   LoadData({
+    this.loadNumber,
     this.baseRate,
     this.fuelSurcharge,
     this.loadedMiles,
@@ -81,6 +83,7 @@ class LoadData {
   });
 
   LoadData.fromJson(Map<String, dynamic> json) {
+    loadNumber = json['loadNumber']?.toString();
     baseRate = (json['baseRate'] as num?)?.toDouble();
     fuelSurcharge = (json['fuelSurcharge'] as num?)?.toDouble();
     loadedMiles = (json['loadedMiles'] as num?)?.toInt();
@@ -104,6 +107,7 @@ class LoadData {
 
   Map<String, dynamic> toJson() {
     return {
+      'loadNumber': loadNumber,
       'baseRate': baseRate,
       'fuelSurcharge': fuelSurcharge,
       'loadedMiles': loadedMiles,

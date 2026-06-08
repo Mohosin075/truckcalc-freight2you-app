@@ -13,6 +13,7 @@ class LoadCalculatorPage extends StatefulWidget {
 }
 
 class _LoadCalculatorPageState extends State<LoadCalculatorPage> {
+  final TextEditingController _loadNumberController = TextEditingController();
   final TextEditingController _baseRateController = TextEditingController(text: '0.00');
   final TextEditingController _fscController = TextEditingController(text: '0.00');
   final TextEditingController _loadedMilesController = TextEditingController(text: '0');
@@ -77,6 +78,7 @@ class _LoadCalculatorPageState extends State<LoadCalculatorPage> {
 
   @override
   void dispose() {
+    _loadNumberController.dispose();
     _baseRateController.dispose();
     _fscController.dispose();
     _loadedMilesController.dispose();
@@ -95,6 +97,7 @@ class _LoadCalculatorPageState extends State<LoadCalculatorPage> {
     final payload = {
       "type": "LOAD",
       "loadData": {
+        "loadNumber": _loadNumberController.text.trim(),
         "baseRate": double.tryParse(_baseRateController.text) ?? 0.0,
         "fuelSurcharge": double.tryParse(_fscController.text) ?? 0.0,
         "loadedMiles": int.tryParse(_loadedMilesController.text) ?? 0,
@@ -166,6 +169,8 @@ class _LoadCalculatorPageState extends State<LoadCalculatorPage> {
                 ),
                 SizedBox(height: 20.h),
                 _buildSummaryHeader(),
+                SizedBox(height: 16.h),
+                _buildLoadDetailsCard(),
                 SizedBox(height: 16.h),
                 _buildRevenueInputsCard(),
                 SizedBox(height: 16.h),
@@ -401,7 +406,14 @@ class _LoadCalculatorPageState extends State<LoadCalculatorPage> {
     );
   }
 
-  Widget _buildInputField(String label, TextEditingController controller, {bool isInt = false}) {
+  Widget _buildLoadDetailsCard() {
+    return _buildSectionCard(
+      title: 'Load Details',
+      child: _buildInputField('Load #', _loadNumberController, isText: true, hintText: 'Enter Load Number'),
+    );
+  }
+
+  Widget _buildInputField(String label, TextEditingController controller, {bool isInt = false, bool isText = false, String? hintText}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -409,12 +421,12 @@ class _LoadCalculatorPageState extends State<LoadCalculatorPage> {
         SizedBox(height: 8.h),
         TextField(
           controller: controller,
-          keyboardType: TextInputType.numberWithOptions(decimal: !isInt),
+          keyboardType: isText ? TextInputType.text : TextInputType.numberWithOptions(decimal: !isInt),
           style: TextStyle(color: Colors.black, fontSize: 15.sp, fontWeight: FontWeight.w500),
           decoration: InputDecoration(
             fillColor: Colors.white,
             filled: true,
-            hintText: '0',
+            hintText: hintText ?? '0',
             hintStyle: TextStyle(color: Colors.grey.shade400),
             contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.r), borderSide: BorderSide.none),

@@ -141,7 +141,7 @@ class CalculationController extends ChangeNotifier {
       if (loadCalcs.isNotEmpty) {
         csvRows.add(["1. Load Profit & Surcharge Calculations"]);
         csvRows.add([
-          'Date', 'Base Rate', 'Loaded Miles', 'Fuel Surcharge', 'Deadhead Miles', 'Tolls & Bonus', 
+          'Date', 'Load #', 'Base Rate', 'Loaded Miles', 'Fuel Surcharge', 'Deadhead Miles', 'Tolls & Bonus', 
           'Total Revenue', 'Total Cost', 'Driver Pay', 'Owner Pay', 'Net Profit'
         ]);
         
@@ -152,6 +152,7 @@ class CalculationController extends ChangeNotifier {
           
           csvRows.add([
             date,
+            getValue(item, 'loadNumber')?.toString() ?? "-",
             formatNum(getValue(item, 'baseRate'), isCurrency: true, suffix: "/mi"),
             formatNum(getValue(item, 'loadedMiles')),
             formatNum(getValue(item, 'fuelSurcharge'), isCurrency: true, suffix: "/mi"),
@@ -366,13 +367,14 @@ class CalculationController extends ChangeNotifier {
                   cellPadding: const pw.EdgeInsets.symmetric(horizontal: 3, vertical: 3),
                   cellAlignment: pw.Alignment.center,
                   headers: [
-                    'Date', 'Base Rate', 'Loaded Mi', 'Fuel Sur', 'DH Miles', 'Tolls/Bon', 
+                    'Date', 'Load #', 'Base Rate', 'Loaded Mi', 'Fuel Sur', 'DH Miles', 'Tolls/Bon', 
                     'Revenue', 'Cost', 'Driver Pay', 'Owner Pay', 'Net Profit'
                   ],
                   data: loadCalcs.map((item) {
                     final date = "${item.createdAt.day}/${item.createdAt.month}/${item.createdAt.year}";
                     return [
                       date,
+                      getValue(item, 'loadNumber')?.toString() ?? "-",
                       formatNum(getValue(item, 'baseRate'), isCurrency: true, suffix: "/mi"),
                       formatNum(getValue(item, 'loadedMiles')),
                       formatNum(getValue(item, 'fuelSurcharge'), isCurrency: true, suffix: "/mi"),
