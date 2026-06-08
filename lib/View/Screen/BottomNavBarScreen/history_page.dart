@@ -15,6 +15,8 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> {
+  String _searchQuery = "";
+
   @override
   void initState() {
     super.initState();
@@ -43,7 +45,9 @@ class _HistoryPageState extends State<HistoryPage> {
                 child: TextField(
                   style: const TextStyle(color: Colors.white),
                   onChanged: (value) {
-                    // Implement search if needed
+                    setState(() {
+                      _searchQuery = value;
+                    });
                   },
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.search, color: Colors.grey),
@@ -66,13 +70,55 @@ class _HistoryPageState extends State<HistoryPage> {
                     if (controller.calculations.isEmpty) {
                       return const Center(child: Text("No calculations found", style: TextStyle(color: Colors.white70)));
                     }
+
+                    final filteredCalculations = controller.calculations.where((calculation) {
+                      if (_searchQuery.isEmpty) return true;
+                      final query = _searchQuery.toLowerCase();
+                      
+                      // Match calculation type
+                      final type = (calculation.type ?? '').toLowerCase();
+                      if (type.contains(query)) return true;
+                      
+                      // Match specific headers / details based on type
+                      if (calculation.type == 'LOAD' && calculation.loadData != null) {
+                        final ld = calculation.loadData!;
+                        if (ld.loadNumber != null && ld.loadNumber!.toLowerCase().contains(query)) return true;
+                        if (ld.loadedMiles?.toString().contains(query) ?? false) return true;
+                        if (ld.totalRevenue?.toString().contains(query) ?? false) return true;
+                        if (ld.totalProfit?.toString().contains(query) ?? false) return true;
+                      } else if (calculation.type == 'GOAL' && calculation.goalData != null) {
+                        final gd = calculation.goalData!;
+                        if (gd.desiredWeeklyProfit?.toString().contains(query) ?? false) return true;
+                        if (gd.loadedMilesNeeded?.toString().contains(query) ?? false) return true;
+                      } else if (calculation.type == 'COST' && calculation.costData != null) {
+                        final cd = calculation.costData!;
+                        if (cd.totalWeeklyOperatingCost?.toString().contains(query) ?? false) return true;
+                        if (cd.trueCPM?.toString().contains(query) ?? false) return true;
+                      }
+                      
+                      // Match date
+                      if (calculation.createdAt != null) {
+                        try {
+                          DateTime dt = DateTime.parse(calculation.createdAt!).toLocal();
+                          final timeStr = DateFormat('M/d/yyyy, H:mm').format(dt).toLowerCase();
+                          if (timeStr.contains(query)) return true;
+                        } catch (_) {}
+                      }
+                      
+                      return false;
+                    }).toList();
+
+                    if (filteredCalculations.isEmpty) {
+                      return const Center(child: Text("No matching calculations found", style: TextStyle(color: Colors.white70)));
+                    }
+
                     return RefreshIndicator(
                       onRefresh: () => controller.fetchCalculations(),
                       child: ListView.builder(
                         padding: EdgeInsets.all(16.w),
-                        itemCount: controller.calculations.length,
+                        itemCount: filteredCalculations.length,
                         itemBuilder: (context, index) {
-                          final calculation = controller.calculations[index];
+                          final calculation = filteredCalculations[index];
                           return _buildHistoryCard(calculation);
                         },
                       ),

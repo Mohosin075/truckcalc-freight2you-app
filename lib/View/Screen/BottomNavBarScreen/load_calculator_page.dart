@@ -410,7 +410,7 @@ class _LoadCalculatorPageState extends State<LoadCalculatorPage> {
   Widget _buildLoadDetailsCard() {
     return _buildSectionCard(
       title: 'Load Details',
-      child: _buildInputField('Load #', _loadNumberController, isText: true, hintText: 'Enter Load Number'),
+      child: _buildInputField('Load #', _loadNumberController, isText: true, hintText: 'Enter Load Number')
     );
   }
 
