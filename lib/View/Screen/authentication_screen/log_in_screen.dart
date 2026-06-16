@@ -94,7 +94,8 @@ class _LogInScreenState extends State<LogInScreen> {
                         hintText: 'you@email.com',
                         keyboardType: TextInputType.emailAddress,
                         validator: (value) {
-                          if (value == null || value.isEmpty) return 'Enter email';
+                          if (value == null || value.isEmpty)
+                            return 'Enter email';
                           return null;
                         },
                       ),
@@ -104,7 +105,8 @@ class _LogInScreenState extends State<LogInScreen> {
                         hintText: '••••••••',
                         isPassword: true,
                         validator: (value) {
-                          if (value == null || value.isEmpty) return 'Enter password';
+                          if (value == null || value.isEmpty)
+                            return 'Enter password';
                           return null;
                         },
                       ),

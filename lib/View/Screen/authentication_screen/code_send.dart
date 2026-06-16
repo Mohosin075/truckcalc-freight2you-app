@@ -5,9 +5,10 @@ import 'package:truckcalc/View/Widgets/app_background.dart';
 
 import '../../Widgets/CustomButton.dart';
 import '../../Widgets/appbar.dart';
+
 class CodeSend extends StatelessWidget {
   const CodeSend({super.key});
-  static const String name= '/code-send';
+  static const String name = '/code-send';
 
   @override
   Widget build(BuildContext context) {

@@ -24,11 +24,11 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _checkAuth() async {
     // Wait for splash animation/time
     await Future.delayed(const Duration(seconds: 3));
-    
+
     if (!mounted) return;
 
     final authController = Provider.of<AuthController>(context, listen: false);
-    
+
     // AuthController initialize is called in main.dart, but we ensure it's done
     if (!authController.isLoggedIn) {
       await authController.initialize();

@@ -12,7 +12,6 @@ import 'package:provider/provider.dart';
 import '../../Widgets/CustomButton.dart';
 import '../../Widgets/appbar.dart';
 
-
 class CodeSubmit extends StatefulWidget {
   const CodeSubmit({super.key});
   static const String name = '/code-submit';
@@ -20,7 +19,6 @@ class CodeSubmit extends StatefulWidget {
   @override
   State<CodeSubmit> createState() => _CodeSubmitState();
 }
-
 
 class _CodeSubmitState extends State<CodeSubmit> {
   final TextEditingController otpController = TextEditingController();
@@ -137,8 +135,12 @@ class _CodeSubmitState extends State<CodeSubmit> {
                     children: [
                       TextSpan(
                         text: 'Resend Again',
-                        style: const TextStyle(color: Color(0xFF00D193), fontWeight: FontWeight.bold),
-                        recognizer: TapGestureRecognizer()..onTap = ontapResendCode,
+                        style: const TextStyle(
+                          color: Color(0xFF00D193),
+                          fontWeight: FontWeight.bold,
+                        ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = ontapResendCode,
                       ),
                     ],
                   ),
@@ -152,12 +154,24 @@ class _CodeSubmitState extends State<CodeSubmit> {
   }
 
   Future<void> ontapResendCode() async {
-    final forgotPassController = Provider.of<ForgotPasswordController>(context, listen: false);
-    bool isSuccess = await forgotPassController.forgotPassword(forgotPassController.savedEmail);
+    final forgotPassController = Provider.of<ForgotPasswordController>(
+      context,
+      listen: false,
+    );
+    bool isSuccess = await forgotPassController.forgotPassword(
+      forgotPassController.savedEmail,
+    );
     if (isSuccess && mounted) {
-      showCustomSnackBar(context: context, message: 'Code resent to ${forgotPassController.savedEmail}', isError: false);
+      showCustomSnackBar(
+        context: context,
+        message: 'Code resent to ${forgotPassController.savedEmail}',
+        isError: false,
+      );
     } else if (mounted) {
-      showCustomSnackBar(context: context, message: forgotPassController.errorMessage ?? 'Resend failed');
+      showCustomSnackBar(
+        context: context,
+        message: forgotPassController.errorMessage ?? 'Resend failed',
+      );
     }
   }
 

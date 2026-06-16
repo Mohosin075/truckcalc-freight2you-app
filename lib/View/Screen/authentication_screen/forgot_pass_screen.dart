@@ -55,7 +55,11 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
                     children: [
                       Text(
                         'Forgot password',
-                        style: TextStyle(color: Colors.white, fontSize: 24.sp, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 24.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       SizedBox(height: 10.h),
                       const Text(
@@ -90,11 +94,19 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
                   ),
                   child: Column(
                     children: [
-                      const Icon(Icons.mail_outline, size: 80, color: Colors.white),
+                      const Icon(
+                        Icons.mail_outline,
+                        size: 80,
+                        color: Colors.white,
+                      ),
                       SizedBox(height: 20.h),
                       Text(
                         'Check your email',
-                        style: TextStyle(color: Colors.white, fontSize: 24.sp, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 24.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       SizedBox(height: 10.h),
                       Text(

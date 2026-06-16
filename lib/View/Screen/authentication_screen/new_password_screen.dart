@@ -99,7 +99,11 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
               SizedBox(height: 20.h),
               GestureDetector(
                 onTap: () {
-                  Navigator.pushNamedAndRemoveUntil(context, ForgotPassScreen.name, (route) => false);
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    ForgotPassScreen.name,
+                    (route) => false,
+                  );
                 },
                 child: Text(
                   'Back',
@@ -124,7 +128,10 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
   }
 
   Future<void> createNewPassword() async {
-    final forgotController = Provider.of<ForgotPasswordController>(context, listen: false);
+    final forgotController = Provider.of<ForgotPasswordController>(
+      context,
+      listen: false,
+    );
 
     bool isSuccess = await forgotController.forgotNewPassword(
       _newPassController.text.trim(),
@@ -138,7 +145,11 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
           message: "Password updated successfully!",
           isError: false,
         );
-        Navigator.pushNamedAndRemoveUntil(context, LogInScreen.name, (route) => false);
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          LogInScreen.name,
+          (route) => false,
+        );
       } else {
         showCustomSnackBar(
           context: context,

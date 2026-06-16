@@ -29,7 +29,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     setState(() => _isLoading = true);
 
-    final signUpController = Provider.of<SignUpController>(context, listen: false);
+    final signUpController = Provider.of<SignUpController>(
+      context,
+      listen: false,
+    );
     final success = await signUpController.signUp(
       email: _emailController.text.trim(),
       name: _nameController.text.trim(),
@@ -116,7 +119,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         labelText: 'Password',
                         hintText: 'Min 6 characters',
                         isPassword: true,
-                        validator: (v) => v!.length < 6 ? 'Min 6 characters' : null,
+                        validator: (v) =>
+                            v!.length < 6 ? 'Min 6 characters' : null,
                       ),
                       SizedBox(height: 24.h),
                       CustomButton(
@@ -130,7 +134,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
               SizedBox(height: 20.h),
               GestureDetector(
-                onTap: () => Navigator.pushReplacementNamed(context, LogInScreen.name),
+                onTap: () =>
+                    Navigator.pushReplacementNamed(context, LogInScreen.name),
                 child: Text(
                   'Back to login',
                   style: TextStyle(

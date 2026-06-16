@@ -106,12 +106,18 @@ class _VerifyAccountState extends State<VerifyAccount> {
                     RichText(
                       textAlign: TextAlign.center,
                       text: TextSpan(
-                        style: TextStyle(color: Colors.white70, fontSize: 14.sp),
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14.sp,
+                        ),
                         text: 'Enter the 6-digit code sent to\n',
                         children: [
                           TextSpan(
                             text: widget.email,
-                            style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
                         ],
                       ),
@@ -124,7 +130,11 @@ class _VerifyAccountState extends State<VerifyAccount> {
                       animationType: AnimationType.none,
                       keyboardType: TextInputType.number,
                       cursorColor: const Color(0xFF00D193),
-                      textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                      textStyle: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                       pinTheme: PinTheme(
                         shape: PinCodeFieldShape.box,
                         borderRadius: BorderRadius.circular(12.r),
@@ -161,8 +171,12 @@ class _VerifyAccountState extends State<VerifyAccount> {
                     children: [
                       TextSpan(
                         text: 'Resend Again',
-                        style: const TextStyle(color: Color(0xFF00D193), fontWeight: FontWeight.bold),
-                        recognizer: TapGestureRecognizer()..onTap = _inProgress ? null : _resendOtp,
+                        style: const TextStyle(
+                          color: Color(0xFF00D193),
+                          fontWeight: FontWeight.bold,
+                        ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = _inProgress ? null : _resendOtp,
                       ),
                     ],
                   ),
@@ -174,6 +188,7 @@ class _VerifyAccountState extends State<VerifyAccount> {
       ),
     );
   }
+
   Future<void> _submitOtp() async {
     if (_inProgress || otpController.text.trim().length != 6) {
       showCustomSnackBar(
@@ -188,8 +203,10 @@ class _VerifyAccountState extends State<VerifyAccount> {
     });
 
     try {
-      final otpVerifyCtrl =
-          Provider.of<OtpVerifyController>(context, listen: false);
+      final otpVerifyCtrl = Provider.of<OtpVerifyController>(
+        context,
+        listen: false,
+      );
 
       final bool success = await otpVerifyCtrl.verifyOtp(
         email: widget.email,
@@ -205,7 +222,10 @@ class _VerifyAccountState extends State<VerifyAccount> {
           isError: false,
         );
         Navigator.pushNamedAndRemoveUntil(
-            context, LogInScreen.name, (predicate) => false);
+          context,
+          LogInScreen.name,
+          (predicate) => false,
+        );
       } else {
         showCustomSnackBar(
           context: context,
