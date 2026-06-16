@@ -24,6 +24,7 @@ class CodeSend extends StatelessWidget {
                 width: 100.w,
                 height: 60.h,
                 fit: BoxFit.contain,
+                filterQuality: FilterQuality.high,
               ),
               SizedBox(height: 10.h),
               Text(

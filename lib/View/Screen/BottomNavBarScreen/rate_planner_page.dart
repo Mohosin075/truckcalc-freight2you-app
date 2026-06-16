@@ -24,8 +24,8 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
   double minTargetRate = 0.0;
   double totalRevenue = 0.0;
   double totalCost = 0.0;
-  int maxDHPerDay = 0;
-  int maxDHPerWeek = 0;
+  double maxDHPerDay = 0.0;
+  double maxDHPerWeek = 0.0;
   double driverPay = 0.0;
   double ownerPay = 0.0;
 
@@ -50,7 +50,7 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
     int driverPercent = int.tryParse(_driverPercentController.text) ?? 100;
 
     int totalMilesPerWeek = daysPerWeek * maxMilesPerDay;
-    maxDHPerDay = (maxMilesPerDay * 0.15).toInt();
+    maxDHPerDay = maxMilesPerDay * 0.15;
     maxDHPerWeek = daysPerWeek * maxDHPerDay;
     loadedMilesNeeded = totalMilesPerWeek;
 
@@ -294,9 +294,9 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
       title: 'Deadhead Suggestions',
       child: Row(
         children: [
-          Expanded(child: _buildResultSubBox('Max DH Per Day', '$maxDHPerDay mi')),
+          Expanded(child: _buildResultSubBox('Max DH Per Day', '${maxDHPerDay % 1 == 0 ? maxDHPerDay.toInt() : maxDHPerDay.toStringAsFixed(1)} mi')),
           SizedBox(width: 16.w),
-          Expanded(child: _buildResultSubBox('Max DH Per Week', '$maxDHPerWeek mi')),
+          Expanded(child: _buildResultSubBox('Max DH Per Week', '${maxDHPerWeek % 1 == 0 ? maxDHPerWeek.toInt() : maxDHPerWeek.toStringAsFixed(1)} mi')),
         ],
       ),
     );

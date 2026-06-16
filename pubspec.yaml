@@ -80,6 +80,13 @@ flutter_launcher_icons:
   ios: true
   image_path: "assets/images/logo-square.png"
   remove_alpha_ios: true
+  windows:
+    generate: true
+    image_path: "assets/images/logo-square.png"
+    icon_size: 256
+  macos:
+    generate: true
+    image_path: "assets/images/logo-square.png"
 
 flutter:
 

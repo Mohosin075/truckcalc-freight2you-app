@@ -142,8 +142,8 @@ class GoalData {
   double? minTargetRate;
   double? totalRevenue;
   double? totalCost;
-  int? maxDHPerDay;
-  int? maxDHPerWeek;
+  double? maxDHPerDay;
+  double? maxDHPerWeek;
   double? driverPay;
   double? ownerPay;
 
@@ -175,8 +175,8 @@ class GoalData {
     minTargetRate = (json['minTargetRate'] as num?)?.toDouble();
     totalRevenue = (json['totalRevenue'] as num?)?.toDouble();
     totalCost = (json['totalCost'] as num?)?.toDouble();
-    maxDHPerDay = (json['maxDHPerDay'] as num?)?.toInt();
-    maxDHPerWeek = (json['maxDHPerWeek'] as num?)?.toInt();
+    maxDHPerDay = (json['maxDHPerDay'] as num?)?.toDouble();
+    maxDHPerWeek = (json['maxDHPerWeek'] as num?)?.toDouble();
     driverPay = (json['driverPay'] as num?)?.toDouble();
     ownerPay = (json['ownerPay'] as num?)?.toDouble();
   }
