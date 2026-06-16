@@ -50,13 +50,13 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
     int driverPercent = int.tryParse(_driverPercentController.text) ?? 100;
 
     int totalMilesPerWeek = daysPerWeek * maxMilesPerDay;
-    maxDHPerWeek = (totalMilesPerWeek * 0.15).toInt(); // 15% Deadhead
     maxDHPerDay = (maxMilesPerDay * 0.15).toInt();
-    loadedMilesNeeded = totalMilesPerWeek - maxDHPerWeek;
+    maxDHPerWeek = daysPerWeek * maxDHPerDay;
+    loadedMilesNeeded = totalMilesPerWeek;
 
     if (loadedMilesNeeded > 0) {
       minTargetRate = costPerMile + (desiredProfit / loadedMilesNeeded);
-      totalRevenue = (loadedMilesNeeded * minTargetRate) + ((maxDHPerWeek * dhPayPerMile) / loadedMilesNeeded);
+      totalRevenue = (loadedMilesNeeded * minTargetRate) + (maxDHPerWeek * dhPayPerMile);
     } else {
       minTargetRate = 0.0;
       totalRevenue = 0.0;
