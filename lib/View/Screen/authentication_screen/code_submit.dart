@@ -3,14 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:truckcalc/Service/Controller/forgot_pass_controller.dart';
 import 'package:truckcalc/View/Screen/authentication_screen/new_password_screen.dart';
-import 'package:truckcalc/View/Theme/theme_provider.dart';
 import 'package:truckcalc/View/Widgets/app_background.dart';
 import 'package:truckcalc/View/Widgets/customSnacBar.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:provider/provider.dart';
 
 import '../../Widgets/CustomButton.dart';
-import '../../Widgets/appbar.dart';
+import '../../Widgets/app_logo.dart';
 
 class CodeSubmit extends StatefulWidget {
   const CodeSubmit({super.key});
@@ -37,12 +36,9 @@ class _CodeSubmitState extends State<CodeSubmit> {
           child: Column(
             children: [
               SizedBox(height: 60.h),
-              Image.asset(
-                'assets/images/logo-cal.png',
-                width: 100.w,
-                height: 60.h,
-                fit: BoxFit.contain,
-                filterQuality: FilterQuality.high,
+              const AppLogo(
+                width: 100,
+                height: 60,
               ),
               SizedBox(height: 10.h),
               Text(

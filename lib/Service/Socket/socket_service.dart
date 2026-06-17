@@ -33,11 +33,11 @@ class SocketService {
     _currentUserId = userId;
 
     debugPrint(
-      "🔌 Connecting to socket... URL: ${Urls.baseUrl}, User: $userId",
+      "🔌 Connecting to socket... URL: ${Urls.socketUrl}, User: $userId",
     );
 
     socket = IO.io(
-      Urls.baseUrl,
+      Urls.socketUrl,
       IO.OptionBuilder()
           .setTransports(['websocket'])
           .setAuth({'token': token})

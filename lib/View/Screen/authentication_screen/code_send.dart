@@ -5,6 +5,7 @@ import 'package:truckcalc/View/Widgets/app_background.dart';
 
 import '../../Widgets/CustomButton.dart';
 import '../../Widgets/appbar.dart';
+import '../../Widgets/app_logo.dart';
 
 class CodeSend extends StatelessWidget {
   const CodeSend({super.key});
@@ -20,12 +21,9 @@ class CodeSend extends StatelessWidget {
           child: Column(
             children: [
               SizedBox(height: 60.h),
-              Image.asset(
-                'assets/images/logo-cal.png',
-                width: 100.w,
-                height: 60.h,
-                fit: BoxFit.contain,
-                filterQuality: FilterQuality.high,
+              const AppLogo(
+                width: 100,
+                height: 60,
               ),
               SizedBox(height: 10.h),
               Text(

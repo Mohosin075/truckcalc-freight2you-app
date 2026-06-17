@@ -5,6 +5,7 @@ import 'package:truckcalc/View/Screen/BottomNavBarScreen/bottom_nav_bar.dart';
 import 'package:truckcalc/View/Screen/authentication_screen/forgot_pass_screen.dart';
 import 'package:truckcalc/View/Screen/authentication_screen/sign_up_screen.dart';
 import 'package:truckcalc/View/Widgets/app_background.dart';
+import 'package:truckcalc/View/Widgets/app_logo.dart';
 import 'package:truckcalc/View/Widgets/CustomButton.dart';
 import 'package:truckcalc/View/Widgets/auth_textFormField.dart';
 import 'package:truckcalc/View/Widgets/customSnacBar.dart';
@@ -60,12 +61,9 @@ class _LogInScreenState extends State<LogInScreen> {
           child: Column(
             children: [
               SizedBox(height: 100.h),
-              Image.asset(
-                'assets/images/logo-cal.png',
-                width: 100.w,
-                height: 60.h,
-                fit: BoxFit.contain,
-                filterQuality: FilterQuality.high,
+              const AppLogo(
+                width: 100,
+                height: 60,
               ),
               SizedBox(height: 10.h),
               Text(

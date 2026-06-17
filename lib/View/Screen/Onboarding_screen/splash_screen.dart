@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:truckcalc/Service/Controller/auth_controller.dart';
 import 'package:truckcalc/View/Screen/BottomNavBarScreen/bottom_nav_bar.dart';
 import 'package:truckcalc/View/Screen/authentication_screen/log_in_screen.dart';
+import 'package:truckcalc/View/Widgets/app_logo.dart';
 import 'package:truckcalc/View/Widgets/app_background.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -52,12 +53,9 @@ class _SplashScreenState extends State<SplashScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Image.asset(
-                'assets/images/logo-cal.png',
-                width: 120.w,
-                height: 80.h,
-                fit: BoxFit.contain,
-                filterQuality: FilterQuality.high,
+              const AppLogo(
+                width: 120,
+                height: 80,
               ),
               SizedBox(height: 10.h),
               Text(

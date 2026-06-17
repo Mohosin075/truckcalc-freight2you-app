@@ -78,15 +78,15 @@ dev_dependencies:
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/images/logo-square.png"
+  image_path: "assets/images/logo-cal.png"
   remove_alpha_ios: true
   windows:
     generate: true
-    image_path: "assets/images/logo-square.png"
+    image_path: "assets/images/logo-cal.png"
     icon_size: 256
   macos:
     generate: true
-    image_path: "assets/images/logo-square.png"
+    image_path: "assets/images/logo-cal.png"
 
 flutter:
 
