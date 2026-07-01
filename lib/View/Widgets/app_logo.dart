@@ -21,6 +21,7 @@ class AppLogo extends StatelessWidget {
       width: width?.w ?? 100.w,
       height: height?.h ?? 60.h,
       fit: fit,
+      colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
     );
   }
 }

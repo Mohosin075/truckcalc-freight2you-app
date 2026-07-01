@@ -48,7 +48,7 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // store-thump.svg — full-screen app thumbnail/background
+          // store-thump.svg — full-screen thumbnail background
           Positioned.fill(
             child: SvgPicture.asset(
               'assets/images/store-thump.svg',
