@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:truckcalc/Service/Controller/auth_controller.dart';
 import 'package:truckcalc/View/Screen/BottomNavBarScreen/bottom_nav_bar.dart';
 import 'package:truckcalc/View/Screen/authentication_screen/log_in_screen.dart';
 import 'package:truckcalc/View/Widgets/app_logo.dart';
-import 'package:truckcalc/View/Widgets/app_background.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -47,29 +46,24 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: AppBackground(
-        imagePath: 'assets/images/authimg.png',
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const AppLogo(
-                width: 120,
-                height: 80,
-              ),
-              SizedBox(height: 10.h),
-              Text(
-                'truckcalc',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 40.sp,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.2,
-                ),
-              ),
-            ],
+      body: Stack(
+        children: [
+          // store-thump.svg — full-screen app thumbnail/background
+          Positioned.fill(
+            child: SvgPicture.asset(
+              'assets/images/store-thump.svg',
+              fit: BoxFit.cover,
+            ),
           ),
-        ),
+
+          // Only logo SVG centered
+          const Center(
+            child: AppLogo(
+              width: 140,
+              height: 90,
+            ),
+          ),
+        ],
       ),
     );
   }
