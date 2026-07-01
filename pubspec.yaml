@@ -74,6 +74,7 @@ dev_dependencies:
 
   flutter_lints: ^5.0.0
   flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.4.4
 
 flutter_launcher_icons:
   android: "launcher_icon"
@@ -128,3 +129,14 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+flutter_native_splash:
+  color: "#010B0B"
+  image: "assets/images/store-thump.png"
+  fullscreen: true
+  android_12:
+    color: "#010B0B"
+    image: "assets/images/store-thump-icon.png"
+  android: true
+  ios: true
+
