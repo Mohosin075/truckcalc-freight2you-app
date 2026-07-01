@@ -32,7 +32,10 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
       builder: (context, controller, child) {
         return Scaffold(
           extendBody: true,
-          body: _pages[controller.selectedIndex],
+          body: IndexedStack(
+            index: controller.selectedIndex,
+            children: _pages,
+          ),
           bottomNavigationBar: Container(
             height: 85.h,
             padding: EdgeInsets.only(top: 10.h),
