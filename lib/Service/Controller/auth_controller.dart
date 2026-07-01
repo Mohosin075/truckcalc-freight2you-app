@@ -15,6 +15,7 @@ class AuthController extends ChangeNotifier {
   final FlutterSecureStorage _storage = const FlutterSecureStorage(
     aOptions: AndroidOptions(
       encryptedSharedPreferences: true,
+      resetOnError: true, // auto-clear corrupted data on decryption failure
     ),
   );
 
@@ -207,10 +208,24 @@ class AuthController extends ChangeNotifier {
     _userName = null;
     _isLoggedIn = false;
 
-    await _storage.deleteAll();
-    await GetStorage().erase();
+    // SecureStorage migration may fail (BadPaddingException) — handle gracefully
+    try {
+      await _storage.deleteAll();
+    } catch (e) {
+      debugPrint("⚠️ SecureStorage deleteAll failed (ignored): $e");
+    }
 
-    SocketService().disconnect();
+    try {
+      await GetStorage().erase();
+    } catch (e) {
+      debugPrint("⚠️ GetStorage erase failed (ignored): $e");
+    }
+
+    try {
+      SocketService().disconnect();
+    } catch (e) {
+      debugPrint("⚠️ Socket disconnect failed (ignored): $e");
+    }
 
     debugPrint("🚪 User logged out completely");
     notifyListeners();
