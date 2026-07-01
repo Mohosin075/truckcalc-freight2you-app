@@ -62,17 +62,8 @@ class _LogInScreenState extends State<LogInScreen> {
             children: [
               SizedBox(height: 100.h),
               const AppLogo(
-                width: 100,
-                height: 60,
-              ),
-              SizedBox(height: 10.h),
-              Text(
-                'truckcalc',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 32.sp,
-                  fontWeight: FontWeight.bold,
-                ),
+                width: 240,
+                height: 140,
               ),
               SizedBox(height: 60.h),
               Container(

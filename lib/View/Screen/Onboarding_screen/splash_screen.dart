@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:truckcalc/Service/Controller/auth_controller.dart';
 import 'package:truckcalc/View/Screen/BottomNavBarScreen/bottom_nav_bar.dart';
 import 'package:truckcalc/View/Screen/authentication_screen/log_in_screen.dart';
-import 'package:truckcalc/View/Widgets/app_logo.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -53,14 +52,6 @@ class _SplashScreenState extends State<SplashScreen> {
             child: SvgPicture.asset(
               'assets/images/store-thump.svg',
               fit: BoxFit.cover,
-            ),
-          ),
-
-          // Only logo SVG centered
-          const Center(
-            child: AppLogo(
-              width: 140,
-              height: 90,
             ),
           ),
         ],
