@@ -132,7 +132,7 @@ class CalculationController extends ChangeNotifier {
       List<List<dynamic>> csvRows = [];
 
       // ১. মেইন হেডার
-      csvRows.add(["Freight2You Trucking Financial Report"]);
+      csvRows.add(["Trucking Financial Report"]);
       csvRows.add(["Generated on:", "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year} at ${DateTime.now().hour}:${DateTime.now().minute.toString().padLeft(2, '0')}"]);
       csvRows.add(["Total Calculations:", list.length.toString()]);
       csvRows.add([]); // ফাকা সারি
@@ -324,7 +324,7 @@ class CalculationController extends ChangeNotifier {
                       crossAxisAlignment: pw.CrossAxisAlignment.start,
                       children: [
                         pw.Text(
-                          "Freight2You Trucking Financial Report", 
+                          "Trucking Financial Report", 
                           style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold, color: PdfColors.blueGrey900)
                         ),
                         pw.SizedBox(height: 4),
