@@ -317,7 +317,7 @@ class _LoadCalculatorPageState extends State<LoadCalculatorPage> {
 
   Widget _buildDriverProfitCard() {
     return _buildSectionCard(
-      title: 'DRIVER PROFIT',
+      title: 'PROFIT',
       child: Column(
         children: [
           Row(
