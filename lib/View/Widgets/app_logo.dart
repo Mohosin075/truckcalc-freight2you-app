@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class AppLogo extends StatelessWidget {
   final double? width;
@@ -16,12 +15,17 @@ class AppLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SvgPicture.asset(
-      'assets/images/logo.svg',
-      width: width?.w ?? 100.w,
-      height: height?.h ?? 60.h,
+    // Scale up the logo size by 1.5x to make it look larger and clearer
+    final double computedWidth = (width ?? 130) * 1.5;
+    final double computedHeight = (height ?? 80) * 1.5;
+
+    return Image.asset(
+      'assets/images/logo.png',
+      width: computedWidth.w,
+      height: computedHeight.h,
       fit: fit,
-      colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
     );
   }
 }
+
+
