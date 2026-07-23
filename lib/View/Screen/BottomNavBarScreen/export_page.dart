@@ -46,6 +46,16 @@ class _ExportPageState extends State<ExportPage> {
 
   Future<void> _handleExportPDF() async {
     final controller = Provider.of<CalculationController>(context, listen: false);
+    if (!controller.isPremium) {
+      if (mounted) {
+        showCustomSnackBar(
+          context: context,
+          message: "PDF Export is a Pro/Annual feature. Please upgrade to download PDF reports.",
+          isError: true,
+        );
+      }
+      return;
+    }
     final filePath = await controller.exportDataAsPDF();
     if (mounted) {
       if (filePath != null) {

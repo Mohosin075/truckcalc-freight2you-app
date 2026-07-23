@@ -20,6 +20,14 @@ class CalculationController extends ChangeNotifier {
   Map<String, dynamic>? get stats => _stats;
   String? get errorMessage => _errorMessage;
 
+  bool get isPremium {
+    if (_stats == null) return false;
+    final planName = _stats!['planName'] ?? 'No Plan';
+    final subscriptionStatus = _stats!['subscriptionStatus'] ?? 'none';
+    return (planName == 'Pro' || planName == 'Annual') &&
+        (subscriptionStatus == 'active' || subscriptionStatus == 'trialing');
+  }
+
   Future<bool> createCalculation(Map<String, dynamic> payload) async {
     _inProgress = true;
     _errorMessage = null;
