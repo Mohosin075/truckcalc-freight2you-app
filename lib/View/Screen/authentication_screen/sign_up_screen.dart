@@ -73,21 +73,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
           padding: EdgeInsets.symmetric(horizontal: 24.w),
           child: Column(
             children: [
-              SizedBox(height: 60.h),
+              SizedBox(height: 100.h),
               const AppLogo(
-                width: 100,
-                height: 60,
+                width: 240,
+                height: 140,
               ),
-              SizedBox(height: 10.h),
-              Text(
-                'truckcalc',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 32.sp,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 40.h),
+              SizedBox(height: 60.h),
               Container(
                 padding: EdgeInsets.all(20.w),
                 decoration: BoxDecoration(
