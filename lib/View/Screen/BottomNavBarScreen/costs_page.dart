@@ -73,9 +73,7 @@ class _CostsPageState extends State<CostsPage> {
 
     weeklyFuelCost = (avgMPG > 0) ? (milesPerWeek / avgMPG) * fuelPrice : 0.0;
 
-    int oilChangesYear = int.tryParse(_oilChangesYearController.text) ?? 0;
-    double costPerOilChange = double.tryParse(_costPerOilChangeController.text) ?? 0.0;
-    weeklyOilChangeCost = (oilChangesYear * costPerOilChange) / 52;
+    weeklyOilChangeCost = (avgMPG > 0) ? (milesPerWeek / avgMPG) * fuelPrice : 0.0;
 
     double tireCostYear = double.tryParse(_tireCostYearController.text) ?? 0.0;
     weeklyTireCost = tireCostYear / 52;
