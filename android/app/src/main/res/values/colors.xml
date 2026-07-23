@@ -2,4 +2,5 @@
 <resources>
     <!-- Splash screen background — matches app dark theme, hides Flutter white flash -->
     <color name="splash_background">#010B0B</color>
+	<color name="ic_launcher_background">#010B0B</color>
 </resources>
