@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:truckcalc/Utils/getStartedData.dart';
-import 'package:truckcalc/View/Screen/Onboarding_screen/interest_screen.dart';
+import 'package:truckcalc/View/Screen/authentication_screen/log_in_screen.dart';
 import 'package:truckcalc/View/Widgets/app_background.dart';
 import 'package:truckcalc/View/Widgets/CustomButton.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -25,8 +25,8 @@ class _GetStartScreenState extends State<GetStartScreen> {
           children: [
             Expanded(
               child: PageView.builder(
-                itemCount: getStartedContent.getStartedData.length,
                 controller: _controller,
+                itemCount: getStartedContent.getStartedData.length,
                 onPageChanged: (i) => setState(() => currentPage = i),
                 itemBuilder: (context, index) {
                   final data = getStartedContent.getStartedData[index];
@@ -54,7 +54,7 @@ class _GetStartScreenState extends State<GetStartScreen> {
                   if (currentPage < getStartedContent.getStartedData.length - 1) {
                     _controller.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
                   } else {
-                    Navigator.pushNamed(context, InterestScreen.name);
+                    Navigator.pushNamed(context, LogInScreen.name);
                   }
                 },
               ),

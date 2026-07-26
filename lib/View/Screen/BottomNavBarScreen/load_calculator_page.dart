@@ -201,8 +201,6 @@ class _LoadCalculatorPageState extends State<LoadCalculatorPage> {
                 _buildSummaryTableCard(),
                 SizedBox(height: 16.h),
                 _buildDriverProfitCard(),
-                SizedBox(height: 16.h),
-                _buildEarningsSplitCard(),
                 SizedBox(height: 100.h),
               ],
             ),
@@ -338,21 +336,7 @@ class _LoadCalculatorPageState extends State<LoadCalculatorPage> {
     );
   }
 
-  Widget _buildEarningsSplitCard() {
-    double driverPercentValue = (double.tryParse(_driverPercentController.text) ?? 100);
-    return _buildSectionCard(
-      title: 'Earnings Split',
-      child: Column(
-        children: [
-          _buildInputField('Driver Percentage (%)', _driverPercentController, isInt: true, hintText: '25'),
-          SizedBox(height: 16.h),
-          _buildSplitItem('DRIVER', '${driverPercentValue.toStringAsFixed(1)}%', '\$${driverPay.toStringAsFixed(2)}'),
-          SizedBox(height: 12.h),
-          _buildSplitItem('OWNER', '${(100 - driverPercentValue).toStringAsFixed(1)}%', '\$${ownerPay.toStringAsFixed(2)}', color: const Color(0xFF4C86FF)),
-        ],
-      ),
-    );
-  }
+
 
   Widget _buildSectionCard({required String title, required Widget child}) {
     return Container(
@@ -374,29 +358,7 @@ class _LoadCalculatorPageState extends State<LoadCalculatorPage> {
     );
   }
 
-  Widget _buildSplitItem(String label, String percent, String value, {Color color = const Color(0xFF00D193)}) {
-    return Container(
-      padding: EdgeInsets.all(12.w),
-      decoration: BoxDecoration(
-        color: const Color(0xFF081414),
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(percent, style: TextStyle(color: Colors.white70, fontSize: 10.sp)),
-              Text(value, style: TextStyle(color: color, fontSize: 18.sp, fontWeight: FontWeight.bold)),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+
 
   Widget _buildLabelValue(String label, String value) {
     return Column(
