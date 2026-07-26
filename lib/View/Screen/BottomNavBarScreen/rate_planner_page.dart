@@ -18,7 +18,6 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
   final TextEditingController _dhPayPerMileController = TextEditingController();
   final TextEditingController _daysPerWeekController = TextEditingController();
   final TextEditingController _maxMilesPerDayController = TextEditingController();
-  final TextEditingController _driverPercentController = TextEditingController();
 
   int loadedMilesNeeded = 0;
   double minTargetRate = 0.0;
@@ -26,8 +25,6 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
   double totalCost = 0.0;
   double maxDHPerDay = 0.0;
   double maxDHPerWeek = 0.0;
-  double driverPay = 0.0;
-  double ownerPay = 0.0;
 
   @override
   void initState() {
@@ -37,7 +34,6 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
     _dhPayPerMileController.addListener(_calculate);
     _daysPerWeekController.addListener(_calculate);
     _maxMilesPerDayController.addListener(_calculate);
-    _driverPercentController.addListener(_calculate);
     _calculate();
   }
 
@@ -47,7 +43,6 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
     double dhPayPerMile = double.tryParse(_dhPayPerMileController.text) ?? 0.0;
     int daysPerWeek = int.tryParse(_daysPerWeekController.text) ?? 0;
     int maxMilesPerDay = int.tryParse(_maxMilesPerDayController.text) ?? 0;
-    int driverPercent = int.tryParse(_driverPercentController.text) ?? 100;
 
     int totalMilesPerWeek = daysPerWeek * maxMilesPerDay;
     maxDHPerDay = maxMilesPerDay * 0.20;
@@ -63,9 +58,6 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
       minTargetRate = 0.0;
     }
 
-    driverPay = desiredProfit * (driverPercent / 100);
-    ownerPay = desiredProfit - driverPay;
-
     if (mounted) {
       setState(() {});
     }
@@ -78,7 +70,6 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
     _dhPayPerMileController.dispose();
     _daysPerWeekController.dispose();
     _maxMilesPerDayController.dispose();
-    _driverPercentController.dispose();
     super.dispose();
   }
 
@@ -134,15 +125,15 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
         "deadheadPayPerMile": double.tryParse(_dhPayPerMileController.text) ?? 0.0,
         "daysPerWeek": int.tryParse(_daysPerWeekController.text) ?? 0,
         "maxMilesPerDay": int.tryParse(_maxMilesPerDayController.text) ?? 0,
-        "driverPercentage": int.tryParse(_driverPercentController.text) ?? 100,
+        "driverPercentage": 0,
         "loadedMilesNeeded": loadedMilesNeeded,
         "minTargetRate": minTargetRate,
         "totalRevenue": totalRevenue,
         "totalCost": totalCost,
         "maxDHPerDay": maxDHPerDay,
         "maxDHPerWeek": maxDHPerWeek,
-        "driverPay": driverPay,
-        "ownerPay": ownerPay,
+        "driverPay": 0.0,
+        "ownerPay": 0.0,
       }
     };
 
@@ -201,8 +192,6 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
                 _buildCalculatedTargetsCard(),
                 SizedBox(height: 16.h),
                 _buildDeadheadSuggestionsCard(),
-                SizedBox(height: 16.h),
-                _buildEarningsSplitCard(),
                 SizedBox(height: 100.h),
               ],
             ),
@@ -301,21 +290,7 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
     );
   }
 
-  Widget _buildEarningsSplitCard() {
-    double driverPercentValue = (double.tryParse(_driverPercentController.text) ?? 100);
-    return _buildSectionCard(
-      title: 'Earnings Split',
-      child: Column(
-        children: [
-          _buildInputField('Driver Percentage (%)', _driverPercentController, isInt: true, hintText: '25'),
-          SizedBox(height: 16.h),
-          _buildSplitItem('DRIVER', '${driverPercentValue.toStringAsFixed(1)}%', '\$${driverPay.toStringAsFixed(2)}'),
-          SizedBox(height: 12.h),
-          _buildSplitItem('OWNER', '${(100 - driverPercentValue).toStringAsFixed(1)}%', '\$${ownerPay.toStringAsFixed(2)}', color: const Color(0xFF4C86FF)),
-        ],
-      ),
-    );
-  }
+
 
   Widget _buildSectionCard({required String title, required Widget child}) {
     return Container(
