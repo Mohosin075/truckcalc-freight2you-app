@@ -22,7 +22,7 @@ import 'package:truckcalc/View/view_controller/saved_event_controller.dart';
 import 'package:truckcalc/Service/Controller/notification_controller.dart';
 import 'package:truckcalc/Service/Controller/create_event_controller.dart';
 import 'package:truckcalc/Service/Controller/user_event_controller.dart';
-import 'package:truckcalc/Service/Controller/map_controller.dart';
+
 import 'package:truckcalc/Service/Controller/calculation_controller.dart';
 import 'package:truckcalc/Service/Controller/subscription_controller.dart';
 import 'package:truckcalc/Service/Controller/iap_controller.dart';
@@ -99,13 +99,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => LiveChatController()),
         ChangeNotifierProvider(create: (_) => NotificationController()),
         ChangeNotifierProvider(create: (_) => CreateEventController()),
-        ChangeNotifierProvider(
-          create: (_) {
-            final m = MapController();
-            m.init();
-            return m;
-          },
-        ),
+
         ChangeNotifierProvider(create: (_) => UserEventController()),
         ChangeNotifierProvider(create: (_) => CalculationController()),
         ChangeNotifierProvider(create: (_) => SubscriptionController()),
