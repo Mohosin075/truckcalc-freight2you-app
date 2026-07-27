@@ -200,8 +200,8 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
     final bool showGlobalLoading = iapController.inProgress || _isPurchasing;
 
     // Resolve store-specific prices if loaded
-    String monthlyPriceText = r'$19.99';
-    String yearlyPriceText = r'$119.99';
+    String monthlyPriceText = r'$9.99';
+    String yearlyPriceText = r'$79.99';
 
     for (var p in _products) {
       if (p.id == 'com.freight2you.truckcalc.monthly') {

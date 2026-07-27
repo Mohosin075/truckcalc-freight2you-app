@@ -18,6 +18,7 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
   final TextEditingController _dhPayPerMileController = TextEditingController();
   final TextEditingController _daysPerWeekController = TextEditingController();
   final TextEditingController _maxMilesPerDayController = TextEditingController();
+  final TextEditingController _driverPercentageController = TextEditingController(text: '40');
 
   int loadedMilesNeeded = 0;
   double minTargetRate = 0.0;
@@ -25,6 +26,9 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
   double totalCost = 0.0;
   double maxDHPerDay = 0.0;
   double maxDHPerWeek = 0.0;
+  double driverPay = 0.0;
+  double ownerPay = 0.0;
+  double driverPercentage = 40.0;
 
   @override
   void initState() {
@@ -34,29 +38,34 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
     _dhPayPerMileController.addListener(_calculate);
     _daysPerWeekController.addListener(_calculate);
     _maxMilesPerDayController.addListener(_calculate);
+    _driverPercentageController.addListener(_calculate);
     _calculate();
   }
 
   void _calculate() {
     double desiredProfit = double.tryParse(_desiredProfitController.text) ?? 0.0;
     double costPerMile = double.tryParse(_costPerMileController.text) ?? 0.0;
-    double dhPayPerMile = double.tryParse(_dhPayPerMileController.text) ?? 0.0;
     int daysPerWeek = int.tryParse(_daysPerWeekController.text) ?? 0;
     int maxMilesPerDay = int.tryParse(_maxMilesPerDayController.text) ?? 0;
+    driverPercentage = double.tryParse(_driverPercentageController.text) ?? 40.0;
 
     int totalMilesPerWeek = daysPerWeek * maxMilesPerDay;
     maxDHPerDay = maxMilesPerDay * 0.20;
     maxDHPerWeek = daysPerWeek * maxDHPerDay;
     loadedMilesNeeded = totalMilesPerWeek;
 
-    totalCost = (loadedMilesNeeded + maxDHPerWeek) * costPerMile;
+    // Excel match formulas:
+    totalCost = loadedMilesNeeded * costPerMile;
     totalRevenue = desiredProfit + totalCost;
 
-    if ((loadedMilesNeeded + maxDHPerWeek) > 0) {
-      minTargetRate = totalRevenue / (loadedMilesNeeded + maxDHPerWeek);
+    if (loadedMilesNeeded > 0) {
+      minTargetRate = totalRevenue / loadedMilesNeeded;
     } else {
       minTargetRate = 0.0;
     }
+
+    driverPay = totalRevenue * (driverPercentage / 100);
+    ownerPay = totalRevenue * (1 - (driverPercentage / 100));
 
     if (mounted) {
       setState(() {});
@@ -70,6 +79,7 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
     _dhPayPerMileController.dispose();
     _daysPerWeekController.dispose();
     _maxMilesPerDayController.dispose();
+    _driverPercentageController.dispose();
     super.dispose();
   }
 
@@ -78,6 +88,7 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
     final costPerMile = double.tryParse(_costPerMileController.text.trim());
     final daysPerWeek = int.tryParse(_daysPerWeekController.text.trim());
     final maxMilesPerDay = int.tryParse(_maxMilesPerDayController.text.trim());
+    final driverPercentageVal = int.tryParse(_driverPercentageController.text.trim()) ?? 40;
 
     if (desiredProfit == null || desiredProfit <= 0) {
       showCustomSnackBar(
@@ -120,20 +131,20 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
     final payload = {
       "type": "GOAL",
       "goalData": {
-        "desiredWeeklyProfit": double.tryParse(_desiredProfitController.text) ?? 0.0,
-        "costPerMile": double.tryParse(_costPerMileController.text) ?? 0.0,
+        "desiredWeeklyProfit": desiredProfit,
+        "costPerMile": costPerMile,
         "deadheadPayPerMile": double.tryParse(_dhPayPerMileController.text) ?? 0.0,
-        "daysPerWeek": int.tryParse(_daysPerWeekController.text) ?? 0,
-        "maxMilesPerDay": int.tryParse(_maxMilesPerDayController.text) ?? 0,
-        "driverPercentage": 0,
+        "daysPerWeek": daysPerWeek,
+        "maxMilesPerDay": maxMilesPerDay,
+        "driverPercentage": driverPercentageVal,
         "loadedMilesNeeded": loadedMilesNeeded,
         "minTargetRate": minTargetRate,
         "totalRevenue": totalRevenue,
         "totalCost": totalCost,
         "maxDHPerDay": maxDHPerDay,
         "maxDHPerWeek": maxDHPerWeek,
-        "driverPay": 0.0,
-        "ownerPay": 0.0,
+        "driverPay": driverPay,
+        "ownerPay": ownerPay,
       }
     };
 
@@ -190,6 +201,8 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
                 _buildGoalSettingsCard(),
                 SizedBox(height: 16.h),
                 _buildCalculatedTargetsCard(),
+                SizedBox(height: 16.h),
+                _buildEarningsSplitCard(),
                 SizedBox(height: 16.h),
                 _buildDeadheadSuggestionsCard(),
                 SizedBox(height: 100.h),
@@ -251,6 +264,24 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
               Expanded(child: _buildInputField('Desired Max Miles/Day', _maxMilesPerDayController, isInt: true, hintText: '600')),
             ],
           ),
+          _buildInputField(r'Driver Share Percentage (%)', _driverPercentageController, isInt: true, hintText: '40'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEarningsSplitCard() {
+    double ownerPercentage = 100.0 - driverPercentage;
+    if (ownerPercentage < 0) ownerPercentage = 0.0;
+    return _buildSectionCard(
+      title: 'Earnings Split',
+      child: Column(
+        children: [
+          _buildSplitItem('DRIVER', '${driverPercentage.toStringAsFixed(2)}%', '\$${driverPay.toStringAsFixed(2)}'),
+          SizedBox(height: 12.h),
+          _buildSplitItem('OWNER', '${ownerPercentage.toStringAsFixed(2)}%', '\$${ownerPay.toStringAsFixed(2)}', color: const Color(0xFF00D193)),
+          SizedBox(height: 12.h),
+          _buildSplitItem('TOTAL', '100.00%', '\$${(driverPay + ownerPay).toStringAsFixed(2)}', color: Colors.white),
         ],
       ),
     );
