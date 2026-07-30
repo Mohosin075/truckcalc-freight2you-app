@@ -437,7 +437,16 @@ class _LoadCalculatorPageState extends State<LoadCalculatorPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.w600)),
+        SizedBox(
+          height: 32.h,
+          child: Align(
+            alignment: Alignment.bottomLeft,
+            child: Text(
+              label,
+              style: TextStyle(color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.w600),
+            ),
+          ),
+        ),
         SizedBox(height: 8.h),
         TextField(
           controller: controller,

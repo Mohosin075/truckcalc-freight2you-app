@@ -512,10 +512,17 @@ class _CostsPageState extends State<CostsPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: EdgeInsets.only(top: 14.h, bottom: 8.h),
-          child: Text(label, style: TextStyle(color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.w600)),
+        SizedBox(
+          height: 32.h,
+          child: Align(
+            alignment: Alignment.bottomLeft,
+            child: Text(
+              label,
+              style: TextStyle(color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.w600),
+            ),
+          ),
         ),
+        SizedBox(height: 8.h),
         TextField(
           controller: controller,
           keyboardType: TextInputType.numberWithOptions(decimal: !isInt),

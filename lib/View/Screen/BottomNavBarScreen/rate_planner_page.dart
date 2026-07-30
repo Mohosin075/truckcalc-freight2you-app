@@ -19,10 +19,8 @@ class RatePlannerPage extends StatefulWidget {
 class _RatePlannerPageState extends State<RatePlannerPage> {
   final TextEditingController _desiredProfitController = TextEditingController();
   final TextEditingController _costPerMileController = TextEditingController();
-  final TextEditingController _dhPayPerMileController = TextEditingController();
   final TextEditingController _daysPerWeekController = TextEditingController();
   final TextEditingController _maxMilesPerDayController = TextEditingController();
-  final TextEditingController _driverPercentageController = TextEditingController(text: '40');
 
   int loadedMilesNeeded = 0;
   double minTargetRate = 0.0;
@@ -30,9 +28,6 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
   double totalCost = 0.0;
   double maxDHPerDay = 0.0;
   double maxDHPerWeek = 0.0;
-  double driverPay = 0.0;
-  double ownerPay = 0.0;
-  double driverPercentage = 40.0;
 
   void _loadInputsFromStorage() {
     final box = GetStorage();
@@ -40,10 +35,8 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
     final Map<String, dynamic> inputs = rawInputs is Map ? Map<String, dynamic>.from(rawInputs) : {};
     _desiredProfitController.text = inputs['desiredWeeklyProfit']?.toString() ?? '';
     _costPerMileController.text = inputs['costPerMile']?.toString() ?? '';
-    _dhPayPerMileController.text = inputs['deadheadPayPerMile']?.toString() ?? '';
     _daysPerWeekController.text = inputs['daysPerWeek']?.toString() ?? '';
     _maxMilesPerDayController.text = inputs['maxMilesPerDay']?.toString() ?? '';
-    _driverPercentageController.text = inputs['driverPercentage']?.toString() ?? '40';
   }
 
   @override
@@ -52,10 +45,8 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
     _loadInputsFromStorage();
     _desiredProfitController.addListener(_calculate);
     _costPerMileController.addListener(_calculate);
-    _dhPayPerMileController.addListener(_calculate);
     _daysPerWeekController.addListener(_calculate);
     _maxMilesPerDayController.addListener(_calculate);
-    _driverPercentageController.addListener(_calculate);
     _calculate();
   }
 
@@ -64,7 +55,6 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
     double costPerMile = double.tryParse(_costPerMileController.text) ?? 0.0;
     int daysPerWeek = int.tryParse(_daysPerWeekController.text) ?? 0;
     int maxMilesPerDay = int.tryParse(_maxMilesPerDayController.text) ?? 0;
-    driverPercentage = double.tryParse(_driverPercentageController.text) ?? 40.0;
 
     int totalMilesPerWeek = daysPerWeek * maxMilesPerDay;
     maxDHPerDay = maxMilesPerDay * 0.20;
@@ -81,9 +71,6 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
       minTargetRate = 0.0;
     }
 
-    driverPay = totalRevenue * (driverPercentage / 100);
-    ownerPay = totalRevenue * (1 - (driverPercentage / 100));
-
     if (mounted) {
       setState(() {});
     }
@@ -92,10 +79,8 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
     final draftData = {
       "desiredWeeklyProfit": _desiredProfitController.text.trim().isEmpty ? null : double.tryParse(_desiredProfitController.text),
       "costPerMile": _costPerMileController.text.trim().isEmpty ? null : double.tryParse(_costPerMileController.text),
-      "deadheadPayPerMile": _dhPayPerMileController.text.trim().isEmpty ? null : double.tryParse(_dhPayPerMileController.text),
       "daysPerWeek": _daysPerWeekController.text.trim().isEmpty ? null : int.tryParse(_daysPerWeekController.text),
       "maxMilesPerDay": _maxMilesPerDayController.text.trim().isEmpty ? null : int.tryParse(_maxMilesPerDayController.text),
-      "driverPercentage": _driverPercentageController.text.trim().isEmpty ? null : double.tryParse(_driverPercentageController.text),
     };
     box.write('rate_inputs', draftData);
   }
@@ -104,10 +89,8 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
   void dispose() {
     _desiredProfitController.dispose();
     _costPerMileController.dispose();
-    _dhPayPerMileController.dispose();
     _daysPerWeekController.dispose();
     _maxMilesPerDayController.dispose();
-    _driverPercentageController.dispose();
     super.dispose();
   }
 
@@ -116,7 +99,6 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
     final costPerMile = double.tryParse(_costPerMileController.text.trim());
     final daysPerWeek = int.tryParse(_daysPerWeekController.text.trim());
     final maxMilesPerDay = int.tryParse(_maxMilesPerDayController.text.trim());
-    final driverPercentageVal = int.tryParse(_driverPercentageController.text.trim()) ?? 40;
 
     if (desiredProfit == null || desiredProfit <= 0) {
       showCustomSnackBar(
@@ -161,18 +143,14 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
       "goalData": {
         "desiredWeeklyProfit": desiredProfit,
         "costPerMile": costPerMile,
-        "deadheadPayPerMile": double.tryParse(_dhPayPerMileController.text) ?? 0.0,
         "daysPerWeek": daysPerWeek,
         "maxMilesPerDay": maxMilesPerDay,
-        "driverPercentage": driverPercentageVal,
         "loadedMilesNeeded": loadedMilesNeeded,
         "minTargetRate": minTargetRate,
         "totalRevenue": totalRevenue,
         "totalCost": totalCost,
         "maxDHPerDay": maxDHPerDay,
         "maxDHPerWeek": maxDHPerWeek,
-        "driverPay": driverPay,
-        "ownerPay": ownerPay,
       }
     };
 
@@ -230,8 +208,6 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
                 SizedBox(height: 16.h),
                 _buildCalculatedTargetsCard(),
                 SizedBox(height: 16.h),
-                _buildEarningsSplitCard(),
-                SizedBox(height: 16.h),
                 _buildDeadheadSuggestionsCard(),
                 SizedBox(height: 100.h),
               ],
@@ -257,7 +233,7 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
           SizedBox(height: 16.h),
           Row(
             children: [
-              _buildTargetItem('Miles Needed', '$loadedMilesNeeded'),
+              _buildTargetItem('Total Miles Needed', '$loadedMilesNeeded'),
               SizedBox(width: 40.w),
               _buildTargetItem('Min Rate/Mile', '\$${minTargetRate.toStringAsFixed(2)}'),
             ],
@@ -284,32 +260,13 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
         children: [
           _buildInputField(r'Desired Weekly Profit ($)', _desiredProfitController, hintText: '2000'),
           _buildInputField(r'Cost Per Mile ($)', _costPerMileController, hintText: '1.50'),
-          _buildInputField(r'Deadhead Pay Per Mile ($)', _dhPayPerMileController, hintText: '1.00'),
           Row(
             children: [
-              Expanded(child: _buildInputField('Desired # of Days/Week', _daysPerWeekController, isInt: true, hintText: '5')),
+              Expanded(child: _buildInputField('Desired # of Work Days Per Week', _daysPerWeekController, isInt: true, hintText: '5')),
               SizedBox(width: 16.w),
-              Expanded(child: _buildInputField('Desired Max Miles/Day', _maxMilesPerDayController, isInt: true, hintText: '600')),
+              Expanded(child: _buildInputField('Desired Max Miles Per Day', _maxMilesPerDayController, isInt: true, hintText: '600')),
             ],
           ),
-          _buildInputField(r'Driver Share Percentage (%)', _driverPercentageController, isInt: true, hintText: '40'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEarningsSplitCard() {
-    double ownerPercentage = 100.0 - driverPercentage;
-    if (ownerPercentage < 0) ownerPercentage = 0.0;
-    return _buildSectionCard(
-      title: 'Earnings Split',
-      child: Column(
-        children: [
-          _buildSplitItem('DRIVER', '${driverPercentage.toStringAsFixed(2)}%', '\$${driverPay.toStringAsFixed(2)}'),
-          SizedBox(height: 12.h),
-          _buildSplitItem('OWNER', '${ownerPercentage.toStringAsFixed(2)}%', '\$${ownerPay.toStringAsFixed(2)}', color: const Color(0xFF00D193)),
-          SizedBox(height: 12.h),
-          _buildSplitItem('TOTAL', '100.00%', '\$${(driverPay + ownerPay).toStringAsFixed(2)}', color: Colors.white),
         ],
       ),
     );
@@ -320,9 +277,9 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
       title: 'Calculated Targets',
       child: Column(
         children: [
-          _buildDarkResultBox('LOADED MILES NEEDED PER WEEK', '$loadedMilesNeeded miles', isGlow: true),
+          _buildDarkResultBox('TOTAL MILES NEEDED PER WEEK', '$loadedMilesNeeded miles', isGlow: true),
           SizedBox(height: 12.h),
-          _buildDarkResultBox('MINIMUM TARGET RATE PER MILE', '\$${minTargetRate.toStringAsFixed(2)}', isGlow: true),
+          _buildDarkResultBox('MINIMUM TARGET RATE PER MILE NEEDED', '\$${minTargetRate.toStringAsFixed(2)}', isGlow: true),
           SizedBox(height: 12.h),
           Row(
             children: [
@@ -445,7 +402,16 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.w600)),
+        SizedBox(
+          height: 32.h,
+          child: Align(
+            alignment: Alignment.bottomLeft,
+            child: Text(
+              label,
+              style: TextStyle(color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.w600),
+            ),
+          ),
+        ),
         SizedBox(height: 8.h),
         TextField(
           controller: controller,
