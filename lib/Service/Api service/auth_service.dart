@@ -8,6 +8,7 @@ class AuthService {
     String? name,
     String? phone,
     String? address,
+    String? deviceId,
   }) async {
     return await NetworkCaller.postRequest(
       url: Urls.registrationUrl,
@@ -17,6 +18,7 @@ class AuthService {
         if (name != null) 'name': name,
         if (phone != null) 'phone': phone,
         if (address != null) 'address': address,
+        if (deviceId != null) 'deviceId': deviceId,
       },
       requireAuth: false,
     );
@@ -27,6 +29,7 @@ class AuthService {
     required String password,
     String? deviceToken,
     bool? rememberMe,
+    String? deviceId,
   }) async {
     return await NetworkCaller.postRequest(
       url: Urls.loginUrl,
@@ -35,6 +38,7 @@ class AuthService {
         'password': password,
         if (deviceToken != null) 'deviceToken': deviceToken,
         if (rememberMe != null) 'rememberMe': rememberMe,
+        if (deviceId != null) 'deviceId': deviceId,
       },
       requireAuth: false,
     );

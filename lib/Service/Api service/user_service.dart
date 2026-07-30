@@ -38,4 +38,15 @@ class UserService {
   static Future<NetworkResponse> getUserById(String userId) async {
     return await NetworkCaller.getRequest(url: Urls.getUserByIdUrl(userId));
   }
+
+  static Future<NetworkResponse> saveDraft(Map<String, dynamic> draftData) async {
+    return await NetworkCaller.patchRequest(
+      url: Urls.userDraftUrl,
+      body: draftData,
+    );
+  }
+
+  static Future<NetworkResponse> getDraft() async {
+    return await NetworkCaller.getRequest(url: Urls.userDraftUrl);
+  }
 }

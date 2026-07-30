@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:truckcalc/Service/Api%20Service/network_caller.dart';
 import 'package:truckcalc/Service/urls.dart';
+import 'package:truckcalc/Utils/device_util.dart';
 import 'package:truckcalc/View/Screen/authentication_screen/verify_account.dart';
 import 'package:truckcalc/View/Widgets/customSnacBar.dart';
 
@@ -22,12 +23,14 @@ class SignUpController extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
 
+    final String? deviceId = await DeviceUtil.getDeviceId();
     final body = {
       "name": name,
       "email": email,
       "password": password,
       if (phone != null) "phone": phone,
       if (address != null) "address": address,
+      if (deviceId != null) "deviceId": deviceId,
     };
 
     try {

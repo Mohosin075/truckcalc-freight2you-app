@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:truckcalc/Service/Controller/calculation_controller.dart';
 import 'package:truckcalc/View/Widgets/app_background.dart';
 import 'package:truckcalc/View/Widgets/customSnacBar.dart';
@@ -30,9 +31,21 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
   double ownerPay = 0.0;
   double driverPercentage = 40.0;
 
+  void _loadInputsFromStorage() {
+    final box = GetStorage();
+    final inputs = box.read<Map<dynamic, dynamic>>('rate_inputs') ?? {};
+    _desiredProfitController.text = inputs['desiredWeeklyProfit']?.toString() ?? '';
+    _costPerMileController.text = inputs['costPerMile']?.toString() ?? '';
+    _dhPayPerMileController.text = inputs['deadheadPayPerMile']?.toString() ?? '';
+    _daysPerWeekController.text = inputs['daysPerWeek']?.toString() ?? '';
+    _maxMilesPerDayController.text = inputs['maxMilesPerDay']?.toString() ?? '';
+    _driverPercentageController.text = inputs['driverPercentage']?.toString() ?? '40';
+  }
+
   @override
   void initState() {
     super.initState();
+    _loadInputsFromStorage();
     _desiredProfitController.addListener(_calculate);
     _costPerMileController.addListener(_calculate);
     _dhPayPerMileController.addListener(_calculate);
@@ -70,6 +83,16 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
     if (mounted) {
       setState(() {});
     }
+
+    final box = GetStorage();
+    box.write('rate_inputs', {
+      "desiredWeeklyProfit": double.tryParse(_desiredProfitController.text) ?? 0.0,
+      "costPerMile": double.tryParse(_costPerMileController.text) ?? 0.0,
+      "deadheadPayPerMile": double.tryParse(_dhPayPerMileController.text) ?? 0.0,
+      "daysPerWeek": int.tryParse(_daysPerWeekController.text) ?? 0,
+      "maxMilesPerDay": int.tryParse(_maxMilesPerDayController.text) ?? 0,
+      "driverPercentage": double.tryParse(_driverPercentageController.text) ?? 40.0,
+    });
   }
 
   @override

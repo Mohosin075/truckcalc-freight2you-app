@@ -27,6 +27,7 @@ class Urls {
   static const String userProfileUrl = "$baseUrl/user/profile";
   static String getUserByIdUrl(String id) => "$baseUrl/user/$id";
   static const String updateProfileUrl = "$baseUrl/user/update-profile";
+  static const String userDraftUrl = "$baseUrl/user/draft";
 
   static const String calculationsUrl = "$baseUrl/calculations";
   static const String calculationStatsUrl = "$baseUrl/calculations/stats";

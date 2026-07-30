@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:truckcalc/Service/Controller/calculation_controller.dart';
 import 'package:truckcalc/View/Widgets/app_background.dart';
 import 'package:truckcalc/View/Widgets/customSnacBar.dart';
@@ -35,9 +36,25 @@ class _LoadCalculatorPageState extends State<LoadCalculatorPage> {
   double driverPay = 0.0;
   double ownerPay = 0.0;
 
+  void _loadInputsFromStorage() {
+    final box = GetStorage();
+    final inputs = box.read<Map<dynamic, dynamic>>('load_inputs') ?? {};
+    _loadNumberController.text = inputs['loadNumber']?.toString() ?? '';
+    _baseRateController.text = inputs['baseRate']?.toString() ?? '';
+    _fscController.text = inputs['fuelSurcharge']?.toString() ?? '';
+    _loadedMilesController.text = inputs['loadedMiles']?.toString() ?? '';
+    _tollsController.text = inputs['tolls']?.toString() ?? '';
+    _dhMilesController.text = inputs['dhMiles']?.toString() ?? '';
+    _dhRateController.text = inputs['dhRate']?.toString() ?? '';
+    _bonusController.text = inputs['bonus']?.toString() ?? '';
+    _driverPercentController.text = inputs['driverPercentage']?.toString() ?? '';
+    _costPerMileController.text = inputs['costPerMile']?.toString() ?? '';
+  }
+
   @override
   void initState() {
     super.initState();
+    _loadInputsFromStorage();
     _baseRateController.addListener(_calculate);
     _fscController.addListener(_calculate);
     _loadedMilesController.addListener(_calculate);
@@ -75,6 +92,20 @@ class _LoadCalculatorPageState extends State<LoadCalculatorPage> {
     if (mounted) {
       setState(() {});
     }
+
+    final box = GetStorage();
+    box.write('load_inputs', {
+      "loadNumber": _loadNumberController.text.trim(),
+      "baseRate": double.tryParse(_baseRateController.text) ?? 0.0,
+      "fuelSurcharge": double.tryParse(_fscController.text) ?? 0.0,
+      "loadedMiles": int.tryParse(_loadedMilesController.text) ?? 0,
+      "tolls": double.tryParse(_tollsController.text) ?? 0.0,
+      "dhMiles": int.tryParse(_dhMilesController.text) ?? 0,
+      "dhRate": double.tryParse(_dhRateController.text) ?? 0.0,
+      "bonus": double.tryParse(_bonusController.text) ?? 0.0,
+      "driverPercentage": int.tryParse(_driverPercentController.text) ?? 100,
+      "costPerMile": double.tryParse(_costPerMileController.text) ?? 0.0,
+    });
   }
 
   @override

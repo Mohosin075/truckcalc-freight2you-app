@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:truckcalc/Service/Controller/calculation_controller.dart';
 import 'package:truckcalc/View/Widgets/app_background.dart';
 import 'package:truckcalc/View/Widgets/customSnacBar.dart';
@@ -40,9 +41,29 @@ class _CostsPageState extends State<CostsPage> {
   double totalWeeklyOperatingCost = 0.0;
   double trueCPM = 0.0;
 
+  void _loadInputsFromStorage() {
+    final box = GetStorage();
+    final inputs = box.read<Map<dynamic, dynamic>>('cost_inputs') ?? {};
+    _insuranceController.text = inputs['insurance']?.toString() ?? '';
+    _truckPaymentController.text = inputs['truckPayment']?.toString() ?? '';
+    _escrowController.text = inputs['escrow']?.toString() ?? '';
+    _repairSavingsController.text = inputs['repairSavings']?.toString() ?? '';
+    _driverPayFixedController.text = inputs['driverPayFixed']?.toString() ?? '';
+    _permitsController.text = inputs['permits']?.toString() ?? '';
+    _otherFixedController.text = inputs['otherFixed']?.toString() ?? '';
+    _milesPerWeekController.text = inputs['milesPerWeek']?.toString() ?? '';
+    _avgMPGController.text = inputs['avgMPG']?.toString() ?? '';
+    _fuelPriceController.text = inputs['fuelPrice']?.toString() ?? '';
+    _oilChangesYearController.text = inputs['oilChangesYear']?.toString() ?? '';
+    _costPerOilChangeController.text = inputs['costPerOilChange']?.toString() ?? '';
+    _tireCostYearController.text = inputs['tireCostYear']?.toString() ?? '';
+    _maintenanceCostYearController.text = inputs['maintenanceCostYear']?.toString() ?? '';
+  }
+
   @override
   void initState() {
     super.initState();
+    _loadInputsFromStorage();
     List<TextEditingController> controllers = [
       _insuranceController, _truckPaymentController, _escrowController,
       _repairSavingsController, _driverPayFixedController, _permitsController,
@@ -90,6 +111,24 @@ class _CostsPageState extends State<CostsPage> {
     if (mounted) {
       setState(() {});
     }
+
+    final box = GetStorage();
+    box.write('cost_inputs', {
+      "insurance": double.tryParse(_insuranceController.text) ?? 0.0,
+      "truckPayment": double.tryParse(_truckPaymentController.text) ?? 0.0,
+      "escrow": double.tryParse(_escrowController.text) ?? 0.0,
+      "repairSavings": double.tryParse(_repairSavingsController.text) ?? 0.0,
+      "driverPayFixed": double.tryParse(_driverPayFixedController.text) ?? 0.0,
+      "permits": double.tryParse(_permitsController.text) ?? 0.0,
+      "otherFixed": double.tryParse(_otherFixedController.text) ?? 0.0,
+      "milesPerWeek": int.tryParse(_milesPerWeekController.text) ?? 0,
+      "avgMPG": double.tryParse(_avgMPGController.text) ?? 0.0,
+      "fuelPrice": double.tryParse(_fuelPriceController.text) ?? 0.0,
+      "oilChangesYear": int.tryParse(_oilChangesYearController.text) ?? 0,
+      "costPerOilChange": double.tryParse(_costPerOilChangeController.text) ?? 0.0,
+      "tireCostYear": double.tryParse(_tireCostYearController.text) ?? 0.0,
+      "maintenanceCostYear": double.tryParse(_maintenanceCostYearController.text) ?? 0.0,
+    });
   }
 
   @override
