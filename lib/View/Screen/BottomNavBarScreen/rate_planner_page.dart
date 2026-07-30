@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:truckcalc/Service/Controller/calculation_controller.dart';
+import 'package:truckcalc/Service/Controller/auth_controller.dart';
+import 'package:truckcalc/Service/Api%20service/user_service.dart';
 import 'package:truckcalc/View/Widgets/app_background.dart';
 import 'package:truckcalc/View/Widgets/customSnacBar.dart';
 
@@ -33,7 +36,8 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
 
   void _loadInputsFromStorage() {
     final box = GetStorage();
-    final inputs = box.read<Map<dynamic, dynamic>>('rate_inputs') ?? {};
+    final rawInputs = box.read('rate_inputs');
+    final Map<String, dynamic> inputs = rawInputs is Map ? Map<String, dynamic>.from(rawInputs) : {};
     _desiredProfitController.text = inputs['desiredWeeklyProfit']?.toString() ?? '';
     _costPerMileController.text = inputs['costPerMile']?.toString() ?? '';
     _dhPayPerMileController.text = inputs['deadheadPayPerMile']?.toString() ?? '';
@@ -85,14 +89,15 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
     }
 
     final box = GetStorage();
-    box.write('rate_inputs', {
-      "desiredWeeklyProfit": double.tryParse(_desiredProfitController.text) ?? 0.0,
-      "costPerMile": double.tryParse(_costPerMileController.text) ?? 0.0,
-      "deadheadPayPerMile": double.tryParse(_dhPayPerMileController.text) ?? 0.0,
-      "daysPerWeek": int.tryParse(_daysPerWeekController.text) ?? 0,
-      "maxMilesPerDay": int.tryParse(_maxMilesPerDayController.text) ?? 0,
-      "driverPercentage": double.tryParse(_driverPercentageController.text) ?? 40.0,
-    });
+    final draftData = {
+      "desiredWeeklyProfit": _desiredProfitController.text.trim().isEmpty ? null : double.tryParse(_desiredProfitController.text),
+      "costPerMile": _costPerMileController.text.trim().isEmpty ? null : double.tryParse(_costPerMileController.text),
+      "deadheadPayPerMile": _dhPayPerMileController.text.trim().isEmpty ? null : double.tryParse(_dhPayPerMileController.text),
+      "daysPerWeek": _daysPerWeekController.text.trim().isEmpty ? null : int.tryParse(_daysPerWeekController.text),
+      "maxMilesPerDay": _maxMilesPerDayController.text.trim().isEmpty ? null : int.tryParse(_maxMilesPerDayController.text),
+      "driverPercentage": _driverPercentageController.text.trim().isEmpty ? null : double.tryParse(_driverPercentageController.text),
+    };
+    box.write('rate_inputs', draftData);
   }
 
   @override

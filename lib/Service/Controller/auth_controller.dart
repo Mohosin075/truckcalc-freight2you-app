@@ -108,7 +108,6 @@ class AuthController extends ChangeNotifier {
     required String password,
     required BuildContext context,
   }) async {
-    if (_isLoggedIn) return true;
 
     try {
       final String? deviceId = await DeviceUtil.getDeviceId();
@@ -154,20 +153,41 @@ class AuthController extends ChangeNotifier {
 
         // Fetch draft from backend and save to GetStorage
         try {
+          final box = GetStorage();
+          
+          // 1. Restore user-specific local backup if exists, to prevent blank inputs while fetching
+          final localLoad = box.read('load_inputs_$userId');
+          final localCost = box.read('cost_inputs_$userId');
+          final localRate = box.read('rate_inputs_$userId');
+          
+          if (localLoad != null) box.write('load_inputs', localLoad);
+          if (localCost != null) box.write('cost_inputs', localCost);
+          if (localRate != null) box.write('rate_inputs', localRate);
+
+          // 2. Fetch latest draft from backend to override and sync
           final draftResponse = await UserService.getDraft();
+          debugPrint("🔄 Get Draft API response: Status: ${draftResponse.statusCode}, Success: ${draftResponse.isSuccess}, Body: ${draftResponse.body}");
+          
           if (draftResponse.isSuccess && draftResponse.body != null) {
             final draftMap = draftResponse.body!['data'] ?? {};
-            final box = GetStorage();
             if (draftMap['loadCalculator'] != null) {
-              box.write('load_inputs', draftMap['loadCalculator']);
+              final Map<String, dynamic> loadData = Map<String, dynamic>.from(draftMap['loadCalculator']);
+              box.write('load_inputs', loadData);
+              box.write('load_inputs_$userId', loadData);
             }
             if (draftMap['costsCalculator'] != null) {
-              box.write('cost_inputs', draftMap['costsCalculator']);
+              final Map<String, dynamic> costData = Map<String, dynamic>.from(draftMap['costsCalculator']);
+              box.write('cost_inputs', costData);
+              box.write('cost_inputs_$userId', costData);
             }
             if (draftMap['ratePlanner'] != null) {
-              box.write('rate_inputs', draftMap['ratePlanner']);
+              final Map<String, dynamic> rateData = Map<String, dynamic>.from(draftMap['ratePlanner']);
+              box.write('rate_inputs', rateData);
+              box.write('rate_inputs_$userId', rateData);
             }
             debugPrint("✅ Draft retrieved and saved to GetStorage on login");
+          } else {
+            debugPrint("❌ Get Draft API failed: ${draftResponse.errorMessage}");
           }
         } catch (e) {
           debugPrint("⚠️ Failed to load draft on login: $e");
@@ -227,23 +247,23 @@ class AuthController extends ChangeNotifier {
 
   // লগআউট আপডেট করা
   Future<void> logout() async {
-    // 1. Sync current local storage inputs to the backend database before logging out
+    final currentUserId = _userId;
+    
+    // Save user-specific local copy before logging out
     try {
       final box = GetStorage();
-      final loadInputs = box.read<Map<dynamic, dynamic>>('load_inputs') ?? {};
-      final costInputs = box.read<Map<dynamic, dynamic>>('cost_inputs') ?? {};
-      final rateInputs = box.read<Map<dynamic, dynamic>>('rate_inputs') ?? {};
+      final Map<String, dynamic> loadInputs = Map<String, dynamic>.from(box.read('load_inputs') ?? {});
+      final Map<String, dynamic> costInputs = Map<String, dynamic>.from(box.read('cost_inputs') ?? {});
+      final Map<String, dynamic> rateInputs = Map<String, dynamic>.from(box.read('rate_inputs') ?? {});
 
-      if (loadInputs.isNotEmpty || costInputs.isNotEmpty || rateInputs.isNotEmpty) {
-        await UserService.saveDraft({
-          'loadCalculator': loadInputs,
-          'costsCalculator': costInputs,
-          'ratePlanner': rateInputs,
-        });
-        debugPrint("✅ Draft synced to backend before logout");
+      if (currentUserId != null && currentUserId.isNotEmpty) {
+        box.write('load_inputs_$currentUserId', loadInputs);
+        box.write('cost_inputs_$currentUserId', costInputs);
+        box.write('rate_inputs_$currentUserId', rateInputs);
+        debugPrint("💾 User-specific backups saved locally before logout");
       }
     } catch (e) {
-      debugPrint("⚠️ Failed to sync draft before logout: $e");
+      debugPrint("⚠️ Failed to save local backup before logout: $e");
     }
 
     _accessToken = null;
@@ -259,10 +279,15 @@ class AuthController extends ChangeNotifier {
       debugPrint("⚠️ SecureStorage deleteAll failed (ignored): $e");
     }
 
+    // Clean up default keys, but do NOT erase() the whole GetStorage (keeps user-specific backups)
     try {
-      await GetStorage().erase();
+      final box = GetStorage();
+      await box.remove('load_inputs');
+      await box.remove('cost_inputs');
+      await box.remove('rate_inputs');
+      debugPrint("🧹 Default calculator inputs removed from GetStorage");
     } catch (e) {
-      debugPrint("⚠️ GetStorage erase failed (ignored): $e");
+      debugPrint("⚠️ GetStorage key removal failed (ignored): $e");
     }
 
     try {

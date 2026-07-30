@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:truckcalc/Service/Controller/calculation_controller.dart';
+import 'package:truckcalc/Service/Controller/auth_controller.dart';
+import 'package:truckcalc/Service/Api%20service/user_service.dart';
 import 'package:truckcalc/View/Widgets/app_background.dart';
 import 'package:truckcalc/View/Widgets/customSnacBar.dart';
 
@@ -43,7 +46,8 @@ class _CostsPageState extends State<CostsPage> {
 
   void _loadInputsFromStorage() {
     final box = GetStorage();
-    final inputs = box.read<Map<dynamic, dynamic>>('cost_inputs') ?? {};
+    final rawInputs = box.read('cost_inputs');
+    final Map<String, dynamic> inputs = rawInputs is Map ? Map<String, dynamic>.from(rawInputs) : {};
     _insuranceController.text = inputs['insurance']?.toString() ?? '';
     _truckPaymentController.text = inputs['truckPayment']?.toString() ?? '';
     _escrowController.text = inputs['escrow']?.toString() ?? '';
@@ -113,22 +117,23 @@ class _CostsPageState extends State<CostsPage> {
     }
 
     final box = GetStorage();
-    box.write('cost_inputs', {
-      "insurance": double.tryParse(_insuranceController.text) ?? 0.0,
-      "truckPayment": double.tryParse(_truckPaymentController.text) ?? 0.0,
-      "escrow": double.tryParse(_escrowController.text) ?? 0.0,
-      "repairSavings": double.tryParse(_repairSavingsController.text) ?? 0.0,
-      "driverPayFixed": double.tryParse(_driverPayFixedController.text) ?? 0.0,
-      "permits": double.tryParse(_permitsController.text) ?? 0.0,
-      "otherFixed": double.tryParse(_otherFixedController.text) ?? 0.0,
-      "milesPerWeek": int.tryParse(_milesPerWeekController.text) ?? 0,
-      "avgMPG": double.tryParse(_avgMPGController.text) ?? 0.0,
-      "fuelPrice": double.tryParse(_fuelPriceController.text) ?? 0.0,
-      "oilChangesYear": int.tryParse(_oilChangesYearController.text) ?? 0,
-      "costPerOilChange": double.tryParse(_costPerOilChangeController.text) ?? 0.0,
-      "tireCostYear": double.tryParse(_tireCostYearController.text) ?? 0.0,
-      "maintenanceCostYear": double.tryParse(_maintenanceCostYearController.text) ?? 0.0,
-    });
+    final draftData = {
+      "insurance": _insuranceController.text.trim().isEmpty ? null : double.tryParse(_insuranceController.text),
+      "truckPayment": _truckPaymentController.text.trim().isEmpty ? null : double.tryParse(_truckPaymentController.text),
+      "escrow": _escrowController.text.trim().isEmpty ? null : double.tryParse(_escrowController.text),
+      "repairSavings": _repairSavingsController.text.trim().isEmpty ? null : double.tryParse(_repairSavingsController.text),
+      "driverPayFixed": _driverPayFixedController.text.trim().isEmpty ? null : double.tryParse(_driverPayFixedController.text),
+      "permits": _permitsController.text.trim().isEmpty ? null : double.tryParse(_permitsController.text),
+      "otherFixed": _otherFixedController.text.trim().isEmpty ? null : double.tryParse(_otherFixedController.text),
+      "milesPerWeek": _milesPerWeekController.text.trim().isEmpty ? null : int.tryParse(_milesPerWeekController.text),
+      "avgMPG": _avgMPGController.text.trim().isEmpty ? null : double.tryParse(_avgMPGController.text),
+      "fuelPrice": _fuelPriceController.text.trim().isEmpty ? null : double.tryParse(_fuelPriceController.text),
+      "oilChangesYear": _oilChangesYearController.text.trim().isEmpty ? null : int.tryParse(_oilChangesYearController.text),
+      "costPerOilChange": _costPerOilChangeController.text.trim().isEmpty ? null : double.tryParse(_costPerOilChangeController.text),
+      "tireCostYear": _tireCostYearController.text.trim().isEmpty ? null : double.tryParse(_tireCostYearController.text),
+      "maintenanceCostYear": _maintenanceCostYearController.text.trim().isEmpty ? null : double.tryParse(_maintenanceCostYearController.text),
+    };
+    box.write('cost_inputs', draftData);
   }
 
   @override

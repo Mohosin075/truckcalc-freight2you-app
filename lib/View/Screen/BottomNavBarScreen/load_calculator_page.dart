@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:truckcalc/Service/Controller/calculation_controller.dart';
+import 'package:truckcalc/Service/Controller/auth_controller.dart';
+import 'package:truckcalc/Service/Api%20service/user_service.dart';
 import 'package:truckcalc/View/Widgets/app_background.dart';
 import 'package:truckcalc/View/Widgets/customSnacBar.dart';
 
@@ -38,7 +41,8 @@ class _LoadCalculatorPageState extends State<LoadCalculatorPage> {
 
   void _loadInputsFromStorage() {
     final box = GetStorage();
-    final inputs = box.read<Map<dynamic, dynamic>>('load_inputs') ?? {};
+    final rawInputs = box.read('load_inputs');
+    final Map<String, dynamic> inputs = rawInputs is Map ? Map<String, dynamic>.from(rawInputs) : {};
     _loadNumberController.text = inputs['loadNumber']?.toString() ?? '';
     _baseRateController.text = inputs['baseRate']?.toString() ?? '';
     _fscController.text = inputs['fuelSurcharge']?.toString() ?? '';
@@ -94,18 +98,19 @@ class _LoadCalculatorPageState extends State<LoadCalculatorPage> {
     }
 
     final box = GetStorage();
-    box.write('load_inputs', {
+    final draftData = {
       "loadNumber": _loadNumberController.text.trim(),
-      "baseRate": double.tryParse(_baseRateController.text) ?? 0.0,
-      "fuelSurcharge": double.tryParse(_fscController.text) ?? 0.0,
-      "loadedMiles": int.tryParse(_loadedMilesController.text) ?? 0,
-      "tolls": double.tryParse(_tollsController.text) ?? 0.0,
-      "dhMiles": int.tryParse(_dhMilesController.text) ?? 0,
-      "dhRate": double.tryParse(_dhRateController.text) ?? 0.0,
-      "bonus": double.tryParse(_bonusController.text) ?? 0.0,
-      "driverPercentage": int.tryParse(_driverPercentController.text) ?? 100,
-      "costPerMile": double.tryParse(_costPerMileController.text) ?? 0.0,
-    });
+      "baseRate": _baseRateController.text.trim().isEmpty ? null : double.tryParse(_baseRateController.text),
+      "fuelSurcharge": _fscController.text.trim().isEmpty ? null : double.tryParse(_fscController.text),
+      "loadedMiles": _loadedMilesController.text.trim().isEmpty ? null : int.tryParse(_loadedMilesController.text),
+      "tolls": _tollsController.text.trim().isEmpty ? null : double.tryParse(_tollsController.text),
+      "dhMiles": _dhMilesController.text.trim().isEmpty ? null : int.tryParse(_dhMilesController.text),
+      "dhRate": _dhRateController.text.trim().isEmpty ? null : double.tryParse(_dhRateController.text),
+      "bonus": _bonusController.text.trim().isEmpty ? null : double.tryParse(_bonusController.text),
+      "driverPercentage": _driverPercentController.text.trim().isEmpty ? null : int.tryParse(_driverPercentController.text),
+      "costPerMile": _costPerMileController.text.trim().isEmpty ? null : double.tryParse(_costPerMileController.text),
+    };
+    box.write('load_inputs', draftData);
   }
 
   @override
