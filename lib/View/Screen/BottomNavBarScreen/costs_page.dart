@@ -58,7 +58,7 @@ class _CostsPageState extends State<CostsPage> {
     _milesPerWeekController.text = inputs['milesPerWeek']?.toString() ?? '';
     _avgMPGController.text = inputs['avgMPG']?.toString() ?? '';
     _fuelPriceController.text = inputs['fuelPrice']?.toString() ?? '';
-    _oilChangesYearController.text = inputs['oilChangesYear']?.toString() ?? '';
+    _oilChangesYearController.text = inputs['oilChangesPerYear']?.toString() ?? '';
     _costPerOilChangeController.text = inputs['costPerOilChange']?.toString() ?? '';
     _tireCostYearController.text = inputs['tireCostYear']?.toString() ?? '';
     _maintenanceCostYearController.text = inputs['maintenanceCostYear']?.toString() ?? '';
@@ -128,7 +128,7 @@ class _CostsPageState extends State<CostsPage> {
       "milesPerWeek": _milesPerWeekController.text.trim().isEmpty ? null : int.tryParse(_milesPerWeekController.text),
       "avgMPG": _avgMPGController.text.trim().isEmpty ? null : double.tryParse(_avgMPGController.text),
       "fuelPrice": _fuelPriceController.text.trim().isEmpty ? null : double.tryParse(_fuelPriceController.text),
-      "oilChangesYear": _oilChangesYearController.text.trim().isEmpty ? null : int.tryParse(_oilChangesYearController.text),
+      "oilChangesPerYear": _oilChangesYearController.text.trim().isEmpty ? null : int.tryParse(_oilChangesYearController.text),
       "costPerOilChange": _costPerOilChangeController.text.trim().isEmpty ? null : double.tryParse(_costPerOilChangeController.text),
       "tireCostYear": _tireCostYearController.text.trim().isEmpty ? null : double.tryParse(_tireCostYearController.text),
       "maintenanceCostYear": _maintenanceCostYearController.text.trim().isEmpty ? null : double.tryParse(_maintenanceCostYearController.text),
