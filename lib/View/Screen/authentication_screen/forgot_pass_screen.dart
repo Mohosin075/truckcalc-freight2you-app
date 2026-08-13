@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
+import 'package:truckcalc/Service/Controller/forgot_pass_controller.dart';
+import 'package:truckcalc/View/Screen/authentication_screen/code_submit.dart';
 import 'package:truckcalc/View/Widgets/app_background.dart';
 import 'package:truckcalc/View/Widgets/app_logo.dart';
 import 'package:truckcalc/View/Widgets/CustomButton.dart';
 import 'package:truckcalc/View/Widgets/auth_textFormField.dart';
+import 'package:truckcalc/View/Widgets/customSnacBar.dart';
 
 class ForgotPassScreen extends StatefulWidget {
   const ForgotPassScreen({super.key});
@@ -16,6 +20,34 @@ class ForgotPassScreen extends StatefulWidget {
 class _ForgotPassScreenState extends State<ForgotPassScreen> {
   final _emailController = TextEditingController();
   bool _isSent = false;
+
+  Future<void> _handleSendResetLink(ForgotPasswordController controller) async {
+    final email = _emailController.text.trim();
+    if (email.isEmpty) {
+      showCustomSnackBar(
+        context: context,
+        message: 'Please enter your email address',
+        isError: true,
+      );
+      return;
+    }
+
+    final success = await controller.forgotPassword(email);
+    if (success && mounted) {
+      showCustomSnackBar(
+        context: context,
+        message: 'OTP sent successfully to $email',
+        isError: false,
+      );
+      Navigator.pushNamed(context, CodeSubmit.name);
+    } else if (mounted) {
+      showCustomSnackBar(
+        context: context,
+        message: controller.errorMessage ?? 'Failed to send OTP',
+        isError: true,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,10 +96,13 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
                         keyboardType: TextInputType.emailAddress,
                       ),
                       SizedBox(height: 24.h),
-                      CustomButton(
-                        buttonName: 'Send reset link',
-                        onPressed: () {
-                          setState(() => _isSent = true);
+                      Consumer<ForgotPasswordController>(
+                        builder: (context, forgotController, child) {
+                          return CustomButton(
+                            buttonName: 'Send reset link',
+                            isLoading: forgotController.inProgress,
+                            onPressed: () => _handleSendResetLink(forgotController),
+                          );
                         },
                       ),
                     ],
