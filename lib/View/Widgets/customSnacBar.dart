@@ -56,7 +56,7 @@ void showCustomSnackBar({
             behavior: HitTestBehavior.opaque,
             onTap: () {
               try {
-                scaffoldMessenger?.hideCurrentSnackBar();
+                scaffoldMessenger.hideCurrentSnackBar();
               } catch (_) {}
               try {
                 ScaffoldMessenger.maybeOf(context)?.hideCurrentSnackBar();

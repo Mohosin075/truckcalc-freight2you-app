@@ -67,7 +67,9 @@ class AppBackground extends StatelessWidget {
           ),
 
           // 4. Content Area
-          child,
+          Positioned.fill(
+            child: child,
+          ),
         ],
       ),
     );
