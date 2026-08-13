@@ -30,11 +30,13 @@ class AuthController extends ChangeNotifier {
   String? _refreshToken;
   String? _userId;
   String? _userName;
+  String? _errorMessage;
 
   String? get accessToken => _accessToken;
   String? get refreshToken => _refreshToken;
   String? get userId => _userId;
   String? get userName => _userName;
+  String? get errorMessage => _errorMessage;
   bool get isLoggedIn => _isLoggedIn;
 
   bool _isLoggedIn = false;
@@ -109,6 +111,8 @@ class AuthController extends ChangeNotifier {
     required BuildContext context,
     bool rememberMe = false,
   }) async {
+    _errorMessage = null;
+    notifyListeners();
 
     try {
       final String? deviceId = await DeviceUtil.getDeviceId();
@@ -142,6 +146,8 @@ class AuthController extends ChangeNotifier {
             'User';
 
         if (accessToken.isEmpty || userId.isEmpty) {
+          _errorMessage = "Missing access token or user ID.";
+          notifyListeners();
           debugPrint("❌ Missing accessToken or userId");
           return false;
         }
@@ -213,10 +219,14 @@ class AuthController extends ChangeNotifier {
         debugPrint("✅ Login successful - User: $userName (ID: $userId)");
         return true;
       } else {
+        _errorMessage = response.errorMessage ?? "Login failed! Please check your credentials.";
+        notifyListeners();
         debugPrint("❌ Login failed: ${response.errorMessage}");
         return false;
       }
     } catch (e) {
+      _errorMessage = e.toString();
+      notifyListeners();
       debugPrint("❌ Login exception: $e");
       return false;
     }

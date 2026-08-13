@@ -31,11 +31,7 @@ class _LogInScreenState extends State<LogInScreen> {
   void initState() {
     super.initState();
     _loadRememberedCredentials();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      try {
-        ScaffoldMessenger.of(context).clearSnackBars();
-      } catch (_) {}
-    });
+    dismissCustomSnackBar();
   }
 
   Future<void> _loadRememberedCredentials() async {
@@ -83,7 +79,7 @@ class _LogInScreenState extends State<LogInScreen> {
       } else {
         showCustomSnackBar(
           context: context,
-          message: "Login failed! Please check your credentials.",
+          message: authController.errorMessage ?? "Login failed! Please check your credentials.",
           isError: true,
         );
       }

@@ -26,11 +26,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      try {
-        ScaffoldMessenger.of(context).clearSnackBars();
-      } catch (_) {}
-    });
+    dismissCustomSnackBar();
   }
 
   @override
