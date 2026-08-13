@@ -10,6 +10,7 @@ import 'package:truckcalc/View/Widgets/CustomButton.dart';
 import 'package:truckcalc/View/Widgets/auth_textFormField.dart';
 import 'package:truckcalc/View/Widgets/customSnacBar.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class LogInScreen extends StatefulWidget {
   const LogInScreen({super.key});
@@ -24,6 +25,38 @@ class _LogInScreenState extends State<LogInScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool _rememberMe = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRememberedCredentials();
+  }
+
+  Future<void> _loadRememberedCredentials() async {
+    const storage = FlutterSecureStorage(
+      aOptions: AndroidOptions(
+        encryptedSharedPreferences: true,
+        resetOnError: true,
+      ),
+    );
+    try {
+      final rememberMeStr = await storage.read(key: 'remember_me');
+      if (rememberMeStr == 'true') {
+        final email = await storage.read(key: 'remembered_email');
+        final password = await storage.read(key: 'remembered_password');
+        if (mounted) {
+          setState(() {
+            _rememberMe = true;
+            if (email != null) _emailController.text = email;
+            if (password != null) _passwordController.text = password;
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint("⚠️ Failed to load remembered credentials: $e");
+    }
+  }
 
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
@@ -35,6 +68,7 @@ class _LogInScreenState extends State<LogInScreen> {
       email: _emailController.text.trim(),
       password: _passwordController.text,
       context: context,
+      rememberMe: _rememberMe,
     );
 
     if (mounted) {
@@ -99,7 +133,29 @@ class _LogInScreenState extends State<LogInScreen> {
                           return null;
                         },
                       ),
-                      SizedBox(height: 24.h),
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: _rememberMe,
+                            activeColor: const Color(0xFF00D193),
+                            checkColor: Colors.black,
+                            side: const BorderSide(color: Colors.white70, width: 1.5),
+                            onChanged: (value) {
+                              setState(() {
+                                _rememberMe = value ?? false;
+                              });
+                            },
+                          ),
+                          Text(
+                            'Remember me',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14.sp,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 12.h),
                       CustomButton(
                         buttonName: 'Sign in',
                         isLoading: _isLoading,

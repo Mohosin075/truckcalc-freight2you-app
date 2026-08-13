@@ -54,7 +54,7 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
     return Scaffold(
       body: AppBackground(
         imagePath: 'assets/images/authimg.png',
-        child: Padding(
+        child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 24.w),
           child: Column(
             children: [

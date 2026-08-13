@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/gestures.dart' show TapGestureRecognizer;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -21,6 +22,41 @@ class CodeSubmit extends StatefulWidget {
 
 class _CodeSubmitState extends State<CodeSubmit> {
   final TextEditingController otpController = TextEditingController();
+  Timer? _timer;
+  int _secondsRemaining = 60;
+  bool _canResend = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
+    setState(() {
+      _secondsRemaining = 60;
+      _canResend = false;
+    });
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) return;
+      setState(() {
+        if (_secondsRemaining > 0) {
+          _secondsRemaining--;
+        } else {
+          _canResend = true;
+          _timer?.cancel();
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    otpController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -121,13 +157,13 @@ class _CodeSubmitState extends State<CodeSubmit> {
                     text: "Don't receive code? ",
                     children: [
                       TextSpan(
-                        text: 'Resend Again',
-                        style: const TextStyle(
-                          color: Color(0xFF00D193),
+                        text: _canResend ? 'Resend Again' : 'Resend in ${_secondsRemaining}s',
+                        style: TextStyle(
+                          color: _canResend ? const Color(0xFF00D193) : Colors.white38,
                           fontWeight: FontWeight.bold,
                         ),
                         recognizer: TapGestureRecognizer()
-                          ..onTap = ontapResendCode,
+                          ..onTap = _canResend ? ontapResendCode : null,
                       ),
                     ],
                   ),
@@ -154,6 +190,7 @@ class _CodeSubmitState extends State<CodeSubmit> {
         message: 'Code resent to ${forgotPassController.savedEmail}',
         isError: false,
       );
+      _startTimer();
     } else if (mounted) {
       showCustomSnackBar(
         context: context,

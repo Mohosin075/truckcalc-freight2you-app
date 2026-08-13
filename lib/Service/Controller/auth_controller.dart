@@ -107,6 +107,7 @@ class AuthController extends ChangeNotifier {
     required String email,
     required String password,
     required BuildContext context,
+    bool rememberMe = false,
   }) async {
 
     try {
@@ -115,6 +116,7 @@ class AuthController extends ChangeNotifier {
         emailOrPhone: email,
         password: password,
         deviceId: deviceId,
+        rememberMe: rememberMe,
       );
 
       if (response.isSuccess && response.body != null) {
@@ -150,6 +152,17 @@ class AuthController extends ChangeNotifier {
           userId: userId,
           userName: userName,
         );
+
+        // Handle "Remember Me" credentials
+        if (rememberMe) {
+          await _storage.write(key: 'remember_me', value: 'true');
+          await _storage.write(key: 'remembered_email', value: email);
+          await _storage.write(key: 'remembered_password', value: password);
+        } else {
+          await _storage.write(key: 'remember_me', value: 'false');
+          await _storage.delete(key: 'remembered_email');
+          await _storage.delete(key: 'remembered_password');
+        }
 
         // Fetch draft from backend and save to GetStorage
         try {
