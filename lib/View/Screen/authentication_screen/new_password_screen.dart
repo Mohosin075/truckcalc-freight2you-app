@@ -24,6 +24,16 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
   final _confirmPassController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      try {
+        ScaffoldMessenger.of(context).clearSnackBars();
+      } catch (_) {}
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: AppBackground(

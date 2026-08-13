@@ -7,8 +7,18 @@ void showCustomSnackBar({
   bool isError = false,
   Duration duration = const Duration(seconds: 4),
 }) {
-  final scaffoldMessenger = ScaffoldMessenger.maybeOf(context) ??
-      AppUtils.scaffoldMessengerKey.currentState;
+  final scaffoldMessenger = AppUtils.scaffoldMessengerKey.currentState ??
+      ScaffoldMessenger.maybeOf(context);
+
+  // Pre-calculate bottom margin using safe context-free platformDispatcher to prevent "deactivated widget's ancestor" exceptions.
+  double bottomMargin = 80.0;
+  try {
+    final view = WidgetsBinding.instance.platformDispatcher.views.first;
+    final screenHeight = view.physicalSize.height / view.devicePixelRatio;
+    bottomMargin = screenHeight * 0.1;
+  } catch (_) {
+    bottomMargin = 80.0;
+  }
 
   scaffoldMessenger?.clearSnackBars();
 
@@ -43,11 +53,25 @@ void showCustomSnackBar({
             ),
           ),
           GestureDetector(
-            onTap: () => scaffoldMessenger?.hideCurrentSnackBar(),
-            child: const Icon(
-              Icons.close_rounded,
-              color: Colors.white70,
-              size: 20,
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
+              try {
+                scaffoldMessenger?.hideCurrentSnackBar();
+              } catch (_) {}
+              try {
+                ScaffoldMessenger.maybeOf(context)?.hideCurrentSnackBar();
+              } catch (_) {}
+              try {
+                AppUtils.scaffoldMessengerKey.currentState?.hideCurrentSnackBar();
+              } catch (_) {}
+            },
+            child: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: Icon(
+                Icons.close_rounded,
+                color: Colors.white70,
+                size: 20,
+              ),
             ),
           ),
         ],
@@ -57,28 +81,7 @@ void showCustomSnackBar({
           : const Color(0xFFCC18CA),
       behavior: SnackBarBehavior.floating,
       margin: EdgeInsets.only(
-        bottom: () {
-          // Use provided context only if it's active
-          if (context.mounted) {
-            try {
-              return MediaQuery.of(context).size.height * 0.1;
-            } catch (e) {
-              debugPrint("CustomSnackBar: MediaQuery failed with context: $e");
-            }
-          }
-          
-          // Fallback to global navigator context
-          final globalCtx = AppUtils.navigatorKey.currentContext;
-          if (globalCtx != null && globalCtx.mounted) {
-            try {
-              return MediaQuery.of(globalCtx).size.height * 0.1;
-            } catch (e) {
-              debugPrint("CustomSnackBar: MediaQuery failed with globalCtx: $e");
-            }
-          }
-          
-          return 80.0; // Hard fallback
-        }(),
+        bottom: bottomMargin,
         left: 20,
         right: 20,
       ),

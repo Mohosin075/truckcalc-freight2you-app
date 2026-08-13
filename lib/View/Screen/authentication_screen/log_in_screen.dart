@@ -31,6 +31,11 @@ class _LogInScreenState extends State<LogInScreen> {
   void initState() {
     super.initState();
     _loadRememberedCredentials();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      try {
+        ScaffoldMessenger.of(context).clearSnackBars();
+      } catch (_) {}
+    });
   }
 
   Future<void> _loadRememberedCredentials() async {

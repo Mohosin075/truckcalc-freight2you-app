@@ -30,6 +30,11 @@ class _CodeSubmitState extends State<CodeSubmit> {
   void initState() {
     super.initState();
     _startTimer();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      try {
+        ScaffoldMessenger.of(context).clearSnackBars();
+      } catch (_) {}
+    });
   }
 
   void _startTimer() {
