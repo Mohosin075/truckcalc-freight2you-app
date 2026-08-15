@@ -402,8 +402,8 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          height: 32.h,
+        Container(
+          constraints: BoxConstraints(minHeight: 32.h),
           child: Align(
             alignment: Alignment.bottomLeft,
             child: Text(

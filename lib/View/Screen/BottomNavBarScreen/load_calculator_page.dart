@@ -437,8 +437,8 @@ class _LoadCalculatorPageState extends State<LoadCalculatorPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          height: 32.h,
+        Container(
+          constraints: BoxConstraints(minHeight: 32.h),
           child: Align(
             alignment: Alignment.bottomLeft,
             child: Text(
