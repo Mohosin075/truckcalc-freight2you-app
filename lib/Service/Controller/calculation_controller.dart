@@ -181,7 +181,7 @@ class CalculationController extends ChangeNotifier {
         csvRows.add(["2. Rate Planner & Weekly Goal Target Calculations"]);
         csvRows.add([
           'Date', 'Desired Profit', 'Miles Needed', 'Min Target Rate', 
-          'Max DH/Week', 'Est. Revenue', 'Est. Cost', 'Driver Share', 'Owner Share'
+          'Est. Revenue', 'Est. Cost', 'Driver Share', 'Owner Share'
         ]);
         
         for (var item in goalCalcs) {
@@ -191,7 +191,6 @@ class CalculationController extends ChangeNotifier {
             formatNum(getValue(item, 'desiredWeeklyProfit'), isCurrency: true),
             formatNum(getValue(item, 'loadedMilesNeeded')),
             formatNum(getValue(item, 'minTargetRate'), isCurrency: true, suffix: "/mi"),
-            formatNum(getValue(item, 'maxDHPerWeek')),
             formatNum(getValue(item, 'totalRevenue'), isCurrency: true),
             formatNum(getValue(item, 'totalCost'), isCurrency: true),
             formatNum(getValue(item, 'driverPay'), isCurrency: true),
@@ -417,7 +416,7 @@ class CalculationController extends ChangeNotifier {
                   cellAlignment: pw.Alignment.center,
                   headers: [
                     'Date', 'Desired Profit', 'Miles Needed', 'Min Target Rate', 
-                    'Max DH/Wk', 'Est. Revenue', 'Est. Cost', 'Driver Share', 'Owner Share'
+                    'Est. Revenue', 'Est. Cost', 'Driver Share', 'Owner Share'
                   ],
                   data: goalCalcs.map((item) {
                     final date = "${item.createdAt.day}/${item.createdAt.month}/${item.createdAt.year}";
@@ -426,7 +425,6 @@ class CalculationController extends ChangeNotifier {
                       formatNum(getValue(item, 'desiredWeeklyProfit'), isCurrency: true),
                       formatNum(getValue(item, 'loadedMilesNeeded')),
                       formatNum(getValue(item, 'minTargetRate'), isCurrency: true, suffix: "/mi"),
-                      formatNum(getValue(item, 'maxDHPerWeek')),
                       formatNum(getValue(item, 'totalRevenue'), isCurrency: true),
                       formatNum(getValue(item, 'totalCost'), isCurrency: true),
                       formatNum(getValue(item, 'driverPay'), isCurrency: true),

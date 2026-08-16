@@ -207,8 +207,6 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
                 _buildGoalSettingsCard(),
                 SizedBox(height: 16.h),
                 _buildCalculatedTargetsCard(),
-                SizedBox(height: 16.h),
-                _buildDeadheadSuggestionsCard(),
                 SizedBox(height: 100.h),
               ],
             ),
@@ -292,20 +290,6 @@ class _RatePlannerPageState extends State<RatePlannerPage> {
       ),
     );
   }
-
-  Widget _buildDeadheadSuggestionsCard() {
-    return _buildSectionCard(
-      title: 'Deadhead Suggestions',
-      child: Row(
-        children: [
-          Expanded(child: _buildResultSubBox('Max DH Per Day', '${maxDHPerDay % 1 == 0 ? maxDHPerDay.toInt() : maxDHPerDay.toStringAsFixed(1)} mi')),
-          SizedBox(width: 16.w),
-          Expanded(child: _buildResultSubBox('Max DH Per Week', '${maxDHPerWeek % 1 == 0 ? maxDHPerWeek.toInt() : maxDHPerWeek.toStringAsFixed(1)} mi')),
-        ],
-      ),
-    );
-  }
-
 
 
   Widget _buildSectionCard({required String title, required Widget child}) {
