@@ -6,13 +6,13 @@ plugins {
 }
 
 android {
-    namespace = "com.gathering.social"
+    namespace = "com.truckcalc.app"
 
     compileSdk = 36
     ndkVersion = "28.2.13676358"
 
     defaultConfig {
-        applicationId = "com.gathering.social"
+        applicationId = "com.truckcalc.app"
         minSdk = flutter.minSdkVersion
         targetSdk = 36
         versionCode = flutter.versionCode

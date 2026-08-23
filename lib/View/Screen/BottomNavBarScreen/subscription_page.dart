@@ -24,8 +24,8 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
 
   // Google Play Console or Apple App Store Product IDs
   final Set<String> _productIds = {
-    'com.freight2you.truckcalc.monthly',
-    'com.freight2you.truckcalc.yearly',
+    'com.truckcalc.app.monthly',
+    'com.truckcalc.app.yearly',
   };
 
   @override
@@ -200,13 +200,17 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
     final bool showGlobalLoading = iapController.inProgress || _isPurchasing;
 
     // Resolve store-specific prices if loaded
+    ProductDetails? monthlyProduct;
+    ProductDetails? annualProduct;
     String monthlyPriceText = r'$9.99';
     String yearlyPriceText = r'$79.99';
 
     for (var p in _products) {
-      if (p.id == 'com.freight2you.truckcalc.monthly') {
+      if (p.id == 'com.truckcalc.app.monthly') {
+        monthlyProduct = p;
         monthlyPriceText = p.price;
-      } else if (p.id == 'com.freight2you.truckcalc.yearly') {
+      } else if (p.id == 'com.truckcalc.app.yearly') {
+        annualProduct = p;
         yearlyPriceText = p.price;
       }
     }
@@ -273,14 +277,14 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                                   'Full history',
                                   'PDF & CSV export',
                                   'Priority support',
-                                ], showButton: true, buttonText: 'Select Pro', productId: 'com.freight2you.truckcalc.monthly'),
+                                ], showButton: true, buttonText: 'Select Pro', productId: 'com.truckcalc.app.monthly'),
                                 SizedBox(height: 16.h),
                                 _buildPlanCard('Annual', yearlyPriceText, '/year', [
                                   'Unlimited calculations',
                                   'Full history',
                                   'PDF & CSV export',
                                   'Priority support',
-                                ], showButton: true, buttonText: 'Select Annual', isBestValue: true, productId: 'com.freight2you.truckcalc.yearly'),
+                                ], showButton: true, buttonText: 'Select Annual', isBestValue: true, productId: 'com.truckcalc.app.yearly'),
                                 SizedBox(height: 100.h),
                               ],
                             ),

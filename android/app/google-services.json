@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:844611876388:android:48b78e61599de31f7f4ab1",
         "android_client_info": {
-          "package_name": "com.gathering.social"
+          "package_name": "com.truckcalc.app"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "844611876388-uoau0hh36gedb5de9f18fuh0kiq49lbt.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.gathering.social",
+            "package_name": "com.truckcalc.app",
             "certificate_hash": "1ef31cac11a21253ee880e82066322ad89d218d8"
           }
         },
@@ -42,7 +42,7 @@
               "client_id": "844611876388-iupnq1g5meql74s4n5jjejj6pihabftp.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.gathering.social"
+                "bundle_id": "com.truckcalc.app"
               }
             }
           ]

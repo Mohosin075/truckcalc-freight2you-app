@@ -64,7 +64,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '844611876388',
     projectId: 'gathering-525c5',
     storageBucket: 'gathering-525c5.firebasestorage.app',
-    iosBundleId: 'com.carlos.gatheringapp',
+    iosBundleId: 'com.truckcalc.app',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
