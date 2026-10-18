@@ -152,9 +152,13 @@ class NetworkCaller {
 
       final response = await Dio().post(
         Urls.refreshTokenUrl,
+        data: {
+          'refreshToken': refreshToken,
+        },
         options: Options(
           headers: {
             'Cookie': 'refreshToken=$refreshToken',
+            'refresh-token': refreshToken,
             'Accept': 'application/json',
           },
         ),

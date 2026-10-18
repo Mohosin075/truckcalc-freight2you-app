@@ -86,7 +86,7 @@ class AuthController extends ChangeNotifier {
           _storage.read(key: _userIdKey).then((v) => _userId = v),
           _storage.read(key: _userNameKey).then((v) => _userName = v),
         ]),
-        Future.delayed(const Duration(seconds: 3))
+        Future.delayed(const Duration(seconds: 10))
             .then((_) => throw Exception("Storage timeout")),
       ]);
 
@@ -295,11 +295,28 @@ class AuthController extends ChangeNotifier {
     _userName = null;
     _isLoggedIn = false;
 
-    // SecureStorage migration may fail (BadPaddingException) — handle gracefully
     try {
-      await _storage.deleteAll();
+      final rememberMe = await _storage.read(key: 'remember_me');
+      final rememberedEmail = await _storage.read(key: 'remembered_email');
+      final rememberedPassword = await _storage.read(key: 'remembered_password');
+
+      await _storage.delete(key: _accessTokenKey);
+      await _storage.delete(key: _refreshTokenKey);
+      await _storage.delete(key: _userIdKey);
+      await _storage.delete(key: _userNameKey);
+
+      // Preserve remembered credentials
+      if (rememberMe != 'false') {
+        if (rememberedEmail != null && rememberedEmail.isNotEmpty) {
+          await _storage.write(key: 'remembered_email', value: rememberedEmail);
+        }
+        if (rememberedPassword != null && rememberedPassword.isNotEmpty) {
+          await _storage.write(key: 'remembered_password', value: rememberedPassword);
+        }
+        await _storage.write(key: 'remember_me', value: 'true');
+      }
     } catch (e) {
-      debugPrint("⚠️ SecureStorage deleteAll failed (ignored): $e");
+      debugPrint("⚠️ SecureStorage delete session failed: $e");
     }
 
     // Clean up default keys, but do NOT erase() the whole GetStorage (keeps user-specific backups)

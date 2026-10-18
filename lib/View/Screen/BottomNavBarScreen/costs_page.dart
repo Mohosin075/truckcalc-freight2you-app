@@ -1,3 +1,4 @@
+import 'package:truckcalc/View/Widgets/trial_expired_dialog.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -229,7 +230,11 @@ class _CostsPageState extends State<CostsPage> {
       }
     } else {
       if (mounted) {
-        showCustomSnackBar(context: context, message: controller.errorMessage ?? "Failed to save", isError: true);
+        if (controller.isTrialExpired || (controller.errorMessage?.toLowerCase().contains('trial') ?? false)) {
+          showTrialExpiredDialog(context);
+        } else {
+          showCustomSnackBar(context: context, message: controller.errorMessage ?? "Failed to save", isError: true);
+        }
       }
     }
   }

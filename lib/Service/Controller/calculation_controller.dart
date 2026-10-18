@@ -28,6 +28,16 @@ class CalculationController extends ChangeNotifier {
         (subscriptionStatus == 'active' || subscriptionStatus == 'trialing');
   }
 
+  bool get isTrialExpired {
+    if (_stats == null) return false;
+    if (isPremium) return false;
+    final planName = _stats!['planName'] ?? '';
+    final daysLeft = _stats!['planLeftDays'] ?? 0;
+    return _stats!['isTrialExpired'] == true ||
+        planName == 'Expired Trial' ||
+        (planName == 'Free Trial' && daysLeft <= 0);
+  }
+
   Future<bool> createCalculation(Map<String, dynamic> payload) async {
     _inProgress = true;
     _errorMessage = null;

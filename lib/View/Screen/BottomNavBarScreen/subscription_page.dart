@@ -1,3 +1,4 @@
+import 'package:truckcalc/Service/Controller/calculation_controller.dart';
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -44,6 +45,11 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
 
     // 2. Fetch available products from Apple App Store / Google Play Store
     _initStoreData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        Provider.of<CalculationController>(context, listen: false).fetchStats();
+      }
+    });
   }
 
   Future<void> _initStoreData() async {
@@ -231,13 +237,33 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                           'Subscription',
                           style: TextStyle(color: Colors.white, fontSize: 20.sp, fontWeight: FontWeight.w600),
                         ),
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFBC02D).withValues(alpha: 0.8), 
-                            borderRadius: BorderRadius.circular(10.r),
-                          ),
-                          child: Text('Trial', style: TextStyle(color: Colors.white, fontSize: 10.sp, fontWeight: FontWeight.bold)),
+                        Consumer<CalculationController>(
+                          builder: (context, calcCtrl, _) {
+                            final stats = calcCtrl.stats;
+                            final planName = stats?['planName'] ?? 'Free Trial';
+                            final daysLeft = stats?['planLeftDays'] ?? 0;
+                            final isPaid = planName == 'Pro' || planName == 'Annual';
+                            final isExpired = calcCtrl.isTrialExpired;
+
+                            final badgeText = isPaid
+                                ? planName
+                                : (isExpired ? 'Trial Expired' : 'Trial (${daysLeft}d left)');
+                            final badgeColor = isPaid
+                                ? const Color(0xFF00D193)
+                                : (isExpired ? const Color(0xFFD32F2F) : const Color(0xFFFBC02D));
+
+                            return Container(
+                              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                              decoration: BoxDecoration(
+                                color: badgeColor.withValues(alpha: 0.85),
+                                borderRadius: BorderRadius.circular(10.r),
+                              ),
+                              child: Text(
+                                badgeText,
+                                style: TextStyle(color: Colors.white, fontSize: 10.sp, fontWeight: FontWeight.bold),
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -249,21 +275,44 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                             padding: EdgeInsets.all(16.w),
                             child: Column(
                               children: [
-                                Container(
-                                  width: double.infinity,
-                                  padding: EdgeInsets.all(20.w),
-                                  decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
-                                      colors: [Color(0xFF880E4F), Color(0xFFE91E63)],
-                                      begin: Alignment.centerLeft,
-                                      end: Alignment.centerRight,
-                                    ),
-                                    borderRadius: BorderRadius.circular(16.r),
-                                  ),
-                                  child: Text(
-                                    'Your free trial ends in 5 days. Upgrade to keep full access.',
-                                    style: TextStyle(color: Colors.white, fontSize: 14.sp, fontWeight: FontWeight.w500),
-                                  ),
+                                Consumer<CalculationController>(
+                                  builder: (context, calcCtrl, _) {
+                                    final stats = calcCtrl.stats;
+                                    final planName = stats?['planName'] ?? 'Free Trial';
+                                    final daysLeft = stats?['planLeftDays'] ?? 0;
+                                    final isPaid = planName == 'Pro' || planName == 'Annual';
+                                    final isExpired = calcCtrl.isTrialExpired;
+
+                                    String bannerText;
+                                    if (isPaid) {
+                                      bannerText = 'You have full access with the $planName plan (${daysLeft} days remaining).';
+                                    } else if (isExpired) {
+                                      bannerText = 'Your 7-day free trial has expired. Upgrade to keep full access.';
+                                    } else {
+                                      bannerText = 'Your free trial ends in $daysLeft day${daysLeft == 1 ? '' : 's'}. Upgrade to keep full access.';
+                                    }
+
+                                    return Container(
+                                      width: double.infinity,
+                                      padding: EdgeInsets.all(20.w),
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: isPaid
+                                              ? [const Color(0xFF004D40), const Color(0xFF00D193)]
+                                              : (isExpired
+                                                  ? [const Color(0xFF5A0B1E), const Color(0xFFB71C1C)]
+                                                  : [const Color(0xFF880E4F), const Color(0xFFE91E63)]),
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight,
+                                        ),
+                                        borderRadius: BorderRadius.circular(16.r),
+                                      ),
+                                      child: Text(
+                                        bannerText,
+                                        style: TextStyle(color: Colors.white, fontSize: 14.sp, fontWeight: FontWeight.w600),
+                                      ),
+                                    );
+                                  },
                                 ),
                                 SizedBox(height: 20.h),
                                 _buildPlanCard('Free Trial', 'Free', '/7 days', [

@@ -195,8 +195,14 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget _buildSubscriptionCard(BuildContext context) {
     return Consumer<CalculationController>(
       builder: (context, controller, child) {
-        final planName = controller.stats?['planName'] ?? 'No Plan';
+        final rawPlan = controller.stats?['planName'] ?? 'Free Trial';
         final daysLeft = controller.stats?['planLeftDays'] ?? 0;
+        final isPaid = rawPlan == 'Pro' || rawPlan == 'Annual';
+        final isExpired = controller.isTrialExpired;
+
+        final displayName = isPaid
+            ? rawPlan
+            : (isExpired ? 'Expired Trial' : (rawPlan == 'No Plan' ? 'Free Trial' : rawPlan));
         
         return Container(
           padding: EdgeInsets.all(16.w),
@@ -213,14 +219,23 @@ class _ProfilePageState extends State<ProfilePage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(planName, style: TextStyle(color: Colors.white, fontSize: 14.sp, fontWeight: FontWeight.w500)),
+                  Text(displayName, style: TextStyle(color: Colors.white, fontSize: 14.sp, fontWeight: FontWeight.w500)),
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                     decoration: BoxDecoration(
-                      color: daysLeft < 7 ? const Color(0xFFD32F2F) : const Color(0xFF00D193), 
+                      color: isPaid
+                          ? const Color(0xFF00D193)
+                          : (isExpired
+                              ? const Color(0xFFD32F2F)
+                              : (daysLeft <= 2
+                                  ? const Color(0xFFD32F2F)
+                                  : const Color(0xFF00D193))),
                       borderRadius: BorderRadius.circular(10.r),
                     ),
-                    child: Text('${daysLeft}d left', style: TextStyle(color: Colors.white, fontSize: 10.sp, fontWeight: FontWeight.bold)),
+                    child: Text(
+                      isExpired ? 'Expired' : '${daysLeft}d left',
+                      style: TextStyle(color: Colors.white, fontSize: 10.sp, fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ],
               ),
