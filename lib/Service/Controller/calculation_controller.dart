@@ -160,7 +160,7 @@ class CalculationController extends ChangeNotifier {
         csvRows.add(["1. Load Profit & Surcharge Calculations"]);
         csvRows.add([
           'Date', 'Load #', 'Base Rate', 'Loaded Miles', 'Fuel Surcharge', 'Deadhead Miles', 'Tolls & Bonus', 
-          'Total Revenue', 'Total Cost', 'Driver Pay', 'Owner Pay', 'Net Profit'
+          'Total Revenue', 'Total Cost', 'Net Profit'
         ]);
         
         for (var item in loadCalcs) {
@@ -178,8 +178,6 @@ class CalculationController extends ChangeNotifier {
             formatNum(tolls + bonus, isCurrency: true),
             formatNum(getValue(item, 'totalRevenue'), isCurrency: true),
             formatNum(getValue(item, 'totalCost'), isCurrency: true),
-            formatNum(getValue(item, 'driverPay'), isCurrency: true),
-            formatNum(getValue(item, 'ownerPay'), isCurrency: true),
             formatNum(getValue(item, 'totalProfit'), isCurrency: true),
           ]);
         }
@@ -385,7 +383,7 @@ class CalculationController extends ChangeNotifier {
                   cellAlignment: pw.Alignment.center,
                   headers: [
                     'Date', 'Load #', 'Base Rate', 'Loaded Mi', 'Fuel Sur', 'DH Miles', 'Tolls/Bon', 
-                    'Revenue', 'Cost', 'Driver Pay', 'Owner Pay', 'Net Profit'
+                    'Revenue', 'Cost', 'Net Profit'
                   ],
                   data: loadCalcs.map((item) {
                     final date = "${item.createdAt.day}/${item.createdAt.month}/${item.createdAt.year}";
@@ -399,8 +397,6 @@ class CalculationController extends ChangeNotifier {
                       formatNum((double.tryParse(getValue(item, 'tolls')?.toString() ?? "0") ?? 0) + (double.tryParse(getValue(item, 'bonus')?.toString() ?? "0") ?? 0), isCurrency: true),
                       formatNum(getValue(item, 'totalRevenue'), isCurrency: true),
                       formatNum(getValue(item, 'totalCost'), isCurrency: true),
-                      formatNum(getValue(item, 'driverPay'), isCurrency: true),
-                      formatNum(getValue(item, 'ownerPay'), isCurrency: true),
                       formatNum(getValue(item, 'totalProfit'), isCurrency: true),
                     ];
                   }).toList(),

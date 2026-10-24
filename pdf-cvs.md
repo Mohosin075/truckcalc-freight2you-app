@@ -149,7 +149,7 @@ import 'package:pdf/widgets.dart' as pw;
                   cellAlignment: pw.Alignment.center,
                   headers: [
                     'Date', 'Base Rate', 'Loaded Mi', 'Fuel Sur', 'DH Miles', 'Tolls/Bon', 
-                    'Revenue', 'Cost', 'Driver Pay', 'Owner Pay', 'Net Profit'
+                    'Revenue', 'Cost', 'Net Profit'
                   ],
                   data: loadCalcs.map((item) {
                     final date = "${item.createdAt.day}/${item.createdAt.month}/${item.createdAt.year}";
@@ -162,8 +162,6 @@ import 'package:pdf/widgets.dart' as pw;
                       formatNum((double.tryParse(getValue(item, 'tolls')?.toString() ?? "0") ?? 0) + (double.tryParse(getValue(item, 'bonus')?.toString() ?? "0") ?? 0), isCurrency: true),
                       formatNum(getValue(item, 'totalRevenue'), isCurrency: true),
                       formatNum(getValue(item, 'totalCost'), isCurrency: true),
-                      formatNum(getValue(item, 'driverPay'), isCurrency: true),
-                      formatNum(getValue(item, 'ownerPay'), isCurrency: true),
                       formatNum(getValue(item, 'totalProfit'), isCurrency: true),
                     ];
                   }).toList(),
