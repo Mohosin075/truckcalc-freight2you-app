@@ -1,3 +1,4 @@
+import 'package:truckcalc/Service/Controller/calculation_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:truckcalc/View/Screen/BottomNavBarScreen/load_calculator_page.dart';
@@ -65,7 +66,12 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
     const Color activeColor = Color(0xFF00D193); 
     
     return GestureDetector(
-      onTap: () => controller.onItemTapped(index),
+      onTap: () {
+        controller.onItemTapped(index);
+        if (index == 3) {
+          Provider.of<CalculationController>(context, listen: false).fetchCalculations();
+        }
+      },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         width: 60.w,

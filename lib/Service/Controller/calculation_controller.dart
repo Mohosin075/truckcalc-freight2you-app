@@ -45,11 +45,11 @@ class CalculationController extends ChangeNotifier {
 
     final response = await CalculationService.createCalculation(payload);
 
-    _inProgress = false;
     if (response.isSuccess) {
-      notifyListeners();
+      await fetchCalculations();
       return true;
     } else {
+      _inProgress = false;
       _errorMessage = response.errorMessage ?? "Failed to create calculation";
       notifyListeners();
       return false;
@@ -105,7 +105,7 @@ class CalculationController extends ChangeNotifier {
 
     try {
       final List<ExportedCalculation> list = await CalculationService.exportCalculationsFlat();
-      
+
       if (list.isEmpty) {
         _errorMessage = "No calculations found to export";
         _inProgress = false;
@@ -142,95 +142,127 @@ class CalculationController extends ChangeNotifier {
         return isCurrency ? "\$$formatted$suffix" : "$formatted$suffix";
       }
 
-      // ক্যালকুলেশন টাইপ অনুযায়ী গ্রুপ করা
-      final loadCalcs = list.where((e) => e.type == 'LOAD').toList();
-      final goalCalcs = list.where((e) => e.type == 'GOAL').toList();
-      final costCalcs = list.where((e) => e.type == 'COST').toList();
+      // ৪টি প্রয়োজনীয় ফিল্ড নিখুঁতভাবে এক্সট্রাক্ট করার হেল্পার
+      Map<String, double> extract4Fields(ExportedCalculation item) {
+        // ১. Total (include DH and loaded miles)
+        double loadedMiles = double.tryParse(getValue(item, 'loadedMiles')?.toString() ?? "0") ?? 0;
+        double dhMiles = double.tryParse(getValue(item, 'dhMiles')?.toString() ?? "0") ?? 0;
+        double totalMiles = double.tryParse(getValue(item, 'totalMiles')?.toString() ?? "0") ?? 0;
+        if (totalMiles == 0 && (loadedMiles > 0 || dhMiles > 0)) {
+          totalMiles = loadedMiles + dhMiles;
+        }
+        if (totalMiles == 0 && item.type == 'GOAL') {
+          totalMiles = double.tryParse(getValue(item, 'loadedMilesNeeded')?.toString() ?? "0") ?? 0;
+        }
+        if (totalMiles == 0 && item.type == 'COST') {
+          totalMiles = double.tryParse(getValue(item, 'milesPerWeek')?.toString() ?? "0") ?? 0;
+        }
+
+        // ২. Total Gross Revenue (Includes: Fuel Surcharge paid, Tolls paid, DH paid and bonuses paid)
+        double baseRate = double.tryParse(getValue(item, 'baseRate')?.toString() ?? "0") ?? 0;
+        double fuelSurcharge = double.tryParse(getValue(item, 'fuelSurcharge')?.toString() ?? "0") ?? 0;
+        double dhRate = double.tryParse(getValue(item, 'dhRate')?.toString() ?? "0") ?? 0;
+        double tolls = double.tryParse(getValue(item, 'tolls')?.toString() ?? "0") ?? 0;
+        double bonus = double.tryParse(getValue(item, 'bonus')?.toString() ?? "0") ?? 0;
+        double totalFSC = double.tryParse(getValue(item, 'totalFSC')?.toString() ?? "0") ?? (fuelSurcharge * loadedMiles);
+        double totalDH = double.tryParse(getValue(item, 'totalDH')?.toString() ?? "0") ?? (dhRate * dhMiles);
+
+        double totalRevenue = double.tryParse(getValue(item, 'totalRevenue')?.toString() ?? "0") ?? 0;
+        if (totalRevenue == 0 && item.type == 'LOAD') {
+          totalRevenue = (baseRate * loadedMiles) + totalFSC + totalDH + bonus + tolls;
+        }
+
+        // ৩. Total Costs
+        double totalCost = double.tryParse(getValue(item, 'totalCost')?.toString() ?? "0") ?? 0;
+        if (totalCost == 0 && item.type == 'LOAD') {
+          double costPerMile = double.tryParse(getValue(item, 'costPerMile')?.toString() ?? "0") ?? 0;
+          totalCost = totalMiles * costPerMile;
+        }
+        if (totalCost == 0 && item.type == 'COST') {
+          totalCost = double.tryParse(getValue(item, 'totalWeeklyOperatingCost')?.toString() ?? "0") ?? 0;
+        }
+
+        // ৪. Total Net Profit
+        double totalProfit = double.tryParse(getValue(item, 'totalProfit')?.toString() ?? "0") ?? 0;
+        if (totalProfit == 0 && (totalRevenue != 0 || totalCost != 0)) {
+          totalProfit = totalRevenue - totalCost;
+        }
+        if (totalProfit == 0 && item.type == 'GOAL') {
+          totalProfit = double.tryParse(getValue(item, 'desiredWeeklyProfit')?.toString() ?? "0") ?? (totalRevenue - totalCost);
+        }
+
+        return {
+          'totalMiles': totalMiles,
+          'totalRevenue': totalRevenue,
+          'totalCost': totalCost,
+          'totalProfit': totalProfit,
+        };
+      }
+
+      String getTitle(ExportedCalculation item) {
+        if (item.type == 'LOAD') {
+          final loadNum = getValue(item, 'loadNumber')?.toString().trim();
+          return (loadNum != null && loadNum.isNotEmpty && loadNum != '-')
+              ? "Load #$loadNum"
+              : "Load Calculation";
+        } else if (item.type == 'GOAL') {
+          return "Weekly Goal";
+        } else if (item.type == 'COST') {
+          return "Operating Cost";
+        }
+        return "Calculation";
+      }
+
+      String getDate(ExportedCalculation item) {
+        return "${item.createdAt.day.toString().padLeft(2, '0')}/${item.createdAt.month.toString().padLeft(2, '0')}/${item.createdAt.year}";
+      }
+
+      final targetList = list;
 
       List<List<dynamic>> csvRows = [];
 
-      // ১. মেইন হেডার
-      csvRows.add(["Trucking Financial Report"]);
-      csvRows.add(["Generated on:", "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year} at ${DateTime.now().hour}:${DateTime.now().minute.toString().padLeft(2, '0')}"]);
-      csvRows.add(["Total Calculations:", list.length.toString()]);
-      csvRows.add([]); // ফাকা সারি
+      // Date এবং Calculation / Load # কলাম সহ হেডার
+      csvRows.add([
+        "Date",
+        "Calculation #",
+        "Total (include DH and loaded miles)",
+        "Total Gross Revenue",
+        "Total Costs",
+        "Total Net Profit"
+      ]);
 
-      // ২. LOAD Calculations Section
-      if (loadCalcs.isNotEmpty) {
-        csvRows.add(["1. Load Profit & Surcharge Calculations"]);
+      double sumMiles = 0;
+      double sumRevenue = 0;
+      double sumCosts = 0;
+      double sumProfit = 0;
+
+      for (var item in targetList) {
+        final data = extract4Fields(item);
+        sumMiles += data['totalMiles']!;
+        sumRevenue += data['totalRevenue']!;
+        sumCosts += data['totalCost']!;
+        sumProfit += data['totalProfit']!;
+
         csvRows.add([
-          'Date', 'Load #', 'Base Rate', 'Loaded Miles', 'Fuel Surcharge', 'Deadhead Miles', 'Tolls & Bonus', 
-          'Total Revenue', 'Total Cost', 'Net Profit'
+          getDate(item),
+          getTitle(item),
+          formatNum(data['totalMiles']),
+          formatNum(data['totalRevenue']),
+          formatNum(data['totalCost']),
+          formatNum(data['totalProfit']),
         ]);
-        
-        for (var item in loadCalcs) {
-          final date = "${item.createdAt.day}/${item.createdAt.month}/${item.createdAt.year}";
-          double tolls = double.tryParse(getValue(item, 'tolls')?.toString() ?? "0") ?? 0;
-          double bonus = double.tryParse(getValue(item, 'bonus')?.toString() ?? "0") ?? 0;
-          
-          csvRows.add([
-            date,
-            getValue(item, 'loadNumber')?.toString() ?? "-",
-            formatNum(getValue(item, 'baseRate'), isCurrency: true, suffix: "/mi"),
-            formatNum(getValue(item, 'loadedMiles')),
-            formatNum(getValue(item, 'fuelSurcharge'), isCurrency: true, suffix: "/mi"),
-            formatNum(getValue(item, 'dhMiles')),
-            formatNum(tolls + bonus, isCurrency: true),
-            formatNum(getValue(item, 'totalRevenue'), isCurrency: true),
-            formatNum(getValue(item, 'totalCost'), isCurrency: true),
-            formatNum(getValue(item, 'totalProfit'), isCurrency: true),
-          ]);
-        }
-        csvRows.add([]); // ফাকা সারি
       }
 
-      // ৩. GOAL Calculations Section
-      if (goalCalcs.isNotEmpty) {
-        csvRows.add(["2. Rate Planner & Weekly Goal Target Calculations"]);
+      // একাধিক লোড থাকলে নিচে সামারি/টোটাল রো যোগ করা
+      if (targetList.length > 1) {
         csvRows.add([
-          'Date', 'Desired Profit', 'Miles Needed', 'Min Target Rate', 
-          'Est. Revenue', 'Est. Cost', 'Driver Share', 'Owner Share'
+          "TOTAL",
+          "-",
+          formatNum(sumMiles),
+          formatNum(sumRevenue),
+          formatNum(sumCosts),
+          formatNum(sumProfit),
         ]);
-        
-        for (var item in goalCalcs) {
-          final date = "${item.createdAt.day}/${item.createdAt.month}/${item.createdAt.year}";
-          csvRows.add([
-            date,
-            formatNum(getValue(item, 'desiredWeeklyProfit'), isCurrency: true),
-            formatNum(getValue(item, 'loadedMilesNeeded')),
-            formatNum(getValue(item, 'minTargetRate'), isCurrency: true, suffix: "/mi"),
-            formatNum(getValue(item, 'totalRevenue'), isCurrency: true),
-            formatNum(getValue(item, 'totalCost'), isCurrency: true),
-            formatNum(getValue(item, 'driverPay'), isCurrency: true),
-            formatNum(getValue(item, 'ownerPay'), isCurrency: true),
-          ]);
-        }
-        csvRows.add([]); // ফাকা সারি
-      }
-
-      // ৪. COST Calculations Section
-      if (costCalcs.isNotEmpty) {
-        csvRows.add(["3. CPM (Cost Per Mile) & Operating Cost Breakdown"]);
-        csvRows.add([
-          'Date', 'Miles/Week', 'Fixed Costs/Wk', 'Fuel Cost/Wk', 'Oil Change/Wk', 
-          'Tire Cost/Wk', 'Maint Cost/Wk', 'Total Variable/Wk', 'Operating Cost/Wk', 'True CPM'
-        ]);
-        
-        for (var item in costCalcs) {
-          final date = "${item.createdAt.day}/${item.createdAt.month}/${item.createdAt.year}";
-          csvRows.add([
-            date,
-            formatNum(getValue(item, 'milesPerWeek')),
-            formatNum(getValue(item, 'totalWeeklyFixed'), isCurrency: true),
-            formatNum(getValue(item, 'weeklyFuelCost'), isCurrency: true),
-            formatNum(getValue(item, 'weeklyOilChangeCost'), isCurrency: true),
-            formatNum(getValue(item, 'weeklyTireCost'), isCurrency: true),
-            formatNum(getValue(item, 'weeklyMaintenanceCost'), isCurrency: true),
-            formatNum(getValue(item, 'totalWeeklyVariable'), isCurrency: true),
-            formatNum(getValue(item, 'totalWeeklyOperatingCost'), isCurrency: true),
-            formatNum(getValue(item, 'trueCPM'), isCurrency: true, suffix: "/mi"),
-          ]);
-        }
       }
 
       // ৫. List of lists-কে RFC 4180 কমপ্লায়েন্ট CSV স্ট্রিং-এ রূপান্তর করা
@@ -274,7 +306,7 @@ class CalculationController extends ChangeNotifier {
     try {
       // ১. ব্যাকএন্ড থেকে হিসাবের তালিকা তুলে আনা
       final List<ExportedCalculation> list = await CalculationService.exportCalculationsFlat();
-      
+
       if (list.isEmpty) {
         _errorMessage = "No calculations found to export";
         _inProgress = false;
@@ -311,15 +343,120 @@ class CalculationController extends ChangeNotifier {
         return isCurrency ? "\$$formatted$suffix" : "$formatted$suffix";
       }
 
-      // ক্যালকুলেশন টাইপ অনুযায়ী গ্রুপ করা
-      final loadCalcs = list.where((e) => e.type == 'LOAD').toList();
-      final goalCalcs = list.where((e) => e.type == 'GOAL').toList();
-      final costCalcs = list.where((e) => e.type == 'COST').toList();
+      // ৪টি প্রয়োজনীয় ফিল্ড নিখুঁতভাবে এক্সট্রাক্ট করার হেল্পার
+      Map<String, double> extract4Fields(ExportedCalculation item) {
+        // ১. Total (include DH and loaded miles)
+        double loadedMiles = double.tryParse(getValue(item, 'loadedMiles')?.toString() ?? "0") ?? 0;
+        double dhMiles = double.tryParse(getValue(item, 'dhMiles')?.toString() ?? "0") ?? 0;
+        double totalMiles = double.tryParse(getValue(item, 'totalMiles')?.toString() ?? "0") ?? 0;
+        if (totalMiles == 0 && (loadedMiles > 0 || dhMiles > 0)) {
+          totalMiles = loadedMiles + dhMiles;
+        }
+        if (totalMiles == 0 && item.type == 'GOAL') {
+          totalMiles = double.tryParse(getValue(item, 'loadedMilesNeeded')?.toString() ?? "0") ?? 0;
+        }
+        if (totalMiles == 0 && item.type == 'COST') {
+          totalMiles = double.tryParse(getValue(item, 'milesPerWeek')?.toString() ?? "0") ?? 0;
+        }
+
+        // ২. Total Gross Revenue (Includes: Fuel Surcharge paid, Tolls paid, DH paid and bonuses paid)
+        double baseRate = double.tryParse(getValue(item, 'baseRate')?.toString() ?? "0") ?? 0;
+        double fuelSurcharge = double.tryParse(getValue(item, 'fuelSurcharge')?.toString() ?? "0") ?? 0;
+        double dhRate = double.tryParse(getValue(item, 'dhRate')?.toString() ?? "0") ?? 0;
+        double tolls = double.tryParse(getValue(item, 'tolls')?.toString() ?? "0") ?? 0;
+        double bonus = double.tryParse(getValue(item, 'bonus')?.toString() ?? "0") ?? 0;
+        double totalFSC = double.tryParse(getValue(item, 'totalFSC')?.toString() ?? "0") ?? (fuelSurcharge * loadedMiles);
+        double totalDH = double.tryParse(getValue(item, 'totalDH')?.toString() ?? "0") ?? (dhRate * dhMiles);
+
+        double totalRevenue = double.tryParse(getValue(item, 'totalRevenue')?.toString() ?? "0") ?? 0;
+        if (totalRevenue == 0 && item.type == 'LOAD') {
+          totalRevenue = (baseRate * loadedMiles) + totalFSC + totalDH + bonus + tolls;
+        }
+
+        // ৩. Total Costs
+        double totalCost = double.tryParse(getValue(item, 'totalCost')?.toString() ?? "0") ?? 0;
+        if (totalCost == 0 && item.type == 'LOAD') {
+          double costPerMile = double.tryParse(getValue(item, 'costPerMile')?.toString() ?? "0") ?? 0;
+          totalCost = totalMiles * costPerMile;
+        }
+        if (totalCost == 0 && item.type == 'COST') {
+          totalCost = double.tryParse(getValue(item, 'totalWeeklyOperatingCost')?.toString() ?? "0") ?? 0;
+        }
+
+        // ৪. Total Net Profit
+        double totalProfit = double.tryParse(getValue(item, 'totalProfit')?.toString() ?? "0") ?? 0;
+        if (totalProfit == 0 && (totalRevenue != 0 || totalCost != 0)) {
+          totalProfit = totalRevenue - totalCost;
+        }
+        if (totalProfit == 0 && item.type == 'GOAL') {
+          totalProfit = double.tryParse(getValue(item, 'desiredWeeklyProfit')?.toString() ?? "0") ?? (totalRevenue - totalCost);
+        }
+
+        return {
+          'totalMiles': totalMiles,
+          'totalRevenue': totalRevenue,
+          'totalCost': totalCost,
+          'totalProfit': totalProfit,
+        };
+      }
+
+      String getTitle(ExportedCalculation item) {
+        if (item.type == 'LOAD') {
+          final loadNum = getValue(item, 'loadNumber')?.toString().trim();
+          return (loadNum != null && loadNum.isNotEmpty && loadNum != '-')
+              ? "Load #$loadNum"
+              : "Load Calculation";
+        } else if (item.type == 'GOAL') {
+          return "Weekly Goal";
+        } else if (item.type == 'COST') {
+          return "Operating Cost";
+        }
+        return "Calculation";
+      }
+
+      String getDate(ExportedCalculation item) {
+        return "${item.createdAt.day.toString().padLeft(2, '0')}/${item.createdAt.month.toString().padLeft(2, '0')}/${item.createdAt.year}";
+      }
+
+      final targetList = list;
+
+      double sumMiles = 0;
+      double sumRevenue = 0;
+      double sumCosts = 0;
+      double sumProfit = 0;
+
+      final tableData = targetList.map((item) {
+        final data = extract4Fields(item);
+        sumMiles += data['totalMiles']!;
+        sumRevenue += data['totalRevenue']!;
+        sumCosts += data['totalCost']!;
+        sumProfit += data['totalProfit']!;
+
+        return [
+          getDate(item),
+          getTitle(item),
+          formatNum(data['totalMiles']),
+          formatNum(data['totalRevenue'], isCurrency: true),
+          formatNum(data['totalCost'], isCurrency: true),
+          formatNum(data['totalProfit'], isCurrency: true),
+        ];
+      }).toList();
+
+      if (targetList.length > 1) {
+        tableData.add([
+          "TOTAL",
+          "-",
+          formatNum(sumMiles),
+          formatNum(sumRevenue, isCurrency: true),
+          formatNum(sumCosts, isCurrency: true),
+          formatNum(sumProfit, isCurrency: true),
+        ]);
+      }
 
       // ২. PDF ডকুমেন্ট তৈরি করা
       final pdf = pw.Document();
 
-      // ৩. PDF পেজ লেআউট ও টেবিল ডিজাইন করা
+      // ৩. PDF পেজ লেআউট ও টেবিল ডিজাইন করা (Date + Calculation / Load # + ৪টি কলাম)
       pdf.addPage(
         pw.MultiPage(
           pageFormat: PdfPageFormat.a4,
@@ -328,9 +465,9 @@ class CalculationController extends ChangeNotifier {
             return [
               // কাস্টম হেডার ডিজাইন
               pw.Container(
-                padding: const pw.EdgeInsets.only(bottom: 10),
+                padding: const pw.EdgeInsets.only(bottom: 12),
                 decoration: const pw.BoxDecoration(
-                  border: pw.Border(bottom: pw.BorderSide(color: PdfColors.grey400, width: 2)),
+                  border: pw.Border(bottom: pw.BorderSide(color: PdfColors.blueGrey700, width: 2)),
                 ),
                 child: pw.Row(
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
@@ -339,145 +476,50 @@ class CalculationController extends ChangeNotifier {
                       crossAxisAlignment: pw.CrossAxisAlignment.start,
                       children: [
                         pw.Text(
-                          "Trucking Financial Report", 
+                          "Trucking Financial Report",
                           style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold, color: PdfColors.blueGrey900)
                         ),
                         pw.SizedBox(height: 4),
                         pw.Text(
-                          "Generated on: ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year} at ${DateTime.now().hour}:${DateTime.now().minute.toString().padLeft(2, '0')}", 
+                          "Generated on: ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year} at ${DateTime.now().hour}:${DateTime.now().minute.toString().padLeft(2, '0')}",
                           style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey600)
                         ),
                       ]
                     ),
                     pw.Container(
-                      padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const pw.EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                       decoration: pw.BoxDecoration(
-                        color: PdfColors.blue100,
+                        color: PdfColors.blueGrey100,
                         borderRadius: pw.BorderRadius.circular(4),
                       ),
                       child: pw.Text(
-                        "TOTAL CALCS: ${list.length}", 
-                        style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, color: PdfColors.blue900)
+                        "RECORDS: ${targetList.length}",
+                        style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: PdfColors.blueGrey900)
                       ),
                     ),
                   ]
                 )
               ),
-              pw.SizedBox(height: 15),
+              pw.SizedBox(height: 18),
 
-              // ================= SECTION 1: LOAD CALCULATIONS =================
-              if (loadCalcs.isNotEmpty) ...[
-                pw.Container(
-                  margin: const pw.EdgeInsets.symmetric(vertical: 8),
-                  child: pw.Text(
-                    "1. Load Profit & Surcharge Calculations",
-                    style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold, color: PdfColors.blueGrey800),
-                  ),
-                ),
-                pw.TableHelper.fromTextArray(
-                  border: pw.TableBorder.all(color: PdfColors.grey300, width: 0.5),
-                  headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 7, color: PdfColors.white),
-                  headerDecoration: const pw.BoxDecoration(color: PdfColors.blueGrey800),
-                  cellStyle: const pw.TextStyle(fontSize: 6.5),
-                  cellPadding: const pw.EdgeInsets.symmetric(horizontal: 3, vertical: 3),
-                  cellAlignment: pw.Alignment.center,
-                  headers: [
-                    'Date', 'Load #', 'Base Rate', 'Loaded Mi', 'Fuel Sur', 'DH Miles', 'Tolls/Bon', 
-                    'Revenue', 'Cost', 'Net Profit'
-                  ],
-                  data: loadCalcs.map((item) {
-                    final date = "${item.createdAt.day}/${item.createdAt.month}/${item.createdAt.year}";
-                    return [
-                      date,
-                      getValue(item, 'loadNumber')?.toString() ?? "-",
-                      formatNum(getValue(item, 'baseRate'), isCurrency: true, suffix: "/mi"),
-                      formatNum(getValue(item, 'loadedMiles')),
-                      formatNum(getValue(item, 'fuelSurcharge'), isCurrency: true, suffix: "/mi"),
-                      formatNum(getValue(item, 'dhMiles')),
-                      formatNum((double.tryParse(getValue(item, 'tolls')?.toString() ?? "0") ?? 0) + (double.tryParse(getValue(item, 'bonus')?.toString() ?? "0") ?? 0), isCurrency: true),
-                      formatNum(getValue(item, 'totalRevenue'), isCurrency: true),
-                      formatNum(getValue(item, 'totalCost'), isCurrency: true),
-                      formatNum(getValue(item, 'totalProfit'), isCurrency: true),
-                    ];
-                  }).toList(),
-                ),
-                pw.SizedBox(height: 15),
-              ],
-
-              // ================= SECTION 2: RATE & GOAL PLANNER =================
-              if (goalCalcs.isNotEmpty) ...[
-                pw.Container(
-                  margin: const pw.EdgeInsets.symmetric(vertical: 8),
-                  child: pw.Text(
-                    "2. Rate Planner & Weekly Goal Target Calculations",
-                    style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold, color: PdfColors.blueGrey800),
-                  ),
-                ),
-                pw.TableHelper.fromTextArray(
-                  border: pw.TableBorder.all(color: PdfColors.grey300, width: 0.5),
-                  headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 7.5, color: PdfColors.white),
-                  headerDecoration: const pw.BoxDecoration(color: PdfColors.teal800),
-                  cellStyle: const pw.TextStyle(fontSize: 7),
-                  cellPadding: const pw.EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                  cellAlignment: pw.Alignment.center,
-                  headers: [
-                    'Date', 'Desired Profit', 'Miles Needed', 'Min Target Rate', 
-                    'Est. Revenue', 'Est. Cost', 'Driver Share', 'Owner Share'
-                  ],
-                  data: goalCalcs.map((item) {
-                    final date = "${item.createdAt.day}/${item.createdAt.month}/${item.createdAt.year}";
-                    return [
-                      date,
-                      formatNum(getValue(item, 'desiredWeeklyProfit'), isCurrency: true),
-                      formatNum(getValue(item, 'loadedMilesNeeded')),
-                      formatNum(getValue(item, 'minTargetRate'), isCurrency: true, suffix: "/mi"),
-                      formatNum(getValue(item, 'totalRevenue'), isCurrency: true),
-                      formatNum(getValue(item, 'totalCost'), isCurrency: true),
-                      formatNum(getValue(item, 'driverPay'), isCurrency: true),
-                      formatNum(getValue(item, 'ownerPay'), isCurrency: true),
-                    ];
-                  }).toList(),
-                ),
-                pw.SizedBox(height: 15),
-              ],
-
-              // ================= SECTION 3: CPM (COST PER MILE) =================
-              if (costCalcs.isNotEmpty) ...[
-                pw.Container(
-                  margin: const pw.EdgeInsets.symmetric(vertical: 8),
-                  child: pw.Text(
-                    "3. CPM (Cost Per Mile) & Operating Cost Breakdown",
-                    style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold, color: PdfColors.blueGrey800),
-                  ),
-                ),
-                pw.TableHelper.fromTextArray(
-                  border: pw.TableBorder.all(color: PdfColors.grey300, width: 0.5),
-                  headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 7, color: PdfColors.white),
-                  headerDecoration: const pw.BoxDecoration(color: PdfColors.brown800),
-                  cellStyle: const pw.TextStyle(fontSize: 6.5),
-                  cellPadding: const pw.EdgeInsets.symmetric(horizontal: 3, vertical: 3.5),
-                  cellAlignment: pw.Alignment.center,
-                  headers: [
-                    'Date', 'Miles/Wk', 'Fixed/Wk', 'Fuel/Wk', 'Oil/Wk', 
-                    'Tires/Wk', 'Maint/Wk', 'Variable/Wk', 'Operating Cost/Wk', 'True CPM'
-                  ],
-                  data: costCalcs.map((item) {
-                    final date = "${item.createdAt.day}/${item.createdAt.month}/${item.createdAt.year}";
-                    return [
-                      date,
-                      formatNum(getValue(item, 'milesPerWeek')),
-                      formatNum(getValue(item, 'totalWeeklyFixed'), isCurrency: true),
-                      formatNum(getValue(item, 'weeklyFuelCost'), isCurrency: true),
-                      formatNum(getValue(item, 'weeklyOilChangeCost'), isCurrency: true),
-                      formatNum(getValue(item, 'weeklyTireCost'), isCurrency: true),
-                      formatNum(getValue(item, 'weeklyMaintenanceCost'), isCurrency: true),
-                      formatNum(getValue(item, 'totalWeeklyVariable'), isCurrency: true),
-                      formatNum(getValue(item, 'totalWeeklyOperatingCost'), isCurrency: true),
-                      formatNum(getValue(item, 'trueCPM'), isCurrency: true, suffix: "/mi"),
-                    ];
-                  }).toList(),
-                ),
-              ],
+              // ================= Date, Calculation / Load # ও ৪টি কলাম সম্বলিত টেবিল =================
+              pw.TableHelper.fromTextArray(
+                border: pw.TableBorder.all(color: PdfColors.grey300, width: 0.5),
+                headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8, color: PdfColors.white),
+                headerDecoration: const pw.BoxDecoration(color: PdfColors.blueGrey800),
+                cellStyle: const pw.TextStyle(fontSize: 7.5),
+                cellPadding: const pw.EdgeInsets.symmetric(horizontal: 6, vertical: 6.5),
+                cellAlignment: pw.Alignment.center,
+                headers: [
+                  'Date',
+                  'Calculation #',
+                  'Total (include DH and loaded miles)',
+                  'Total Gross Revenue',
+                  'Total Costs',
+                  'Total Net Profit'
+                ],
+                data: tableData,
+              ),
             ];
           },
         ),
@@ -488,7 +530,7 @@ class CalculationController extends ChangeNotifier {
       final pathOfTheFile = "${directory.path}/calculations_report_${DateTime.now().millisecondsSinceEpoch}.pdf";
       final file = File(pathOfTheFile);
       await file.writeAsBytes(await pdf.save());
-      
+
       // 6. Open Native OS Save Dialog (direct download to Downloads or custom folder)
       final params = SaveFileDialogParams(sourceFilePath: pathOfTheFile);
       final filePath = await FlutterFileDialog.saveFile(params: params);

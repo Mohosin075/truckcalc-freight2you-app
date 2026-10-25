@@ -81,29 +81,45 @@ class _ExportPageState extends State<ExportPage> {
         child: SafeArea(
           child: Consumer<CalculationController>(
             builder: (context, controller, child) {
-              return SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Export',
-                      style: TextStyle(color: Colors.white, fontSize: 22.sp, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 20.h),
-                    Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.all(16.w),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF00302E).withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(16.r),
-                        border: Border.all(color: const Color(0xFF00D193).withOpacity(0.2)),
+              return RefreshIndicator(
+                onRefresh: () => controller.fetchCalculations(),
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Export',
+                        style: TextStyle(color: Colors.white, fontSize: 22.sp, fontWeight: FontWeight.bold),
                       ),
-                      child: Text(
-                        '${controller.calculations.length} calculations ready to export',
-                        style: const TextStyle(color: Color(0xFF00D193), fontWeight: FontWeight.bold, fontSize: 13),
+                      SizedBox(height: 20.h),
+                      Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.all(16.w),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF00302E).withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(16.r),
+                          border: Border.all(color: const Color(0xFF00D193).withOpacity(0.2)),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              controller.inProgress
+                                  ? 'Loading calculations...'
+                                  : '${controller.calculations.length} calculations ready to export',
+                              style: const TextStyle(color: Color(0xFF00D193), fontWeight: FontWeight.bold, fontSize: 13),
+                            ),
+                            if (controller.inProgress)
+                              const SizedBox(
+                                width: 14,
+                                height: 14,
+                                child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF00D193)),
+                              ),
+                          ],
+                        ),
                       ),
-                    ),
                     SizedBox(height: 20.h),
                     _buildExportCard(
                       'CSV Export',
@@ -134,7 +150,8 @@ class _ExportPageState extends State<ExportPage> {
                     SizedBox(height: 100.h),
                   ],
                 ),
-              );
+              ),
+            );
             },
           ),
         ),
@@ -212,7 +229,7 @@ class _ExportPageState extends State<ExportPage> {
         children: calculations.take(3).map((calc) {
           String text = "";
           if (calc.type == 'LOAD' && calc.loadData != null) {
-            text = 'Load: ${calc.loadData!.loadedMiles}mi + ${calc.loadData!.dhMiles}DH = Profit: \$${calc.loadData!.totalProfit?.toStringAsFixed(0)}';
+            text = 'Load: ${(calc.loadData!.loadedMiles ?? 0) + (calc.loadData!.dhMiles ?? 0)} mi | Rev: \${calc.loadData!.totalRevenue?.toStringAsFixed(0)} | Cost: \${calc.loadData!.totalCost?.toStringAsFixed(0)} | Profit: \${calc.loadData!.totalProfit?.toStringAsFixed(0)}';
           } else if (calc.type == 'GOAL' && calc.goalData != null) {
             text = 'Goal: \$${calc.goalData!.desiredWeeklyProfit} = Need ${calc.goalData!.loadedMilesNeeded}mi';
           } else if (calc.type == 'COST' && calc.costData != null) {
