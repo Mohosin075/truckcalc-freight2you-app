@@ -1,3 +1,4 @@
+import 'package:truckcalc/Utils/report_formatting.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -229,7 +230,7 @@ class _ExportPageState extends State<ExportPage> {
         children: calculations.take(3).map((calc) {
           String text = "";
           if (calc.type == 'LOAD' && calc.loadData != null) {
-            text = 'Load: ${(calc.loadData!.loadedMiles ?? 0) + (calc.loadData!.dhMiles ?? 0)} mi | Rev: \${calc.loadData!.totalRevenue?.toStringAsFixed(0)} | Cost: \${calc.loadData!.totalCost?.toStringAsFixed(0)} | Profit: \${calc.loadData!.totalProfit?.toStringAsFixed(0)}';
+            text = formatLoadPreview(calc.loadData!);
           } else if (calc.type == 'GOAL' && calc.goalData != null) {
             text = 'Goal: \$${calc.goalData!.desiredWeeklyProfit} = Need ${calc.goalData!.loadedMilesNeeded}mi';
           } else if (calc.type == 'COST' && calc.costData != null) {
