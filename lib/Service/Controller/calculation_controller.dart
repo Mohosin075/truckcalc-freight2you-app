@@ -1,3 +1,4 @@
+import 'package:truckcalc/Utils/report_formatting.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -214,7 +215,7 @@ class CalculationController extends ChangeNotifier {
       }
 
       String getDate(ExportedCalculation item) {
-        return "${item.createdAt.day.toString().padLeft(2, '0')}/${item.createdAt.month.toString().padLeft(2, '0')}/${item.createdAt.year}";
+        return formatReportDate(item.createdAt);
       }
 
       final targetList = list;
@@ -415,7 +416,7 @@ class CalculationController extends ChangeNotifier {
       }
 
       String getDate(ExportedCalculation item) {
-        return "${item.createdAt.day.toString().padLeft(2, '0')}/${item.createdAt.month.toString().padLeft(2, '0')}/${item.createdAt.year}";
+        return formatReportDate(item.createdAt);
       }
 
       final targetList = list;
